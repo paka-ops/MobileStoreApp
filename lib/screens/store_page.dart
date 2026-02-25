@@ -64,166 +64,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     super.initState();
     getEmployeeByStoreId(widget.store.id);
   }
-
-  // --- POPUP FORMULAIRE AJOUT PERSONNEL AVEC VALIDATION ---
-  void _showAddEmployeeForm(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Force à utiliser les boutons pour fermer
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.person_add, color: Colors.blueAccent),
-            SizedBox(width: 10),
-            Text("Nouveau Personnel"),
-          ],
-        ),
-        content: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // CHAMP NOM
-                TextFormField(
-                  controller: _firstnameController,
-                  decoration: const InputDecoration(
-                    labelText: "Nom",
-                    prefixIcon: Icon(Icons.badge),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer un nom';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                // CHAMP PRÉNOM
-                TextFormField(
-                  controller: _secondnameController,
-                  decoration: const InputDecoration(
-                    labelText: "Prénom",
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer un prénom';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                // CHAMP POSTE
-                TextFormField(
-                  controller: _posteController,
-                  decoration: const InputDecoration(
-                    labelText: "Poste",
-                    prefixIcon: Icon(Icons.work),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez préciser le poste';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: "Nom d' utilisateur",
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Veuillez entrer un nom d' utilisateur";
-                    }
-                     return null;}
-                ),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: "Téléphone",
-                    prefixIcon: Icon(Icons.phone)
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Veuillez entrer un numéro de téléphone";
-                    }
-                    return null;
-                  }
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: "Mot de passe",
-                    prefixIcon: Icon(Icons.lock)
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Veuillez entrer un mot de passe";
-                    }
-                    return null;
-                  }
-                )
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          // BOUTON RETOUR / ANNULER
-          TextButton(
-            onPressed: () {
-              _firstnameController.clear();
-              _secondnameController.clear();
-              _posteController.clear();
-              _usernameController.clear();
-              _phoneController.clear();
-              _passwordController.clear();
-              Navigator.pop(context);
-            },
-            child: const Text("Annuler", style: TextStyle(color: Colors.red)),
-          ),
-          // BOUTON VALIDER
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-            onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                // LOGIQUE D'ENVOI ICI
-                Map<String,dynamic> requestBody = {
-                  "firstname": _firstnameController.text,
-                  "lastname": _secondnameController.text,
-                  "poste": _posteController.text,
-                  "username": _usernameController.text,
-                  "phone": _phoneController.text,
-                  "password": _passwordController.text,
-                };
-                EmployeeService em = EmployeeService();
-                Employee employee = await em.addEmployee(requestBody, widget.store.id);
-                setState(() {
-                  widget.employees.add(employee);
-                });
-                Navigator.pop(context);
-                _firstnameController.clear();
-                _secondnameController.clear();
-                _posteController.clear();
-                _usernameController.clear();
-                _phoneController.clear();
-                _passwordController.clear();
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Personnel enregistré avec succès")),
-                );
-              }
-            },
-            child: const Text("Enregistrer", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -344,7 +184,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           for(Category category in categories)
             _buildExpandableCategory(context, category),
         IconButton(
-              onPressed: () => _showAddCategoryForm(context),
+              onPressed: () => _showAddCategoryForm(context,null),
               icon: const Icon(Icons.add_circle_outline, size: 35, color: Colors.orange),
 
         )
@@ -378,14 +218,26 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 22),
                   onPressed: () {
-                    // Logique pour modifier (ex: ouvrir la popup avec les données pré-remplies)
+                    _showAddCategoryForm(context,category);
                     print("Modifier ${category.name}");
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 22),
-                  onPressed: () {
-                    // Logique pour supprimer
+                  onPressed: () async {
+                    bool delete = await CategoryService().delete(category.id);
+                    if(delete){
+                      setState(() {
+                        widget.categories.removeWhere((c) => c.id == category.id);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Catégorie supprimée !")),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Erreur lors de la suppression")),
+                      );
+                    }
                     print("Supprimer ${category.name}");
                   },
                 ),
@@ -445,7 +297,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => CategoryDetailScreen(category: category),
+                              builder: (context) => EmployerCategoryDetailScreen(category: category),
                             ),
                           );
                           // Navigation vers le détail
@@ -486,7 +338,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             title: const Text("Catégories & Rayons"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const EmployerCategoryDetailScreen()));
             },
           ),
           ListTile(
@@ -615,7 +466,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       ),
     );
   }
-  void _showAddCategoryForm(BuildContext context) {
+  void _showAddCategoryForm(BuildContext context,Category? category) {
+    if(category != null){
+      _categoryNameController.text = category.name;
+      _categoryDescController.text = category.description ?? "";
+    } else {
+      _categoryNameController.clear();
+      _categoryDescController.clear();
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -688,6 +546,23 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 CategoryService cs = CategoryService();
                 // Ici, j'appelle votre service (assurez-vous que addCategory existe)
                 try {
+                  if(category != null){
+                    // Logique de modification
+                    Category? updatedCat = await cs.update(category.id, categoryData);
+                    setState(() {
+                      if(updatedCat != null) {
+                        int index = widget.categories.indexWhere((c) => c.id == category.id);
+                        if(index != -1) {
+                          widget.categories[index] = updatedCat;
+                        }
+                      }
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Catégorie mise à jour !")),
+                    );
+                    Navigator.pop(context);
+                    return;
+                  }
                   Category? newCat = await cs.create(categoryData,widget.store.id);
                   setState(() {
                     if(newCat != null) {
@@ -711,7 +586,164 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       ),
     );
   }
+  // --- POPUP FORMULAIRE AJOUT PERSONNEL AVEC VALIDATION ---
+  void _showAddEmployeeForm(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Force à utiliser les boutons pour fermer
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.person_add, color: Colors.blueAccent),
+            SizedBox(width: 10),
+            Text("Nouveau Personnel"),
+          ],
+        ),
+        content: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // CHAMP NOM
+                TextFormField(
+                  controller: _firstnameController,
+                  decoration: const InputDecoration(
+                    labelText: "Nom",
+                    prefixIcon: Icon(Icons.badge),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Veuillez entrer un nom';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                // CHAMP PRÉNOM
+                TextFormField(
+                  controller: _secondnameController,
+                  decoration: const InputDecoration(
+                    labelText: "Prénom",
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Veuillez entrer un prénom';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                // CHAMP POSTE
+                TextFormField(
+                  controller: _posteController,
+                  decoration: const InputDecoration(
+                    labelText: "Poste",
+                    prefixIcon: Icon(Icons.work),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Veuillez préciser le poste';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: "Nom d' utilisateur",
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer un nom d' utilisateur";
+                      }
+                      return null;}
+                ),
+                TextFormField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                        labelText: "Téléphone",
+                        prefixIcon: Icon(Icons.phone)
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer un numéro de téléphone";
+                      }
+                      return null;
+                    }
+                ),
+                TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                        labelText: "Mot de passe",
+                        prefixIcon: Icon(Icons.lock)
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez entrer un mot de passe";
+                      }
+                      return null;
+                    }
+                )
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          // BOUTON RETOUR / ANNULER
+          TextButton(
+            onPressed: () {
+              _firstnameController.clear();
+              _secondnameController.clear();
+              _posteController.clear();
+              _usernameController.clear();
+              _phoneController.clear();
+              _passwordController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text("Annuler", style: TextStyle(color: Colors.red)),
+          ),
+          // BOUTON VALIDER
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                // LOGIQUE D'ENVOI ICI
+                Map<String,dynamic> requestBody = {
+                  "firstname": _firstnameController.text,
+                  "lastname": _secondnameController.text,
+                  "poste": _posteController.text,
+                  "username": _usernameController.text,
+                  "phone": _phoneController.text,
+                  "password": _passwordController.text,
+                };
+                EmployeeService em = EmployeeService();
+                Employee employee = await em.addEmployee(requestBody, widget.store.id);
+                setState(() {
+                  widget.employees.add(employee);
+                });
+                Navigator.pop(context);
+                _firstnameController.clear();
+                _secondnameController.clear();
+                _posteController.clear();
+                _usernameController.clear();
+                _phoneController.clear();
+                _passwordController.clear();
 
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Personnel enregistré avec succès")),
+                );
+              }
+            },
+            child: const Text("Enregistrer", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showNavigationMessage(BuildContext context, String pageName) {
     Navigator.pop(context);

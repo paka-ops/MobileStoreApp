@@ -31,22 +31,5 @@ class UserService {
       return false;
     }
   }
-  Future<List<Store>> getStoresByUser() async{
-    var response = await http.get(Uri.parse("$baseUrl/v1/stores"),headers:{
-      "accept": "application/json",
-      "Authorization" : "Bearer $token"
-    });
-    String body = response.body;
-    Map<String,dynamic> bodyMap = jsonDecode(body);
-    print("voici  $bodyMap");
-    List<dynamic> storeList = bodyMap.values.first;
 
-    List<Store> stores = [];
-    storeList.forEach((e){
-      Store store = Store.fromJson(e);
-      print(store.id);
-      stores.add(store);
-    });
-    return stores;
-  }
 }

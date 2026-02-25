@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_store_app/models/Store.dart';
 import 'package:mobile_store_app/screens/welcome_screen.dart';
+import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -66,11 +67,12 @@ class LoginPage extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               UserService userService = UserService();
+              StoreService storeService = StoreService();
               String username = usernameController.text.trim();
               String password  = passwordController.text.trim();
               bool response = await Future.value(userService.login(username: username, password: password));
               if(response == true){
-                List<Store> stores= await Future.value(userService.getStoresByUser());
+                List<Store> stores= await Future.value(storeService.getStoresByUser());
                 Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen(stores: stores)));
               }
 

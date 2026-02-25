@@ -40,6 +40,7 @@ class ProductService{
     );
     if(response.statusCode == 201){
       Map<String,dynamic> responseMap = jsonDecode(response.body);
+      print("voici l' autre response ${responseMap}");
       return Product.fromJson(responseMap.values.first);
     }
     return null;
@@ -53,6 +54,7 @@ class ProductService{
         "content-type": "application/json"
       }
     );
+    print("voici response ${response.body}");
     if(response.statusCode == 200){
       Map<String,dynamic> responseMap = jsonDecode(response.body);
       return Product.fromJson(responseMap.values.first);
@@ -70,5 +72,20 @@ class ProductService{
       return true;
     }
     return false;
+  }
+  Future<Map<String,dynamic>?> getStatsForProduct(String productId) async {
+    var response = await http.get(
+        Uri.parse("$baseUrl/v1/products/$productId/stats"),
+        headers: {
+          "Authorization": "Bearer $token"
+        }
+    );
+
+    if(response.statusCode == 200) {
+      Map<String, dynamic> responseMap = jsonDecode(response.body);
+      print("voici response ${responseMap['Stock']}");
+      return responseMap['Stock'];
+    }
+    return null;
   }
 }

@@ -45,5 +45,35 @@ class CategoryService{
     }
     return null;
   }
+  Future<Category?> update(String id,Map<String,dynamic> category)async {
+    print("voici le id $id");
+    var response = await http.patch(
+        Uri.parse("$baseUrl/v1/categories/$id"),
+        body: jsonEncode(category),
+        headers: {
+          "Authorization": "Bearer $token",
+          "content-type": "application/json"
+        }
+    );
+    String res = response.body;
+    print(res);
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseMap = jsonDecode(response.body);
+      return Category.fromJson(responseMap.values.first);
+    }
+    return null;
+  }
+  Future<bool> delete(String id) async {
+    var response = await http.delete(
+        Uri.parse("$baseUrl/v1/categories/$id"),
+        headers: {
+          "Authorization": "Bearer $token"
+        }
+    );
+    if (response.statusCode == 204) {
+      return true;
+    }
+    return false;
+  }
 
 }
