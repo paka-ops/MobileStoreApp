@@ -2,15 +2,15 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_store_app/screens/category_detail_screen.dart';
-import 'package:mobile_store_app/screens/category_list_screen.dart';
+import 'package:mobile_store_app/screens/low_stock_product.dart';
 import 'package:mobile_store_app/screens/login_screen.dart';
-import 'package:mobile_store_app/screens/store_page.dart';
-import 'package:mobile_store_app/screens/welcome_screen.dart';
 import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
 import 'models/Store.dart';
-void main() {
+// Crée cette clé en dehors de tes classes (variable globale)
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+main() {
+
   runApp(const MyApp());
 }
 class MyApp extends StatefulWidget{
@@ -19,12 +19,6 @@ class MyApp extends StatefulWidget{
   State createState() => _MyAppState();
 }
 class _MyAppState extends State<MyApp>{
- var store = Store(
-  id: "dsqfjlk",
-  name: 'Magasin Central Kara',
-  location: 'Grand Marché de Kara',
-  productIds: ['p5', 'p6'],
-  );
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,8 +31,6 @@ class _MyAppState extends State<MyApp>{
       routes: {
         "/": (context) => WelcomePreLoginScreen(),
         "/login": (context) => LoginScreen(),
-        "/store": (context) => StoreDetailScreen(store: store),
-        "/categories" : (context) => CategoryListScreen(),
       },
     );
   }

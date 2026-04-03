@@ -1,42 +1,42 @@
 // dart
+import 'dart:convert';
+
+import 'package:mobile_store_app/models/enums.dart';
+import 'package:mobile_store_app/models/product.dart';
+
 import 'order_content.dart';
 
 class Order {
-  final String id;
-  final String? customerId;
-  final DateTime? createdAt;
-  final String? status;
-  final List<OrderContent> contents;
-  final double? total;
+  String orderId;
+  String storeId;
+  Map<dynamic,dynamic> maker;
+  DateTime createdAt;
+  OrderStatus status;
+  Map<Product,dynamic> products = {};
 
   Order({
-    required this.id,
-    this.customerId,
-    this.createdAt,
-    this.status,
-    this.contents = const [],
-    this.total,
+    required this.orderId,
+    required this.storeId,
+   required  this.createdAt,
+    required this.maker,
+    required this.status,
   });
 
-  factory Order.fromJson(Map<String, dynamic> json) {
-    final list = (json['orderContentDtos'] ?? json['contents'] ?? []) as List<dynamic>;
-    final contents = list.map((e) => OrderContent.fromJson(e as Map<String, dynamic>)).toList();
+  factory Order.fromJson(Map<dynamic, dynamic> json) {
     return Order(
-      id: json['id'] as String,
-      customerId: json['customerId'] as String? ?? json['customer_id'] as String?,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null,
-      status: json['status'] as String?,
-      contents: contents,
-      total: (json['total'] != null) ? (json['total'] as num).toDouble() : null,
+      orderId: json['id'] ,
+      maker: json['maker']  ,
+      createdAt: DateTime.parse(json['creationDate'] as String) ,
+      storeId: json['store']['id'] ,
+      status: OrderStatus.values.firstWhere((element) => element.name == json['status'])
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'customerId': customerId,
+    'orderId': orderId,
+    'makerId': maker,
     'createdAt': createdAt?.toIso8601String(),
-    'status': status,
-    'contents': contents.map((c) => c.toJson()).toList(),
-    'total': total,
+    'storeId': storeId,
+    'status': status
   };
 }

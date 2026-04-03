@@ -12,3 +12,10 @@ enum UserType {
   employee,
   admin,
 }
+enum OrderStatus{
+  VALIDATED,
+  DELETION_PENDING,
+  UPDATED,
+  CREATED,
+  SCRAPPED
+}

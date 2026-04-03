@@ -1,28 +1,35 @@
 // dart
+import 'package:mobile_store_app/models/category.dart';
+import 'package:mobile_store_app/models/stock.dart';
+
 class Product {
   final String id;
   final String name;
-  final double? price;
-  final int? quantity;
+  double? buyingPrice;
+  double? sellingPrice;
+  double? quantity;
+  final Category? category;
+  final Stock? stock;
 
   Product({
     required this.id,
     required this.name,
-    this.price,
-    this.quantity,
+    required this.category,
+    required this.stock
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
     id: json['id'] as String,
     name: json['name'] as String? ?? '',
-    price: (json['price'] != null) ? (json['price'] as num).toDouble() : null,
-    quantity: (json['quantity'] as num?)?.toInt(),
+    category: Category.fromJson(json['categoryDto']),
+    stock: Stock.fromJson(json['stock'] as Map<String,dynamic>? ?? null)
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
-    'price': price,
+    'buyingPrice': buyingPrice,
+    'sellingPrice': sellingPrice,
     'stock': quantity,
   };
 }

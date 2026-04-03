@@ -1,11 +1,14 @@
 
 
+import 'package:mobile_store_app/models/subscription.dart';
+
 class Store {
   final String id;
   final String name;
   final String? employerId;
   final String? location;
   final List<String>? productIds;
+  Subscription? subscription;
 
   Store({
     required this.id,
@@ -13,6 +16,7 @@ class Store {
     this.location,
     this.employerId,
     this.productIds,
+    this.subscription
   });
 
   factory Store.fromJson(Map<String, dynamic> json) =>  Store(
@@ -21,6 +25,7 @@ class Store {
     location: json['location'] as String?,
     employerId: json['employerId'] as String? ?? json['employer_id'] as String?,
     productIds: (json['productIds'] as List<dynamic>?)?.map((e) => e as String).toList(),
+    subscription:json['subscription']==null?null: Subscription.fromJson(json['subscription'])
   );
 
   Map<String, dynamic> toJson() => {
