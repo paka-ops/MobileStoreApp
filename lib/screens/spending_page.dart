@@ -155,7 +155,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           lastDate: DateTime(2100),
           builder: (context, child) => Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(primary: Colors.orange),
+              colorScheme: Theme.of(context).colorScheme.copyWith(primary: Colors.orange),
             ),
             child: child!,
           ),
