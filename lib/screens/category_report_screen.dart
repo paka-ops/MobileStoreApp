@@ -3,25 +3,7 @@ import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
 import 'package:collection/collection.dart';
-
-// ---------------------------------------------------------------------
-// PALETTE — désaturée, confortable pour de longues sessions de travail
-// ---------------------------------------------------------------------
-class AppColors {
-  static const primary = Color(0xFF4A7C82);       // teal désaturé, doux
-  static const primarySoft = Color(0xFFEBF2F2);
-  static const accent = Color(0xFFC08552);         // terracotta doux (dépenses/alertes)
-  static const accentSoft = Color(0xFFF6ECE3);
-  static const danger = Color(0xFFC96B6B);
-  static const success = Color(0xFF6FA687);
-
-  static const background = Color(0xFFF7F8FA);
-  static const card = Colors.white;
-  static const border = Color(0xFFEDEEF2);
-
-  static const textDark = Color(0xFF2E333D);
-  static const textGrey = Color(0xFF95999E);
-}
+import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
 
 class CategoryReportScreen extends StatelessWidget {
   final String storeId;
@@ -39,16 +21,18 @@ class CategoryReportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = DashColors(context);
     _filterOrderProductsByCategory(orders, categories);
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Analyses par Catégorie",
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textDark),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: colors.textPrimary),
         ),
-        backgroundColor: AppColors.background,
-        foregroundColor: AppColors.textDark,
+        backgroundColor: colors.background,
+        foregroundColor: colors.textPrimary,
         elevation: 0,
         centerTitle: true,
       ),
@@ -65,6 +49,7 @@ class CategoryReportScreen extends StatelessWidget {
               result['sales'] ?? 0,
               result['revenues'] ?? 0,
               _getCategoryColor(index),
+              colors,
             );
           },
         ),
@@ -73,13 +58,13 @@ class CategoryReportScreen extends StatelessWidget {
   }
 
   Widget _buildEnhancedCategoryCard(
-      String name, num sales, num revenue, Color color) {
+      String name, num sales, num revenue, Color color, DashColors colors) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: colors.border, width: 1),
       ),
       child: Column(
         children: [
@@ -106,10 +91,10 @@ class CategoryReportScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15.5,
-                    color: AppColors.textDark,
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -120,10 +105,10 @@ class CategoryReportScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                _buildStatItem("VENTES (CA)", sales, AppColors.primary),
+                _buildStatItem("VENTES (CA)", sales, colors.primary, colors),
                 if (userType == "employer") ...[
-                  Container(width: 1, height: 40, color: AppColors.border),
-                  _buildStatItem("BÉNÉFICE NET", revenue, AppColors.success),
+                  Container(width: 1, height: 40, color: colors.border),
+                  _buildStatItem("BÉNÉFICE NET", revenue, colors.success, colors),
                 ],
               ],
             ),
@@ -136,7 +121,7 @@ class CategoryReportScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: (revenue / sales).clamp(0, 1).toDouble(),
-                  backgroundColor: AppColors.background,
+                  backgroundColor: colors.background,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                   minHeight: 6,
                 ),
@@ -147,14 +132,14 @@ class CategoryReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, num value, Color color) {
+  Widget _buildStatItem(String label, num value, Color color, DashColors colors) {
     return Expanded(
       child: Column(
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textGrey,
+            style: TextStyle(
+              color: colors.textSecondary,
               fontSize: 10,
               letterSpacing: 1.2,
               fontWeight: FontWeight.w700,
@@ -174,9 +159,7 @@ class CategoryReportScreen extends StatelessWidget {
     );
   }
 
-  // --- LOGIQUE CONSERVÉE ---
   void _filterOrderProductsByCategory(List<Order> orders, List<Category> categories) {
-    // --- ÉTAPE CRUCIALE : On vide les anciens rapports pour éviter le cumul ---
     for (var cat in categories) {
       cat.orderContentsByCategory.clear();
     }
@@ -188,7 +171,6 @@ class CategoryReportScreen extends StatelessWidget {
                 (element) => element.name == product.category?.name);
 
         if (category != null) {
-          // On utilise la syntaxe Map correcte {product: quantity}
           category.orderContentsByCategory.add({product: quantity});
         }
       });
@@ -212,14 +194,13 @@ class CategoryReportScreen extends StatelessWidget {
   }
 
   Color _getCategoryColor(int index) {
-    // Palette adaptée pour matcher le style désaturé de l'application
     List<Color> colors = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.success,
-      const Color(0xFF8A7CB8), // Violet doux
-      const Color(0xFFD8A657), // Or doux
-      const Color(0xFF5C8AAE), // Bleu pétrole doux
+      const Color(0xFF4A7C82),  // primary
+      const Color(0xFFC08552),  // accent
+      const Color(0xFF6FA687),  // success
+      const Color(0xFF8A7CB8),  // Violet doux
+      const Color(0xFFD8A657),  // Or doux
+      const Color(0xFF5C8AAE),  // Bleu pétrole doux
     ];
     return colors[index % colors.length];
   }
