@@ -1,38 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Etat du thème partagé par toute l'application.
-final ValueNotifier<bool> appDarkMode = ValueNotifier<bool>(false);
-
-ThemeData buildAppTheme(bool dark) {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: dark ? AppColors.darkPrimary : AppColors.primary,
-    brightness: dark ? Brightness.dark : Brightness.light,
-  );
-  return ThemeData(
-    useMaterial3: true,
-    brightness: dark ? Brightness.dark : Brightness.light,
-    colorScheme: scheme,
-    scaffoldBackgroundColor: dark ? AppColors.darkBackground : AppColors.background,
-    canvasColor: dark ? AppColors.darkBackground : AppColors.background,
-    cardColor: dark ? AppColors.darkCard : AppColors.card,
-    dividerColor: dark ? AppColors.darkBorder : AppColors.border,
-    fontFamily: 'Inter',
-    appBarTheme: AppBarTheme(
-      backgroundColor: dark ? AppColors.darkBackground : AppColors.background,
-      foregroundColor: dark ? AppColors.darkTextPrimary : AppColors.textDark,
-      elevation: 0,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: dark ? AppColors.darkCard : AppColors.card,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-    ),
-    dialogTheme: DialogTheme(backgroundColor: dark ? AppColors.darkCard : AppColors.card),
-    snackBarTheme: SnackBarThemeData(behavior: SnackBarBehavior.floating),
-  );
-}
-
-
 class AppColors {
   // =====================================================================
   // LIGHT THEME
