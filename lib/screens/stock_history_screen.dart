@@ -80,7 +80,7 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: SafeArea(child: Column(
         children: [
           _buildFilterBar(),
           Expanded(
@@ -89,7 +89,7 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
                 :stocks.isEmpty?_buildEmptyState(): _buildRestockList(),
           ),
         ],
-      ),
+      )),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () { /* Formulaire pour créer un nouveau Stock */ },
         label: const Text("Nouvel Arrivage"),

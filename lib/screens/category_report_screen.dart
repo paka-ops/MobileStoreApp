@@ -4,6 +4,25 @@ import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
 import 'package:collection/collection.dart';
 
+// ---------------------------------------------------------------------
+// PALETTE — désaturée, confortable pour de longues sessions de travail
+// ---------------------------------------------------------------------
+class AppColors {
+  static const primary = Color(0xFF4A7C82);       // teal désaturé, doux
+  static const primarySoft = Color(0xFFEBF2F2);
+  static const accent = Color(0xFFC08552);         // terracotta doux (dépenses/alertes)
+  static const accentSoft = Color(0xFFF6ECE3);
+  static const danger = Color(0xFFC96B6B);
+  static const success = Color(0xFF6FA687);
+
+  static const background = Color(0xFFF7F8FA);
+  static const card = Colors.white;
+  static const border = Color(0xFFEDEEF2);
+
+  static const textDark = Color(0xFF2E333D);
+  static const textGrey = Color(0xFF95999E);
+}
+
 class CategoryReportScreen extends StatelessWidget {
   final String storeId;
   final List<Category> categories;
@@ -22,29 +41,33 @@ class CategoryReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _filterOrderProductsByCategory(orders, categories);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Analyses par Catégorie",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: const Text(
+          "Analyses par Catégorie",
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textDark),
+        ),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textDark,
         elevation: 0,
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          Category category = categories[index];
-          Map<String, num> result = _getSalesInformationByCategory(category);
+      body: SafeArea(
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            Category category = categories[index];
+            Map<String, num> result = _getSalesInformationByCategory(category);
 
-          return _buildEnhancedCategoryCard(
-            category.name,
-            result['sales'] ?? 0,
-            result['revenues'] ?? 0,
-            _getCategoryColor(index),
-          );
-        },
+            return _buildEnhancedCategoryCard(
+              category.name,
+              result['sales'] ?? 0,
+              result['revenues'] ?? 0,
+              _getCategoryColor(index),
+            );
+          },
+        ),
       ),
     );
   }
@@ -52,16 +75,11 @@ class CategoryReportScreen extends StatelessWidget {
   Widget _buildEnhancedCategoryCard(
       String name, num sales, num revenue, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4))
-        ],
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border, width: 1),
       ),
       child: Column(
         children: [
@@ -69,20 +87,31 @@ class CategoryReportScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.05),
+              color: color.withOpacity(0.06),
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                topLeft: Radius.circular(17),
+                topRight: Radius.circular(17),
+              ),
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: color.withOpacity(0.2),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   child: Icon(Icons.category_rounded, color: color, size: 20),
                 ),
                 const SizedBox(width: 12),
-                Text(name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15.5,
+                    color: AppColors.textDark,
+                  ),
+                ),
               ],
             ),
           ),
@@ -90,24 +119,24 @@ class CategoryReportScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
-          children: [
-          _buildStatItem("VENTES (CA)", sales, Colors.blueAccent),
-          if (userType == "employer") ...[
-            Container(width: 1, height: 40, color: Colors.grey[200]),
-            _buildStatItem("BÉNÉFICE NET", revenue, Colors.green),
-          ],
-        ],
-      )
+              children: [
+                _buildStatItem("VENTES (CA)", sales, AppColors.primary),
+                if (userType == "employer") ...[
+                  Container(width: 1, height: 40, color: AppColors.border),
+                  _buildStatItem("BÉNÉFICE NET", revenue, AppColors.success),
+                ],
+              ],
+            ),
           ),
           // Barre visuelle de rentabilité (Bénéfice/Vente)
           if (sales > 0)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: (revenue / sales).clamp(0, 1).toDouble(),
-                  backgroundColor: Colors.grey[100],
+                  backgroundColor: AppColors.background,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                   minHeight: 6,
                 ),
@@ -122,17 +151,23 @@ class CategoryReportScreen extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Text(label,
-              style: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 10,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textGrey,
+              fontSize: 10,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 6),
           Text(
             "${value.toStringAsFixed(0)} F",
             style: TextStyle(
-                color: color, fontWeight: FontWeight.bold, fontSize: 17),
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+            ),
           ),
         ],
       ),
@@ -177,13 +212,14 @@ class CategoryReportScreen extends StatelessWidget {
   }
 
   Color _getCategoryColor(int index) {
+    // Palette adaptée pour matcher le style désaturé de l'application
     List<Color> colors = [
-      Colors.blue,
-      Colors.orange,
-      Colors.green,
-      Colors.purple,
-      Colors.red,
-      Colors.teal
+      AppColors.primary,
+      AppColors.accent,
+      AppColors.success,
+      const Color(0xFF8A7CB8), // Violet doux
+      const Color(0xFFD8A657), // Or doux
+      const Color(0xFF5C8AAE), // Bleu pétrole doux
     ];
     return colors[index % colors.length];
   }

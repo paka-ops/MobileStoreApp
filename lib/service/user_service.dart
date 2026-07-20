@@ -37,6 +37,7 @@ class UserService {
         token = responseMap["jwtToken"];
         userType = responseMap["userType"];
         UserService.username = responseMap["username"];
+        print("login en cours ");
         return true;
       } else {
         return false;

@@ -4,6 +4,25 @@ import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/service/employer_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
+// ---------------------------------------------------------------------
+// PALETTE — désaturée, confortable pour de longues sessions de travail
+// ---------------------------------------------------------------------
+class AppColors {
+  static const primary = Color(0xFF4A7C82);       // teal désaturé, doux
+  static const primarySoft = Color(0xFFEBF2F2);
+  static const accent = Color(0xFFC08552);         // terracotta doux (dépenses/alertes)
+  static const accentSoft = Color(0xFFF6ECE3);
+  static const danger = Color(0xFFC96B6B);
+  static const success = Color(0xFF6FA687);
+
+  static const background = Color(0xFFF7F8FA);
+  static const card = Colors.white;
+  static const border = Color(0xFFEDEEF2);
+
+  static const textDark = Color(0xFF2E333D);
+  static const textGrey = Color(0xFF95999E);
+}
+
 class EmployerFormPage extends StatefulWidget {
   const EmployerFormPage({super.key});
 
@@ -24,11 +43,10 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   final usernameController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController(); // Nouveau controller
+  final confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    // Nettoyage des controllers
     lastnameController.dispose();
     firstnameController.dispose();
     usernameController.dispose();
@@ -38,26 +56,26 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
     super.dispose();
   }
 
-  // Style commun pour les champs
+  // Style commun pour les champs — aligné sur le design global
   InputDecoration _inputStyle(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-      prefixIcon: Icon(icon, color: Colors.blueAccent, size: 20),
+      labelStyle: const TextStyle(color: AppColors.textGrey, fontSize: 14),
+      prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
       filled: true,
-      fillColor: Colors.grey[50],
+      fillColor: AppColors.background,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.border, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.blueAccent, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }
@@ -65,12 +83,12 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -84,7 +102,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               Expanded(
                 child: Theme(
                   data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(primary: Colors.blueAccent),
+                    colorScheme: const ColorScheme.light(primary: AppColors.primary),
                   ),
                   child: Stepper(
                     type: StepperType.horizontal,
@@ -111,27 +129,28 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
           width: 120,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: AppColors.primarySoft,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Center(
+          child: const Center(
             child: Text(
               "BouTiKa",
               style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[900]),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ),
         const SizedBox(height: 15),
         const Text(
           "Créer votre compte",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textDark),
         ),
         const Text(
           "Complétez les étapes pour commencer",
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: TextStyle(color: AppColors.textGrey, fontSize: 13),
         ),
       ],
     );
@@ -147,7 +166,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                color: index <= _currentStep ? Colors.blueAccent : Colors.grey[200],
+                color: index <= _currentStep ? AppColors.primary : AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -162,7 +181,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       Step(
         state: _currentStep > 0 ? StepState.complete : StepState.indexed,
         isActive: _currentStep >= 0,
-        title: const Text("Identité", style: TextStyle(fontSize: 12)),
+        title: Text("Identité", style: TextStyle(fontSize: 12, color: _currentStep == 0 ? AppColors.primary : AppColors.textGrey)),
         content: Column(
           children: [
             TextFormField(
@@ -182,7 +201,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       Step(
         state: _currentStep > 1 ? StepState.complete : StepState.indexed,
         isActive: _currentStep >= 1,
-        title: const Text("Contact", style: TextStyle(fontSize: 12)),
+        title: Text("Contact", style: TextStyle(fontSize: 12, color: _currentStep == 1 ? AppColors.primary : AppColors.textGrey)),
         content: Column(
           children: [
             TextFormField(
@@ -202,7 +221,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       ),
       Step(
         isActive: _currentStep >= 2,
-        title: const Text("Sécurité", style: TextStyle(fontSize: 12)),
+        title: Text("Sécurité", style: TextStyle(fontSize: 12, color: _currentStep == 2 ? AppColors.primary : AppColors.textGrey)),
         content: Column(
           children: [
             TextFormField(
@@ -210,7 +229,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               obscureText: _isObscured,
               decoration: _inputStyle("Mot de passe", Icons.lock_outline).copyWith(
                 suffixIcon: IconButton(
-                  icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility),
+                  icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility, color: AppColors.textGrey),
                   onPressed: () => setState(() => _isObscured = !_isObscured),
                 ),
               ),
@@ -222,7 +241,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               obscureText: _isConfirmObscured,
               decoration: _inputStyle("Confirmer mot de passe", Icons.lock_reset).copyWith(
                 suffixIcon: IconButton(
-                  icon: Icon(_isConfirmObscured ? Icons.visibility_off : Icons.visibility),
+                  icon: Icon(_isConfirmObscured ? Icons.visibility_off : Icons.visibility, color: AppColors.textGrey),
                   onPressed: () => setState(() => _isConfirmObscured = !_isConfirmObscured),
                 ),
               ),
@@ -231,7 +250,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
             const SizedBox(height: 10),
             const Text(
               "Assurez-vous que les mots de passe correspondent",
-              style: TextStyle(fontSize: 11, color: Colors.grey),
+              style: TextStyle(fontSize: 11, color: AppColors.textGrey),
             )
           ],
         ),
@@ -241,9 +260,14 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
 
   Widget _buildStepControls(BuildContext context, ControlsDetails details) {
     bool isLastStep = _currentStep == 2;
-    _isLoading == true?Future.delayed(Duration(seconds: 7),(){setState(() {
-      _isLoading = false;
-    });}):null;
+
+    // Conserve la logique originale mais adaptée au style
+    _isLoading == true ? Future.delayed(const Duration(seconds: 7), () {
+      setState(() {
+        _isLoading = false;
+      });
+    }) : null;
+
     return Padding(
       padding: const EdgeInsets.only(top: 30),
       child: Row(
@@ -254,10 +278,12 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
                 onPressed: details.onStepCancel,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  side: const BorderSide(color: Colors.blueAccent),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  side: const BorderSide(color: AppColors.border, width: 1.1),
+                  foregroundColor: AppColors.textDark,
+                  backgroundColor: AppColors.card,
                 ),
-                child: const Text("Retour"),
+                child: const Text("Retour", style: TextStyle(fontWeight: FontWeight.w600)),
               ),
             ),
           if (_currentStep > 0) const SizedBox(width: 15),
@@ -265,30 +291,29 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : details.onStepContinue,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: _isLoading
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : Text(isLastStep ? "Terminer l'inscription" : "Suivant"),
+                  : Text(isLastStep ? "Terminer l'inscription" : "Suivant", style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
       ),
     );
   }
+
   void _handleNext() {
     bool isStepValid = false;
 
-    // Validation manuelle par étape pour éviter de bloquer sur les étapes futures
     if (_currentStep == 0) {
       if (lastnameController.text.isNotEmpty && firstnameController.text.isNotEmpty) {
         isStepValid = true;
       } else {
-        // Force l'affichage des erreurs visuelles pour l'étape 1
         _formKey.currentState!.validate();
       }
     } else if (_currentStep == 1) {
@@ -298,7 +323,6 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
         _formKey.currentState!.validate();
       }
     } else if (_currentStep == 2) {
-      // Pour la dernière étape, on fait une validation complète
       if (_formKey.currentState!.validate()) {
         isStepValid = true;
       }
@@ -311,12 +335,15 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
         _submitForm();
       }
     } else {
-      // Optionnel : Afficher un message si les champs sont vides
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez remplir tous les champs de cette étape")),
+        const SnackBar(
+          content: Text("Veuillez remplir tous les champs de cette étape"),
+          backgroundColor: AppColors.danger,
+        ),
       );
     }
   }
+
   void _handleBack() {
     if (_currentStep > 0) {
       setState(() => _currentStep -= 1);
@@ -325,20 +352,20 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
 
   Future<void> _submitForm() async {
     setState(() => _isLoading = true);
-    Map<String,dynamic> employerMap = {};
-    employerMap.putIfAbsent("firstname",()=>firstnameController.text);
-    employerMap.putIfAbsent("lastname", ()=>lastnameController.text);
-    employerMap.putIfAbsent("username", ()=>usernameController.text);
-    employerMap.putIfAbsent("password", ()=>passwordController.text);
-    employerMap.putIfAbsent("phone", ()=>phoneController.text);
-    // Logique d'appel à votre service API ici
-    // await UserService().register(...)
+    Map<String, dynamic> employerMap = {};
+    employerMap.putIfAbsent("firstname", () => firstnameController.text);
+    employerMap.putIfAbsent("lastname", () => lastnameController.text);
+    employerMap.putIfAbsent("username", () => usernameController.text);
+    employerMap.putIfAbsent("password", () => passwordController.text);
+    employerMap.putIfAbsent("phone", () => phoneController.text);
+
     EmployerService employerService = EmployerService();
     bool isCreated = await employerService.createEmployer(employerMap, context);
     if (mounted) setState(() => _isLoading = false);
-    if(isCreated == true){
+
+    if (isCreated == true) {
       showSuccessMessage("Compte creer avec success", context);
-      Future.delayed(Duration(seconds: 3),() => Navigator.pushNamed(context, "/login"));
+      Future.delayed(const Duration(seconds: 3), () => Navigator.pushNamed(context, "/login"));
     }
   }
 }
