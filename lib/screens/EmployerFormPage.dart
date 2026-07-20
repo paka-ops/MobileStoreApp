@@ -102,7 +102,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               Expanded(
                 child: Theme(
                   data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(primary: AppColors.primary),
+                    colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppColors.primary),
                   ),
                   child: Stepper(
                     type: StepperType.horizontal,

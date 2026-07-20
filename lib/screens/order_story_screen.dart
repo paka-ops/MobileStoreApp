@@ -418,7 +418,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
+                colorScheme: Theme.of(context).colorScheme.copyWith(
                   primary: c.primary,
                   onPrimary: Colors.white,
                   surface: c.card,

@@ -48,7 +48,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedPeriodIndex = 2;
-  bool _isDarkMode = false;
+
 
   final List<String> _periods = ["Jour", "Semaine", "Mois", "Année"];
   final List<String> _weekDays = [
@@ -119,7 +119,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     // On wrap dans un Theme pour basculer light/dark
     return Theme(
-      data: _isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
+      data: appDarkMode.value ? _buildDarkTheme() : _buildLightTheme(),
       child: Builder(builder: (context) {
         final c = DashColors(context);
 
@@ -127,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness:
-          _isDarkMode ? Brightness.light : Brightness.dark,
+          appDarkMode.value ? Brightness.light : Brightness.dark,
         ));
 
         return Scaffold(
@@ -202,7 +202,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // THEMES
   // =====================================================================
   ThemeData _buildLightTheme() {
-    return ThemeData(
+    // Preserve the global application theme instead of replacing it locally.
+    return Theme.of(context).copyWith(
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: 'Inter',
@@ -210,9 +211,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   ThemeData _buildDarkTheme() {
-    return ThemeData(
+    // Preserve all global component themes (inputs, dialogs, buttons, etc.).
+    return Theme.of(context).copyWith(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.darkBackground,
+      canvasColor: AppColors.darkBackground,
+      cardColor: AppColors.darkCard,
+      dividerColor: AppColors.darkBorder,
       fontFamily: 'Inter',
     );
   }
@@ -277,22 +282,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           // --- TOGGLE DARK MODE ---
           GestureDetector(
-            onTap: () => setState(() => _isDarkMode = !_isDarkMode),
+            onTap: () {
+              appDarkMode.value = !appDarkMode.value;
+              setState(() {});
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: _isDarkMode ? AppColors.darkCardElevated : AppColors.card,
+                color: appDarkMode.value ? AppColors.darkCardElevated : AppColors.card,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: c.border),
               ),
               child: Icon(
-                _isDarkMode
+                appDarkMode.value
                     ? Icons.light_mode_rounded
                     : Icons.dark_mode_rounded,
                 size: 20,
-                color: _isDarkMode
+                color: appDarkMode.value
                     ? AppColors.darkWarning
                     : AppColors.textGrey,
               ),

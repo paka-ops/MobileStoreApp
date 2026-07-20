@@ -7,6 +7,7 @@ import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
 import 'models/Store.dart';
+import 'utils/app_colors.dart';
 // Crée cette clé en dehors de tes classes (variable globale)
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 main() {
@@ -21,17 +22,20 @@ class MyApp extends StatefulWidget{
 class _MyAppState extends State<MyApp>{
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkMode,
+      builder: (context, isDark, _) => MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Store.dart App",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: buildAppTheme(isDark),
+      darkTheme: buildAppTheme(true),
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: "/",
       routes: {
         "/": (context) => WelcomePreLoginScreen(),
         "/login": (context) => LoginScreen(),
       },
+    ),
     );
   }
 }
