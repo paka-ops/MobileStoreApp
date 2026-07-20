@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_store_app/screens/dashboard_screens.dart';
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode;
 import '../widgets/store_item.dart';
 import '../models/Store.dart';
 
@@ -91,6 +92,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ],
                   ),
                   const Spacer(),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: appDarkMode,
+                    builder: (context, isDark, _) => IconButton(
+                      tooltip: isDark ? 'Activer le thème clair' : 'Activer le thème sombre',
+                      onPressed: () => appDarkMode.value = !isDark,
+                      icon: Icon(
+                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
                   _buildHeaderStatChip(
                     icon: Icons.inventory_2_rounded,
                     label: "${widget.stores.length}",

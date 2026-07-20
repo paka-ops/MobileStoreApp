@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/screens/EmployerFormPage.dart';
+import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode;
 
 // ---------------------------------------------------------------------
 // PALETTE — désaturée, confortable pour de longues sessions de travail
@@ -29,7 +30,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -71,6 +72,18 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    const Spacer(),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: appDarkMode,
+                      builder: (context, isDark, _) => IconButton(
+                        tooltip: isDark ? 'Activer le thème clair' : 'Activer le thème sombre',
+                        onPressed: () => appDarkMode.value = !isDark,
+                        icon: Icon(
+                          isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
                   ],
                 ),
