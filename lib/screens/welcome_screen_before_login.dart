@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/screens/EmployerFormPage.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode;
-
-// ---------------------------------------------------------------------
-// PALETTE — désaturée, confortable pour de longues sessions de travail
-// ---------------------------------------------------------------------
-class AppColors {
-  static const primary = Color(0xFF4A7C82);       // teal désaturé, doux
-  static const primarySoft = Color(0xFFEBF2F2);
-  static const accent = Color(0xFFC08552);         // terracotta doux (dépenses/alertes)
-  static const accentSoft = Color(0xFFF6ECE3);
-  static const danger = Color(0xFFC96B6B);
-  static const success = Color(0xFF6FA687);
-
-  static const background = Color(0xFFF7F8FA);
-  static const card = Colors.white;
-  static const border = Color(0xFFEDEEF2);
-
-  static const textDark = Color(0xFF2E333D);
-  static const textGrey = Color(0xFF95999E);
-}
+import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
 
 class WelcomePreLoginScreen extends StatefulWidget {
   @override
@@ -29,8 +10,10 @@ class WelcomePreLoginScreen extends StatefulWidget {
 class _WelcomeState extends State<WelcomePreLoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final colors = DashColors(context);
+    
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -54,11 +37,11 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Text(
                           "BouTiKa",
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: colors.primary,
                             fontWeight: FontWeight.w700,
                             fontSize: 18,
                           ),
@@ -66,7 +49,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                         Text(
                           "ma boutique autrement",
                           style: TextStyle(
-                            color: AppColors.textGrey,
+                            color: colors.textSecondary,
                             fontSize: 12,
                             fontStyle: FontStyle.italic,
                           ),
@@ -81,7 +64,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                         onPressed: () => appDarkMode.value = !isDark,
                         icon: Icon(
                           isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                          color: AppColors.primary,
+                          color: colors.primary,
                         ),
                       ),
                     ),
@@ -96,32 +79,32 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                 width: 160,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: colors.primarySoft,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border, width: 1),
+                  border: Border.all(color: colors.border, width: 1),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.storefront_rounded,
                   size: 70,
-                  color: AppColors.primary,
+                  color: colors.primary,
                 ),
               ),
               const SizedBox(height: 40),
 
-              const Text(
+              Text(
                 "Bienvenue",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 "Gérez votre stock, suivez vos ventes et\npilotez votre boutique en toute simplicité.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppColors.textGrey,
+                  color: colors.textSecondary,
                   fontSize: 14,
                   height: 1.5,
                 ),
@@ -136,7 +119,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, "/login"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: colors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -165,10 +148,10 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                     );
                   },
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: AppColors.card,
-                    foregroundColor: AppColors.textDark,
+                    backgroundColor: colors.card,
+                    foregroundColor: colors.textPrimary,
                     elevation: 0,
-                    side: const BorderSide(color: AppColors.border, width: 1.2),
+                    side: BorderSide(color: colors.border, width: 1.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
