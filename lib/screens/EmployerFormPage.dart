@@ -3,25 +3,7 @@ import 'package:mobile_store_app/models/employer.dart';
 import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/service/employer_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
-
-// ---------------------------------------------------------------------
-// PALETTE — désaturée, confortable pour de longues sessions de travail
-// ---------------------------------------------------------------------
-class AppColors {
-  static const primary = Color(0xFF4A7C82);       // teal désaturé, doux
-  static const primarySoft = Color(0xFFEBF2F2);
-  static const accent = Color(0xFFC08552);         // terracotta doux (dépenses/alertes)
-  static const accentSoft = Color(0xFFF6ECE3);
-  static const danger = Color(0xFFC96B6B);
-  static const success = Color(0xFF6FA687);
-
-  static const background = Color(0xFFF7F8FA);
-  static const card = Colors.white;
-  static const border = Color(0xFFEDEEF2);
-
-  static const textDark = Color(0xFF2E333D);
-  static const textGrey = Color(0xFF95999E);
-}
+import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
 
 class EmployerFormPage extends StatefulWidget {
   const EmployerFormPage({super.key});
@@ -57,13 +39,13 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   }
 
   // Style commun pour les champs — aligné sur le design global
-  InputDecoration _inputStyle(String label, IconData icon) {
+  InputDecoration _inputStyle(String label, IconData icon, DashColors colors) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: AppColors.textGrey, fontSize: 14),
-      prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
+      labelStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+      prefixIcon: Icon(icon, color: colors.primary, size: 20),
       filled: true,
-      fillColor: AppColors.background,
+      fillColor: colors.card,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -71,24 +53,26 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border, width: 1),
+        borderSide: BorderSide(color: colors.border, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: BorderSide(color: colors.primary, width: 1.5),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = DashColors(context);
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -97,12 +81,12 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
           key: _formKey,
           child: Column(
             children: [
-              _buildHeader(),
-              _buildProgressIndicator(),
+              _buildHeader(colors),
+              _buildProgressIndicator(colors),
               Expanded(
                 child: Theme(
                   data: Theme.of(context).copyWith(
-                    colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppColors.primary),
+                    colorScheme: Theme.of(context).colorScheme.copyWith(primary: colors.primary),
                   ),
                   child: Stepper(
                     type: StepperType.horizontal,
@@ -110,8 +94,8 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
                     currentStep: _currentStep,
                     onStepContinue: _handleNext,
                     onStepCancel: _handleBack,
-                    controlsBuilder: _buildStepControls,
-                    steps: _buildSteps(),
+                    controlsBuilder: (context, details) => _buildStepControls(context, details, colors),
+                    steps: _buildSteps(colors),
                   ),
                 ),
               ),
@@ -122,41 +106,41 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(DashColors colors) {
     return Column(
       children: [
         Container(
           width: 120,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           decoration: BoxDecoration(
-            color: AppColors.primarySoft,
+            color: colors.primarySoft,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               "BouTiKa",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                color: colors.primary,
               ),
             ),
           ),
         ),
         const SizedBox(height: 15),
-        const Text(
+        Text(
           "Créer votre compte",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textDark),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: colors.textPrimary),
         ),
-        const Text(
+        Text(
           "Complétez les étapes pour commencer",
-          style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          style: TextStyle(color: colors.textSecondary, fontSize: 13),
         ),
       ],
     );
   }
 
-  Widget _buildProgressIndicator() {
+  Widget _buildProgressIndicator(DashColors colors) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
       child: Row(
@@ -166,7 +150,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                color: index <= _currentStep ? AppColors.primary : AppColors.border,
+                color: index <= _currentStep ? colors.primary : colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -176,23 +160,23 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
     );
   }
 
-  List<Step> _buildSteps() {
+  List<Step> _buildSteps(DashColors colors) {
     return [
       Step(
         state: _currentStep > 0 ? StepState.complete : StepState.indexed,
         isActive: _currentStep >= 0,
-        title: Text("Identité", style: TextStyle(fontSize: 12, color: _currentStep == 0 ? AppColors.primary : AppColors.textGrey)),
+        title: Text("Identité", style: TextStyle(fontSize: 12, color: _currentStep == 0 ? colors.primary : colors.textSecondary)),
         content: Column(
           children: [
             TextFormField(
               controller: lastnameController,
-              decoration: _inputStyle("Nom", Icons.person_outline),
+              decoration: _inputStyle("Nom", Icons.person_outline, colors),
               validator: (v) => v!.isEmpty ? "Champ requis" : null,
             ),
             const SizedBox(height: 15),
             TextFormField(
               controller: firstnameController,
-              decoration: _inputStyle("Prénom", Icons.person_outline),
+              decoration: _inputStyle("Prénom", Icons.person_outline, colors),
               validator: (v) => v!.isEmpty ? "Champ requis" : null,
             ),
           ],
@@ -201,19 +185,19 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       Step(
         state: _currentStep > 1 ? StepState.complete : StepState.indexed,
         isActive: _currentStep >= 1,
-        title: Text("Contact", style: TextStyle(fontSize: 12, color: _currentStep == 1 ? AppColors.primary : AppColors.textGrey)),
+        title: Text("Contact", style: TextStyle(fontSize: 12, color: _currentStep == 1 ? colors.primary : colors.textSecondary)),
         content: Column(
           children: [
             TextFormField(
               controller: usernameController,
-              decoration: _inputStyle("Nom d'utilisateur", Icons.alternate_email),
+              decoration: _inputStyle("Nom d'utilisateur", Icons.alternate_email, colors),
               validator: (v) => v!.isEmpty ? "Champ requis" : null,
             ),
             const SizedBox(height: 15),
             TextFormField(
               controller: phoneController,
               keyboardType: TextInputType.phone,
-              decoration: _inputStyle("Téléphone", Icons.phone_outlined),
+              decoration: _inputStyle("Téléphone", Icons.phone_outlined, colors),
               validator: (v) => v!.isEmpty ? "Champ requis" : null,
             ),
           ],
@@ -221,15 +205,15 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       ),
       Step(
         isActive: _currentStep >= 2,
-        title: Text("Sécurité", style: TextStyle(fontSize: 12, color: _currentStep == 2 ? AppColors.primary : AppColors.textGrey)),
+        title: Text("Sécurité", style: TextStyle(fontSize: 12, color: _currentStep == 2 ? colors.primary : colors.textSecondary)),
         content: Column(
           children: [
             TextFormField(
               controller: passwordController,
               obscureText: _isObscured,
-              decoration: _inputStyle("Mot de passe", Icons.lock_outline).copyWith(
+              decoration: _inputStyle("Mot de passe", Icons.lock_outline, colors).copyWith(
                 suffixIcon: IconButton(
-                  icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility, color: AppColors.textGrey),
+                  icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility, color: colors.textSecondary),
                   onPressed: () => setState(() => _isObscured = !_isObscured),
                 ),
               ),
@@ -239,18 +223,18 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
             TextFormField(
               controller: confirmPasswordController,
               obscureText: _isConfirmObscured,
-              decoration: _inputStyle("Confirmer mot de passe", Icons.lock_reset).copyWith(
+              decoration: _inputStyle("Confirmer mot de passe", Icons.lock_reset, colors).copyWith(
                 suffixIcon: IconButton(
-                  icon: Icon(_isConfirmObscured ? Icons.visibility_off : Icons.visibility, color: AppColors.textGrey),
+                  icon: Icon(_isConfirmObscured ? Icons.visibility_off : Icons.visibility, color: colors.textSecondary),
                   onPressed: () => setState(() => _isConfirmObscured = !_isConfirmObscured),
                 ),
               ),
               validator: (v) => v != passwordController.text ? "Les mots de passe diffèrent" : null,
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               "Assurez-vous que les mots de passe correspondent",
-              style: TextStyle(fontSize: 11, color: AppColors.textGrey),
+              style: TextStyle(fontSize: 11, color: colors.textSecondary),
             )
           ],
         ),
@@ -258,10 +242,9 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
     ];
   }
 
-  Widget _buildStepControls(BuildContext context, ControlsDetails details) {
+  Widget _buildStepControls(BuildContext context, ControlsDetails details, DashColors colors) {
     bool isLastStep = _currentStep == 2;
 
-    // Conserve la logique originale mais adaptée au style
     _isLoading == true ? Future.delayed(const Duration(seconds: 7), () {
       setState(() {
         _isLoading = false;
@@ -279,9 +262,9 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  side: const BorderSide(color: AppColors.border, width: 1.1),
-                  foregroundColor: AppColors.textDark,
-                  backgroundColor: AppColors.card,
+                  side: BorderSide(color: colors.border, width: 1.1),
+                  foregroundColor: colors.textPrimary,
+                  backgroundColor: colors.card,
                 ),
                 child: const Text("Retour", style: TextStyle(fontWeight: FontWeight.w600)),
               ),
@@ -291,7 +274,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : details.onStepContinue,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: colors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 elevation: 0,
@@ -336,9 +319,9 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Veuillez remplir tous les champs de cette étape"),
-          backgroundColor: AppColors.danger,
+        SnackBar(
+          content: const Text("Veuillez remplir tous les champs de cette étape"),
+          backgroundColor: DashColors(context).danger,
         ),
       );
     }
