@@ -569,21 +569,24 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   Widget _buildBody(DashColors c) {
     if (isLoading) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-                strokeWidth: 2.5, color: c.primary),
-            const SizedBox(height: 16),
-            Text(
-              "Chargement des commandes...",
-              style: TextStyle(
-                color: c.textSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,           // <-- au lieu de max
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(strokeWidth: 2.5, color: c.primary),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  "Chargement des commandes...",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -622,63 +625,81 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   }
 
   Widget _buildEmptyState(DashColors c) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: c.primarySoft,
-                shape: BoxShape.circle,
-                border: Border.all(color: c.border),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Si la hauteur dispo est faible, on réduit l'illustration
+        final bool compact = constraints.maxHeight < 320;
+        final double circle = compact ? 64 : 120;
+
+        return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: compact ? 12 : 24,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,           // <-- clé
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: circle,
+                      height: circle,
+                      decoration: BoxDecoration(
+                        color: c.primarySoft,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: c.border),
+                      ),
+                      child: Icon(Icons.receipt_long_rounded,
+                          size: compact ? 28 : 50, color: c.primary),
+                    ),
+                    SizedBox(height: compact ? 12 : 28),
+                    Text(
+                      "Aucune commande trouvée",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: compact ? 16 : 20,
+                        fontWeight: FontWeight.w700,
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 6 : 10),
+                    Text(
+                      "Modifiez les filtres ou la période pour afficher les commandes.",
+                      textAlign: TextAlign.center,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: c.textSecondary,
+                        fontSize: compact ? 12.5 : 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 14 : 24),
+                    OutlinedButton.icon(
+                      onPressed: () => _getOrders(storeId: widget.storeId),
+                      icon: Icon(Icons.refresh_rounded, color: c.primary, size: 18),
+                      label: Text("Rafraîchir",
+                          style: TextStyle(
+                              color: c.primary, fontWeight: FontWeight.w600)),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24, vertical: compact ? 10 : 14),
+                        side: BorderSide(color: c.primary),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Icon(Icons.receipt_long_rounded,
-                  size: 50, color: c.primary),
             ),
-            const SizedBox(height: 28),
-            Text(
-              "Aucune commande trouvée",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: c.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "Modifiez les filtres ou la période pour afficher les commandes.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: c.textSecondary,
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: () => _getOrders(storeId: widget.storeId),
-              icon: Icon(Icons.refresh_rounded, color: c.primary, size: 18),
-              label: Text(
-                "Rafraîchir",
-                style: TextStyle(
-                    color: c.primary,
-                    fontWeight: FontWeight.w600),
-              ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 14),
-                side: BorderSide(color: c.primary),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

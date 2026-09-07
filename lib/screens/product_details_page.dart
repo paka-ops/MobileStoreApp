@@ -459,7 +459,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                             size: 13, color: c.textSecondary),
                         const SizedBox(width: 4),
                         Text(
-                          "${widget.product.stock?.sellingPrice?.toStringAsFixed(0) ?? '0'} F",
+                          "${widget.product.stock?.sellingPrice.toStringAsFixed(0) ?? '0'} F",
                           style: TextStyle(
                             color: c.textSecondary,
                             fontSize: 12.5,
@@ -507,7 +507,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                 ),
               ),
               Text(
-                "${stockRestant.toStringAsFixed(0)} / ${stockTotal.toStringAsFixed(0)} unité(s)",
+                "${stockRestant.toStringAsFixed(2)} / ${stockTotal.toStringAsFixed(2)} unité(s)",
                 style: TextStyle(
                   color: statusColor,
                   fontSize: 12,
@@ -661,14 +661,14 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
     final List<_StatItem> items = [
       _StatItem(
         title: 'Vendus',
-        value: stats.totalSold.toStringAsFixed(0),
+        value: stats.totalSold.toStringAsFixed(2),
         icon: Icons.shopping_cart_checkout_rounded,
         color: c.success,
         softColor: c.successSoft,
       ),
       _StatItem(
         title: 'Entrés',
-        value: stats.totalEntered.toStringAsFixed(0),
+        value: stats.totalEntered.toStringAsFixed(2),
         icon: Icons.inventory_2_outlined,
         color: c.primary,
         softColor: c.primarySoft,
@@ -877,7 +877,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              "+${quantityAdded.toStringAsFixed(0)} unités",
+                              "+${quantityAdded.toStringAsFixed(2)} unités",
                               style: TextStyle(
                                 color: c.success,
                                 fontSize: 11.5,
@@ -895,7 +895,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                "-${totalSell.toStringAsFixed(0)} vendus",
+                                "-${totalSell.toStringAsFixed(2)} vendus",
                                 style: TextStyle(
                                   color: c.danger,
                                   fontSize: 11.5,

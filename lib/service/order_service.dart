@@ -76,7 +76,7 @@ class OrderService {
           "Authorization": "Bearer $token",
           "content-type": "application/json"
         },
-      ).timeout(Duration(seconds: 15));
+      ).timeout(Duration(seconds: 30));
       if (response.statusCode == 200) {
         Map<String,dynamic> responseMap = jsonDecode(response.body) as Map<String,dynamic>;
         List<dynamic> orderMaps = responseMap.values.first;

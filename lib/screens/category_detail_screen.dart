@@ -938,7 +938,7 @@ class _EmployerCategoryDetailsState
 
                 // Info rows
                 _infoRow(c, "Prix de vente", "${p.stock!.sellingPrice} F"),
-                _infoRow(c, "Stock restant", "${stock.toStringAsFixed(0)}"),
+                _infoRow(c, "Stock restant", "${stock.toStringAsFixed(2)}"),
                 _infoRow(
                   c,
                   "État",
@@ -1312,7 +1312,7 @@ class _ProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  "${stock.toStringAsFixed(0)} en stock",
+                  "${stock.toStringAsFixed(2)} en stock",
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 10.5,
@@ -1364,7 +1364,7 @@ class _ProductCard extends StatelessWidget {
                           "${product.stock!.sellingPrice} F", c.primary,
                           c.primarySoft),
                       _detailChip(c, "Stock",
-                          stock.toStringAsFixed(0), statusColor,
+                          stock.toStringAsFixed(2), statusColor,
                           statusColor.withOpacity(0.12)),
                     ],
                   ),
@@ -1419,7 +1419,7 @@ class _ProductCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${stock.toStringAsFixed(0)} restant",
+              "${stock.toStringAsFixed(2)} restant",
               style: TextStyle(
                 color: c.textPrimary,
                 fontWeight: FontWeight.w700,

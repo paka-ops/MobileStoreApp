@@ -206,7 +206,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Theme.of(context).copyWith(
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
-      fontFamily: 'Inter',
     );
   }
 
@@ -218,7 +217,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       canvasColor: AppColors.darkBackground,
       cardColor: AppColors.darkCard,
       dividerColor: AppColors.darkBorder,
-      fontFamily: 'Inter',
     );
   }
 

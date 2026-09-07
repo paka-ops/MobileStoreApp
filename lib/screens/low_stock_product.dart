@@ -396,7 +396,7 @@ class _LowStockProductDetailsScreenState
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            "Stock actuel : ${_getStock(product).toStringAsFixed(0)} unité(s)",
+                            "Stock actuel : ${_getStock(product).toStringAsFixed(2)} unité(s)",
                             style: TextStyle(
                               color: c.danger,
                               fontSize: 13,
@@ -468,7 +468,7 @@ class _LowStockProductDetailsScreenState
 
                       Navigator.pop(dialogContext);
                       showSuccessMessage(
-                        "${add.toStringAsFixed(0)} unités ajoutées à ${p.name}",
+                        "${add.toStringAsFixed(2)} unités ajoutées à ${p.name}",
                         context,
                       );
                     }
@@ -537,7 +537,7 @@ class _LowStockProductDetailsScreenState
                 _infoRow(c, "Prix de vente",
                     "${p.stock!.sellingPrice} F"),
                 _infoRow(c, "Stock restant",
-                    "${stock.toStringAsFixed(0)} unités"),
+                    "${stock.toStringAsFixed(2)} unités"),
                 _infoRow(
                   c,
                   "État",
@@ -968,7 +968,7 @@ class _LowStockProductCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "${stock.toStringAsFixed(0)} — ${_stockLabel()}",
+                      "${stock.toStringAsFixed(2)} — ${_stockLabel()}",
                       style: TextStyle(
                         color: statusColor,
                         fontSize: 10.5,
@@ -1011,7 +1011,7 @@ class _LowStockProductCard extends StatelessWidget {
                     MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${stock.toStringAsFixed(0)} restant sur ${maxStock.toStringAsFixed(0)}",
+                        "${stock.toStringAsFixed(2)} restant sur ${maxStock.toStringAsFixed(0)}",
                         style: TextStyle(
                           color: c.textPrimary,
                           fontWeight: FontWeight.w700,
@@ -1019,7 +1019,7 @@ class _LowStockProductCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "${(ratio * 100).toStringAsFixed(0)}%",
+                        "${(ratio * 100).toStringAsFixed(2)}%",
                         style: TextStyle(
                           color: statusColor,
                           fontWeight: FontWeight.w800,
@@ -1055,7 +1055,7 @@ class _LowStockProductCard extends StatelessWidget {
                       ),
                       _detailChip(
                         "Stock",
-                        stock.toStringAsFixed(0),
+                        stock.toStringAsFixed(2),
                         statusColor,
                         statusSoft,
                       ),

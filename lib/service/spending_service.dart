@@ -27,8 +27,8 @@ class SpendingServcie{
       showExceptionMessage(context);
     }
   }
-  getAllSpending(String? storeId,BuildContext context)async{
-    var result = await http.get(Uri.parse("$baseUrl/v1/spending?storeId=$storeId"),
+  getAllSpending(String? storeId,DateTime? startDate, DateTime? endDate, BuildContext context)async{
+    var result = await http.get(Uri.parse("$baseUrl/v1/spending?storeId=$storeId&startDate=${startDate?.toIso8601String()}&endDate=${endDate?.toIso8601String()}"),
         headers: {
           'Authorization' : 'Bearer $token',
           'content-type' : 'application/json'
