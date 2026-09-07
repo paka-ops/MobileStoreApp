@@ -11,6 +11,7 @@ import 'package:mobile_store_app/utils/message.dart';
 import '../service/order_service.dart';
 import 'category_report_screen.dart';
 import 'general_report_screen.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class OrderStoryScreen extends StatefulWidget {
   final String storeId;
@@ -574,7 +575,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
             mainAxisSize: MainAxisSize.min,           // <-- au lieu de max
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(strokeWidth: 2.5, color: c.primary),
+              const BouTikaLoader(),
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -877,13 +878,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                           Navigator.pop(dialogContext);
                         },
                         child: isDeleting
-                            ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.2,
-                              color: Colors.white),
-                        )
+                            ? const BouTikaLoader.compact()
                             : Text(
                           widget.userType == 'employee'
                               ? "Demander l'annulation"

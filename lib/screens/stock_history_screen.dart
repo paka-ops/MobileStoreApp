@@ -4,6 +4,7 @@ import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/models/stock.dart';
 import 'package:mobile_store_app/service/product_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // Note: Assure-toi d'avoir un modèle Dart correspondant à ton entité Java Stock
 
@@ -85,7 +86,7 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
           _buildFilterBar(),
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: BouTikaLoader())
                 :stocks.isEmpty?_buildEmptyState(): _buildRestockList(),
           ),
         ],

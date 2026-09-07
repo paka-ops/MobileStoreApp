@@ -4,6 +4,7 @@ import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/service/employer_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class EmployerFormPage extends StatefulWidget {
   const EmployerFormPage({super.key});
@@ -281,7 +282,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: _isLoading
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  ? const BouTikaLoader.compact()
                   : Text(isLastStep ? "Terminer l'inscription" : "Suivant", style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),

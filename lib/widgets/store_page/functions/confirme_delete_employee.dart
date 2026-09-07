@@ -6,6 +6,7 @@ import '../../../service/employee_service.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 import '../../../utils/message.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 void _confirmDeleteEmployee({required BuildContext context,required Employee emp,required bool isDeletingEmployee}) {
   showDialog(
@@ -33,7 +34,7 @@ void _confirmDeleteEmployee({required BuildContext context,required Employee emp
               Navigator.pop(context);
               _fetchAllData();
             },
-            child:isDeletingEmployee?CircularProgressIndicator(): const Text("Supprimer", style: TextStyle(color: Colors.white)),
+            child:isDeletingEmployee ? const BouTikaLoader.compact(): const Text("Supprimer", style: TextStyle(color: Colors.white)),
           ),
         ],
       );

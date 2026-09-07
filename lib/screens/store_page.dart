@@ -23,6 +23,7 @@ import '../service/user_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import '../widgets/store_page/functions/get_low_stock_product.dart';
 import 'login_screen.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // ---------------------------------------------------------------------------
 // Modèle ligne de vente
@@ -91,6 +92,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
   int _currentIndex = 0;
 
+  // Vrai tant que les appels API initiaux ne sont pas terminés :
+  // la page affiche alors l'écran d'attente « BouTika ».
+  bool _isLoading = true;
+
   final _firstnameController    = TextEditingController();
   final _secondnameController   = TextEditingController();
   final _usernameController     = TextEditingController();
@@ -133,8 +138,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // Chargement des données
   // -------------------------------------------------------------------------
   Future<void> _fetchAllData() async {
-    await _loadEmployeesAndCategories();
-    await _loadAllProductsForSale();
+    try {
+      await _loadEmployeesAndCategories();
+      await _loadAllProductsForSale();
+    } finally {
+      // Les appels API sont terminés (succès ou échec) : on quitte
+      // l'écran d'attente « BouTika ».
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _loadEmployeesAndCategories() async {
@@ -168,6 +179,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       valueListenable: appDarkMode,
       builder: (context, isDark, __) {
         final colors = DashColors(context);
+
+        // Écran d'attente « BouTika » tant que les appels API
+        // de chargement des données ne sont pas terminés.
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor: colors.background,
+            body: Center(
+              child: const BouTikaLoader(),
+            ),
+          );
+        }
+
         return Scaffold(
           backgroundColor: colors.background,
           body: SafeArea(
@@ -1271,11 +1294,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     _fetchAllData();
                   },
                   child: isDeletingEmployee
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Supprimer",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1331,11 +1350,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         dialogContext, createdOrder != null);
                   },
                   child: isCreatingOrder
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Oui",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1547,11 +1562,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isCancelingSale
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Valider",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1629,11 +1640,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isValidatingSale
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Oui, Valider",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1771,11 +1778,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingCategory
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : Text(
                     category == null ? "Créer" : "Enregistrer",
                     style:
@@ -1895,11 +1898,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingEmployee
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : Text(
                     employee == null ? "Ajouter" : "Enregistrer",
                     style:
@@ -2080,11 +2079,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingExpense
-                      ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Enregistrer",
                       style: TextStyle(color: Colors.white)),
                 ),

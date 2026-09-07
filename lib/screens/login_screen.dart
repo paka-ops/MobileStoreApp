@@ -5,6 +5,7 @@ import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -160,14 +161,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               onPressed: _isLoading ? null : _handleLogin,
               child: _isLoading
-                  ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
+                  ? const BouTikaLoader.compact()
                   : const Text(
                 "Se connecter",
                 style: TextStyle(

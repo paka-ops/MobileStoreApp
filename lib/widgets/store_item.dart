@@ -5,6 +5,7 @@ import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import '../models/Store.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // Couleurs fixes indépendantes du thème
 class _Fixed {
@@ -240,12 +241,7 @@ class _StoreItemState extends State<StoreItem> {
                               borderRadius: BorderRadius.circular(14)),
                         ),
                         child: isLoading
-                            ? const SizedBox(
-                          height: 18,
-                          width:  18,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.2, color: Colors.white),
-                        )
+                            ? const BouTikaLoader.compact()
                             : const Text(
                           "Enregistrer",
                           style: TextStyle(
@@ -387,13 +383,7 @@ class _StoreItemState extends State<StoreItem> {
                               borderRadius: BorderRadius.circular(14)),
                         ),
                         child: isLoading
-                            ? const SizedBox(
-                          height: 18,
-                          width:  18,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.2,
-                              color: Colors.white),
-                        )
+                            ? const BouTikaLoader.compact()
                             : const Text(
                           "Supprimer",
                           style: TextStyle(
