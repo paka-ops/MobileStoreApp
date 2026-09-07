@@ -18,8 +18,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   List<Spending> allExpenses = [];
   List<Spending> filteredExpenses = [];
 
-  DateTime? startDate = DateTime.now().subtract(Duration(days: 1));
-  DateTime? endDate = DateTime.now();
+  DateTime? startDate;
+  DateTime? endDate;
 
   static const Color _accent = Color(0xFFC08552);
   static const Color _danger = Color(0xFFC96B6B);
@@ -30,12 +30,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     _fetchExpenses();
   }
 
-  Future<void> _fetchExpenses() async {
+  Future<void> _fetchExpenses({DateTime? startDate, DateTime? endDate}) async {
     setState(() => isLoading = true);
     try {
       final spendingServcie = SpendingServcie();
-      final List<Spending> spendings =
-      await spendingServcie.getAllSpending(widget.storeId,startDate,endDate,context);
+      final List<Spending> spendings = await spendingServcie.getAllSpending(
+        widget.storeId,
+        startDate ?? DateTime.now().subtract(const Duration(days: 1)),
+        endDate ?? DateTime.now().add(const Duration(days: 1)),
+        context,
+      );
 
       final expenses = spendings.cast<Spending>();
 
@@ -48,7 +52,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       if (mounted) {
         setState(() {
           allExpenses = expenses;
-          _applyLocalFilter();
+          _runFilterLogic();
         });
       }
     } catch (e) {
@@ -58,22 +62,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     }
   }
 
-  void _applyLocalFilter() {
-    filteredExpenses = allExpenses.where((expense) {
-      final createdAt = expense.createdAt;
-      if (createdAt == null) return false;
-
-      final isAfterStart =
-      startDate == null ? true : !createdAt.isBefore(_startOfDay(startDate!));
-
-      final isBeforeEnd =
-      endDate == null ? true : createdAt.isBefore(_startOfDay(endDate!).add(const Duration(days: 1)));
-
-      return isAfterStart && isBeforeEnd;
-    }).toList();
+  void _runFilterLogic() {
+    filteredExpenses = List<Spending>.from(allExpenses);
   }
 
-  DateTime _startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
+  void _applyFilters() =>
+      _fetchExpenses(startDate: startDate, endDate: endDate);
 
   double get _totalFilteredAmount {
     return filteredExpenses.fold<double>(
@@ -107,14 +101,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             actions: [
               IconButton(
                 tooltip: "Actualiser",
-                onPressed: _fetchExpenses,
+                onPressed: () =>
+                    _fetchExpenses(startDate: startDate, endDate: endDate),
                 icon: Icon(Icons.refresh_rounded, color: colors.primary),
               ),
             ],
           ),
           body: SafeArea(
             child: RefreshIndicator(
-              onRefresh: _fetchExpenses,
+              onRefresh: () =>
+                  _fetchExpenses(startDate: startDate, endDate: endDate),
               color: colors.primary,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -280,8 +276,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     setState(() {
                       startDate = null;
                       endDate = null;
-                      _applyLocalFilter();
                     });
+                    _applyFilters();
                   },
                   icon: const Icon(Icons.close_rounded, size: 16, color: _danger),
                   label: const Text(
@@ -300,28 +296,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               Expanded(
                 child: _buildDatePickerChip(
                   colors: colors,
-                  label: "Du",
+                  label: "Date début",
                   date: startDate,
-                  onPicked: (date) {
-                    setState(() {
-                      startDate = date;
-                      _applyLocalFilter();
-                    });
-                  },
+                  isStart: true,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildDatePickerChip(
                   colors: colors,
-                  label: "Au",
+                  label: "Date fin",
                   date: endDate,
-                  onPicked: (date) {
-                    setState(() {
-                      endDate = date;
-                      _applyLocalFilter();
-                    });
-                  },
+                  isStart: false,
                 ),
               ),
             ],
@@ -335,8 +321,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     required DashColors colors,
     required String label,
     required DateTime? date,
-    required Function(DateTime) onPicked,
+    required bool isStart,
   }) {
+    final hasDate = date != null;
+
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () async {
@@ -349,37 +337,73 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             data: Theme.of(context).copyWith(
               colorScheme: Theme.of(context).colorScheme.copyWith(
                 primary: colors.primary,
+                onPrimary: Colors.white,
+                surface: colors.card,
+                onSurface: colors.textPrimary,
               ),
             ),
             child: child!,
           ),
         );
 
-        if (picked != null) onPicked(picked);
+        if (picked != null) {
+          setState(() {
+            if (isStart) {
+              startDate = picked;
+            } else {
+              endDate = picked;
+            }
+          });
+          _applyFilters();
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 14),
         decoration: BoxDecoration(
-          color: colors.background,
+          color: hasDate ? colors.primarySoft : colors.background,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colors.border),
+          border: Border.all(
+            color: hasDate ? colors.primary.withOpacity(0.3) : colors.border,
+            width: 1.2,
+          ),
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_month_rounded,
-                size: 18, color: colors.primary),
+            Icon(
+              Icons.calendar_month_rounded,
+              size: 18,
+              color: hasDate ? colors.primary : colors.textSecondary,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                date == null ? label : DateFormat('dd/MM/yyyy').format(date),
+                hasDate ? DateFormat('dd/MM/yy').format(date!) : label,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: date == null ? colors.textSecondary : colors.textPrimary,
+                  color: hasDate ? colors.primary : colors.textSecondary,
                 ),
               ),
             ),
+            if (hasDate)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isStart) {
+                      startDate = null;
+                    } else {
+                      endDate = null;
+                    }
+                  });
+                  _applyFilters();
+                },
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 14,
+                  color: colors.primary,
+                ),
+              ),
           ],
         ),
       ),
