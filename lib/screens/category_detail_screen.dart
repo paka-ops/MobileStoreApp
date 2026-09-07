@@ -7,6 +7,7 @@ import 'package:mobile_store_app/screens/product_details_page.dart';
 import 'package:mobile_store_app/service/product_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart';
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class EmployerCategoryDetailScreen extends StatefulWidget {
   final Category category;
@@ -331,10 +332,7 @@ class _EmployerCategoryDetailsState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              strokeWidth: 2.5,
-              color: c.primary,
-            ),
+            const BouTikaLoader(),
             const SizedBox(height: 16),
             Text(
               "Chargement des produits...",
@@ -1142,12 +1140,7 @@ class _EmployerCategoryDetailsState
             ),
             onPressed: isLoading ? null : onConfirm,
             child: isLoading
-                ? const SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(
-                  strokeWidth: 2.2, color: Colors.white),
-            )
+                ? const BouTikaLoader.compact()
                 : Text(confirmLabel,
                 style: const TextStyle(
                     fontWeight: FontWeight.w600, fontSize: 14)),

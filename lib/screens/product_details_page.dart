@@ -5,6 +5,7 @@ import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/service/product_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // =====================================================================
 // MODÈLE
@@ -255,7 +256,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(strokeWidth: 2.5, color: c.primary),
+          const BouTikaLoader(),
           const SizedBox(height: 16),
           Text(
             "Chargement des statistiques...",

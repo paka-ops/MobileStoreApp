@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_store_app/models/spending.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class ExpensesScreen extends StatefulWidget {
   final String storeId;
@@ -124,7 +125,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 80),
                       child: Center(
-                        child: CircularProgressIndicator(color: colors.primary),
+                        child: const BouTikaLoader(),
                       ),
                     )
                   else if (filteredExpenses.isEmpty)

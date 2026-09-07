@@ -23,6 +23,7 @@ import '../service/user_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import '../widgets/store_page/functions/get_low_stock_product.dart';
 import 'login_screen.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // ---------------------------------------------------------------------------
 // Modèle ligne de vente
@@ -185,7 +186,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           return Scaffold(
             backgroundColor: colors.background,
             body: Center(
-              child: _BouTikaLoader(isDark: isDark),
+              child: const BouTikaLoader(),
             ),
           );
         }
@@ -1293,11 +1294,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     _fetchAllData();
                   },
                   child: isDeletingEmployee
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Supprimer",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1353,11 +1350,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         dialogContext, createdOrder != null);
                   },
                   child: isCreatingOrder
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Oui",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1569,11 +1562,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isCancelingSale
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Valider",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1651,11 +1640,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isValidatingSale
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Oui, Valider",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -1793,11 +1778,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingCategory
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : Text(
                     category == null ? "Créer" : "Enregistrer",
                     style:
@@ -1917,11 +1898,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingEmployee
-                      ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : Text(
                     employee == null ? "Ajouter" : "Enregistrer",
                     style:
@@ -2102,11 +2079,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     }
                   },
                   child: isSavingExpense
-                      ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
+                      ? const BouTikaLoader.compact()
                       : const Text("Enregistrer",
                       style: TextStyle(color: Colors.white)),
                 ),
@@ -2373,95 +2346,6 @@ class _CategoryActionButton extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-// ---------------------------------------------------------------------------
-// BouTikaLoader — écran d'attente du chargement des données
-//
-// Le mot « BouTika » est affiché et chaque lettre est parcourue par une
-// lumière : un reflet doux glisse sur le mot, comme un rayon de lumière
-// qui passe sur une vitre, mais avec une réflexion volontairement très
-// discrète (les lettres restent mates, seule une fine lueur les traverse).
-// ---------------------------------------------------------------------------
-class _BouTikaLoader extends StatefulWidget {
-  final bool isDark;
-
-  const _BouTikaLoader({required this.isDark});
-
-  @override
-  State<_BouTikaLoader> createState() => _BouTikaLoaderState();
-}
-
-class _BouTikaLoaderState extends State<_BouTikaLoader>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _sweepController;
-
-  @override
-  void initState() {
-    super.initState();
-    _sweepController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2200),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _sweepController.dispose();
-    super.dispose();
-  }
-
-  double _stopAt(double v) => v.clamp(0.0, 1.0).toDouble();
-
-  @override
-  Widget build(BuildContext context) {
-    // Lettres « verre dépoli » (mates, peu visibles) + lueur chaude discrète.
-    final base = widget.isDark
-        ? const Color(0xFF44454C)
-        : const Color(0xFFB6BAC3);
-    final glow = widget.isDark
-        ? const Color(0xFF6E5A43)
-        : const Color(0xFFC99C73);
-    final core = widget.isDark
-        ? const Color(0xFFCBA97E)
-        : const Color(0xFFB0713C);
-
-    return AnimatedBuilder(
-      animation: _sweepController,
-      builder: (context, _) {
-        // Position du reflet : il traverse le mot de gauche à droite,
-        // avec une courte pause avant chaque nouveau passage.
-        final t = -0.35 + _sweepController.value * 1.7;
-
-        return ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              // Léger biais diagonal : la lumière « glisse » sur la vitre.
-              begin: const Alignment(-1.0, -0.25),
-              end: const Alignment(1.0, 0.25),
-              colors: [base, glow, core, glow, base],
-              stops: [
-                0.0,
-                _stopAt(t - 0.18),
-                _stopAt(t - 0.03),
-                _stopAt(t + 0.09),
-                1.0,
-              ],
-            ).createShader(bounds);
-          },
-          child: const Text(
-            'BouTika',
-            style: TextStyle(
-              fontSize: 42,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 3,
-              color: Colors.white,
-            ),
-          ),
-        );
-      },
     );
   }
 }
