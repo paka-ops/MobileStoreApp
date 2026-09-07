@@ -91,6 +91,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
   int _currentIndex = 0;
 
+  // Vrai tant que les appels API initiaux ne sont pas terminés :
+  // la page affiche alors l'écran d'attente « BouTika ».
+  bool _isLoading = true;
+
   final _firstnameController    = TextEditingController();
   final _secondnameController   = TextEditingController();
   final _usernameController     = TextEditingController();
@@ -133,8 +137,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // Chargement des données
   // -------------------------------------------------------------------------
   Future<void> _fetchAllData() async {
-    await _loadEmployeesAndCategories();
-    await _loadAllProductsForSale();
+    try {
+      await _loadEmployeesAndCategories();
+      await _loadAllProductsForSale();
+    } finally {
+      // Les appels API sont terminés (succès ou échec) : on quitte
+      // l'écran d'attente « BouTika ».
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _loadEmployeesAndCategories() async {
@@ -168,6 +178,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       valueListenable: appDarkMode,
       builder: (context, isDark, __) {
         final colors = DashColors(context);
+
+        // Écran d'attente « BouTika » tant que les appels API
+        // de chargement des données ne sont pas terminés.
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor: colors.background,
+            body: Center(
+              child: _BouTikaLoader(isDark: isDark),
+            ),
+          );
+        }
+
         return Scaffold(
           backgroundColor: colors.background,
           body: SafeArea(
@@ -2351,6 +2373,95 @@ class _CategoryActionButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+// ---------------------------------------------------------------------------
+// BouTikaLoader — écran d'attente du chargement des données
+//
+// Le mot « BouTika » est affiché et chaque lettre est parcourue par une
+// lumière : un reflet doux glisse sur le mot, comme un rayon de lumière
+// qui passe sur une vitre, mais avec une réflexion volontairement très
+// discrète (les lettres restent mates, seule une fine lueur les traverse).
+// ---------------------------------------------------------------------------
+class _BouTikaLoader extends StatefulWidget {
+  final bool isDark;
+
+  const _BouTikaLoader({required this.isDark});
+
+  @override
+  State<_BouTikaLoader> createState() => _BouTikaLoaderState();
+}
+
+class _BouTikaLoaderState extends State<_BouTikaLoader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _sweepController;
+
+  @override
+  void initState() {
+    super.initState();
+    _sweepController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _sweepController.dispose();
+    super.dispose();
+  }
+
+  double _stopAt(double v) => v.clamp(0.0, 1.0).toDouble();
+
+  @override
+  Widget build(BuildContext context) {
+    // Lettres « verre dépoli » (mates, peu visibles) + lueur chaude discrète.
+    final base = widget.isDark
+        ? const Color(0xFF44454C)
+        : const Color(0xFFB6BAC3);
+    final glow = widget.isDark
+        ? const Color(0xFF6E5A43)
+        : const Color(0xFFC99C73);
+    final core = widget.isDark
+        ? const Color(0xFFCBA97E)
+        : const Color(0xFFB0713C);
+
+    return AnimatedBuilder(
+      animation: _sweepController,
+      builder: (context, _) {
+        // Position du reflet : il traverse le mot de gauche à droite,
+        // avec une courte pause avant chaque nouveau passage.
+        final t = -0.35 + _sweepController.value * 1.7;
+
+        return ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              // Léger biais diagonal : la lumière « glisse » sur la vitre.
+              begin: const Alignment(-1.0, -0.25),
+              end: const Alignment(1.0, 0.25),
+              colors: [base, glow, core, glow, base],
+              stops: [
+                0.0,
+                _stopAt(t - 0.18),
+                _stopAt(t - 0.03),
+                _stopAt(t + 0.09),
+                1.0,
+              ],
+            ).createShader(bounds);
+          },
+          child: const Text(
+            'BouTika',
+            style: TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 3,
+              color: Colors.white,
+            ),
+          ),
+        );
+      },
     );
   }
 }
