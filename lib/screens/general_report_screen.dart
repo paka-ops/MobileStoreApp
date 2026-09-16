@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/constants/app_radius.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
 
@@ -43,7 +44,7 @@ class GeneralReportScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
             "Rapport Général",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: colors.textPrimary)
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16.5, letterSpacing: -0.2, color: colors.textPrimary)
         ),
         backgroundColor: colors.background,
         foregroundColor: colors.textPrimary,
@@ -60,18 +61,18 @@ class GeneralReportScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildKPICard("Ventes Totales", "${result['sales']} CFA", Icons.payments, colors.success, colors)),
+                  Expanded(child: _buildKPICard(colors, "Ventes Totales", "${result['sales']} CFA", Icons.payments_rounded, colors.success)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildKPICard("Ordres Totaux", "${result['totalOrder']}", Icons.shopping_bag, colors.primary, colors)),
+                  Expanded(child: _buildKPICard(colors, "Ordres Totaux", "${result['totalOrder']}", Icons.shopping_bag_rounded, colors.primary)),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _buildKPICard("Panier Moyen", "${result['panierMoyen']!.toStringAsFixed(2)} F", Icons.trending_up, colors.accent, colors)),
+                  Expanded(child: _buildKPICard(colors, "Panier Moyen", "${result['panierMoyen']!.toStringAsFixed(2)} F", Icons.trending_up_rounded, colors.accent)),
                   const SizedBox(width: 12),
                   if (userType == "employer")
-                    Expanded(child: _buildKPICard("Bénéfices", "${result['revenue']} CFA", Icons.account_balance_wallet, const Color(0xFF8A7CB8), colors)),
+                    Expanded(child: _buildKPICard(colors, "Bénéfices", "${result['revenue']} CFA", Icons.account_balance_wallet_rounded, const Color(0xFF8A7CB8))),
                 ],
               ),
               const SizedBox(height: 24),
@@ -88,25 +89,26 @@ class GeneralReportScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title, DashColors colors) {
     return Text(
       title,
-      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colors.textPrimary),
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: -0.2, color: colors.textPrimary),
     );
   }
 
-  Widget _buildKPICard(String label, String value, IconData icon, Color color, DashColors colors) {
+  Widget _buildKPICard(DashColors colors, String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: colors.border),
+        boxShadow: colors.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
+              color: color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -114,9 +116,12 @@ class GeneralReportScreen extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              fontSize: 16.5,
+              letterSpacing: -0.2,
               color: colors.textPrimary,
             ),
           ),
@@ -139,18 +144,30 @@ class GeneralReportScreen extends StatelessWidget {
       height: 200,
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: colors.border),
       ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.bar_chart_rounded, size: 40, color: colors.textSecondary.withOpacity(0.5)),
-            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: colors.primarySoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.bar_chart_rounded, size: 30, color: colors.primary.withValues(alpha: 0.7)),
+            ),
+            const SizedBox(height: 12),
             Text(
               "Graphique de performance",
               style: TextStyle(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Bientôt disponible",
+              style: TextStyle(color: colors.textSecondary.withValues(alpha: 0.7), fontSize: 11),
             ),
           ],
         ),

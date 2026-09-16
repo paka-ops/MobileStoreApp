@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/constants/app_radius.dart';
+import 'package:mobile_store_app/core/widgets/cards/app_card.dart';
+import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
@@ -23,13 +26,17 @@ class CategoryReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = DashColors(context);
     _filterOrderProductsByCategory(orders, categories);
-    
+
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
           "Analyses par Catégorie",
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: colors.textPrimary),
+          style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 16.5,
+              letterSpacing: -0.2,
+              color: colors.textPrimary),
         ),
         backgroundColor: colors.background,
         foregroundColor: colors.textPrimary,
@@ -37,34 +44,50 @@ class CategoryReportScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            Category category = categories[index];
-            Map<String, num> result = _getSalesInformationByCategory(category);
+        child: categories.isEmpty
+            ? Center(
+                child: Text(
+                  "Aucune catégorie à analyser",
+                  style: TextStyle(
+                      color: colors.textSecondary, fontSize: 14),
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  Category category = categories[index];
+                  Map<String, num> result =
+                      _getSalesInformationByCategory(category);
 
-            return _buildEnhancedCategoryCard(
-              category.name,
-              result['sales'] ?? 0,
-              result['revenues'] ?? 0,
-              _getCategoryColor(index),
-              colors,
-            );
-          },
-        ),
+                  return _buildEnhancedCategoryCard(
+                    context,
+                    category.name,
+                    result['sales'] ?? 0,
+                    result['revenues'] ?? 0,
+                    _getCategoryColor(index),
+                    colors,
+                  );
+                },
+              ),
       ),
     );
   }
 
   Widget _buildEnhancedCategoryCard(
-      String name, num sales, num revenue, Color color, DashColors colors) {
+      BuildContext context,
+      String name,
+      num sales,
+      num revenue,
+      Color color,
+      DashColors colors) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: colors.border),
+        boxShadow: colors.cardShadow,
       ),
       child: Column(
         children: [
@@ -72,29 +95,33 @@ class CategoryReportScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.06),
+              color: color.withValues(alpha: 0.06),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(17),
-                topRight: Radius.circular(17),
+                topLeft: Radius.circular(AppRadius.xl - 1),
+                topRight: Radius.circular(AppRadius.xl - 1),
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.category_rounded, color: color, size: 20),
+                  child:
+                      Icon(Icons.category_rounded, color: color, size: 20),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15.5,
-                    color: colors.textPrimary,
+                Expanded(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15.5,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
               ],
@@ -105,16 +132,21 @@ class CategoryReportScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                _buildStatItem("VENTES (CA)", sales, colors.primary, colors),
+                _buildStatItem(
+                    "VENTES (CA)", sales, colors.primary, colors),
                 if (userType == "employer") ...[
-                  Container(width: 1, height: 40, color: colors.border),
-                  _buildStatItem("BÉNÉFICE NET", revenue, colors.success, colors),
+                  Container(
+                      width: 1,
+                      height: 40,
+                      color: colors.border),
+                  _buildStatItem(
+                      "BÉNÉFICE NET", revenue, colors.success, colors),
                 ],
               ],
             ),
           ),
           // Barre visuelle de rentabilité (Bénéfice/Vente)
-          if (sales > 0)
+          if (sales > 0 && userType == "employer")
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: ClipRRect(
@@ -122,7 +154,8 @@ class CategoryReportScreen extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: (revenue / sales).clamp(0, 1).toDouble(),
                   backgroundColor: colors.background,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(color),
                   minHeight: 6,
                 ),
               ),
@@ -150,8 +183,9 @@ class CategoryReportScreen extends StatelessWidget {
             "${value.toStringAsFixed(0)} F",
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               fontSize: 16,
+              letterSpacing: -0.2,
             ),
           ),
         ],
@@ -195,12 +229,12 @@ class CategoryReportScreen extends StatelessWidget {
 
   Color _getCategoryColor(int index) {
     List<Color> colors = [
-      const Color(0xFF4A7C82),  // primary
-      const Color(0xFFC08552),  // accent
-      const Color(0xFF6FA687),  // success
-      const Color(0xFF8A7CB8),  // Violet doux
-      const Color(0xFFD8A657),  // Or doux
-      const Color(0xFF5C8AAE),  // Bleu pétrole doux
+      const Color(0xFF4A7C82),  // sarcelle doux
+      const Color(0xFFC08552),  // camel
+      const Color(0xFF6FA687),  // vert sauge
+      const Color(0xFF8A7CB8),  // violet doux
+      const Color(0xFFD8A657),  // or doux
+      const Color(0xFF5C8AAE),  // bleu pétrole doux
     ];
     return colors[index % colors.length];
   }

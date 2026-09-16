@@ -8,7 +8,6 @@ import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
 import '../widgets/store_item.dart';
 import '../models/Store.dart';
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final List<Store> stores;
