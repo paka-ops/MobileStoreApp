@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/constants/app_radius.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/common/primitives.dart';
+import 'package:mobile_store_app/core/widgets/dialogs/app_dialog.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/widgets/navigation/app_bottom_nav.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
@@ -12,9 +18,9 @@ import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
-import 'package:mobile_store_app/widgets/store_page/widgets/drawer_item.dart';
 import '../models/Store.dart';
 import '../models/employee.dart';
 import '../models/spending.dart';
@@ -23,7 +29,6 @@ import '../service/user_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import '../widgets/store_page/functions/get_low_stock_product.dart';
 import 'login_screen.dart';
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // ---------------------------------------------------------------------------
 // Modèle ligne de vente
@@ -47,8 +52,8 @@ class OrderLine {
 // ---------------------------------------------------------------------------
 class _Fixed {
   static const accent  = Color(0xFFC08552);
-  static const danger  = Color(0xFFC96B6B);
-  static const success = Color(0xFF6FA687);
+  static const danger  = Color(0xFFDE4A52);
+  static const success = Color(0xFF2F9E68);
 }
 
 class _NavItemData {
@@ -186,7 +191,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           return Scaffold(
             backgroundColor: colors.background,
             body: Center(
-              child: const BouTikaLoader(),
+              child: const BouTikaLoader(
+                message: "Préparation de votre boutique…",
+              ),
             ),
           );
         }
@@ -194,6 +201,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         return Scaffold(
           backgroundColor: colors.background,
           body: SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 _buildTopBar(context, colors),
@@ -237,7 +245,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: colors.accent.withOpacity(0.5),
+                  color: colors.accent.withValues(alpha: 0.5),
                   width: 2,
                 ),
                 color: colors.primarySoft,
@@ -264,6 +272,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 decoration: BoxDecoration(
                   color: colors.greetingPill,
                   borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.greetingPill.withValues(alpha: 0.30),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -271,7 +286,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       "👋 ",
                       style: TextStyle(fontSize: 14),
                     ),
-
                     const Text(
                       "Hello ",
                       style: TextStyle(
@@ -280,8 +294,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-
-                    // Le nom peut maintenant se réduire
                     Flexible(
                       child: Text(
                         widget.store.name,
@@ -294,9 +306,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 6),
-
                     Container(
                       padding: const EdgeInsets.all(3),
                       decoration: const BoxDecoration(
@@ -317,22 +327,21 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
           const SizedBox(width: 8),
 
-          // Bouton thème
-          _topIconButton(
+          AppIconButton(
             icon: appDarkMode.value
                 ? Icons.light_mode_rounded
                 : Icons.dark_mode_rounded,
-            colors: colors,
+            tooltip: "Thème",
             onTap: () => appDarkMode.value = !appDarkMode.value,
           ),
 
           const SizedBox(width: 8),
 
-          // Alerte stock
-          _topIconButton(
+          AppIconButton(
             icon: Icons.notifications_outlined,
-            colors: colors,
-            badge: lowStockProducts.isNotEmpty,
+            tooltip: "Alertes stock",
+            badge: lowStockProducts.length,
+            badgeColor: colors.accent,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -348,157 +357,86 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  Widget _topIconButton({
-    required IconData icon,
-    required DashColors colors,
-    bool badge = false,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colors.topBarIconBg,
-              shape: BoxShape.circle,
-              boxShadow: colors.subtleShadow,
-            ),
-            child: Icon(icon, size: 20, color: colors.topBarIcon),
-          ),
-          if (badge)
-            Positioned(
-              top: -2,
-              right: -2,
-              child: Container(
-                width: 9,
-                height: 9,
-                decoration: BoxDecoration(
-                  color: colors.accent,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   // =========================================================================
-  // STORE SWITCHER SHEET
+  // STORE SWITCHER SHEET (logique de navigation inchangée)
   // =========================================================================
   void _showStoreSwitcherSheet(BuildContext context, DashColors colors) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: colors.card,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
+    AppSheet.show(
+      context,
+      title: "Mes boutiques",
       builder: (ctx) {
-        final maxHeight = MediaQuery.sizeOf(ctx).height * 0.75;
-        return SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: maxHeight),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  width: 36,
-                  height: 4,
+        return Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+            children: [
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: colors.border,
+                    color: colors.primarySoft,
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  child: Icon(Icons.check_circle_rounded,
+                      color: colors.primary, size: 20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Mes boutiques",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: colors.textPrimary,
+                title: Text(
+                  widget.store.name,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary),
+                ),
+                subtitle: Text(
+                  "Boutique active",
+                  style: TextStyle(color: colors.textSecondary),
+                ),
+              ),
+              if (displayStore.isNotEmpty)
+                Divider(
+                    height: 1,
+                    indent: 20,
+                    endIndent: 20,
+                    color: colors.border),
+              ...displayStore.map((newStore) => ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.cardElevated,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.storefront_outlined,
+                      color: colors.textSecondary, size: 20),
+                ),
+                title: Text(newStore.name,
+                    style:
+                    TextStyle(color: colors.textPrimary)),
+                trailing: Icon(Icons.chevron_right_rounded,
+                    color: colors.textSecondary),
+                onTap: () {
+                  final nextOthers =
+                  List<Store>.from(widget.otherStores)
+                    ..removeWhere((s) => s.id == newStore.id)
+                    ..add(widget.store);
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StoreDetailScreen(
+                        store: newStore,
+                        userType: widget.userType,
+                        otherStores: nextOthers,
                       ),
                     ),
-                  ),
-                ),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 16),
-                    children: [
-                      ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: colors.primarySoft,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(Icons.check_circle_rounded,
-                              color: colors.primary, size: 20),
-                        ),
-                        title: Text(
-                          widget.store.name,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: colors.textPrimary),
-                        ),
-                        subtitle: Text(
-                          "Boutique active",
-                          style: TextStyle(color: colors.textSecondary),
-                        ),
-                      ),
-                      if (displayStore.isNotEmpty)
-                        Divider(
-                            height: 1,
-                            indent: 20,
-                            endIndent: 20,
-                            color: colors.border),
-                      ...displayStore.map((newStore) => ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: colors.cardElevated,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(Icons.storefront_outlined,
-                              color: colors.textSecondary, size: 20),
-                        ),
-                        title: Text(newStore.name,
-                            style:
-                            TextStyle(color: colors.textPrimary)),
-                        trailing: Icon(Icons.chevron_right_rounded,
-                            color: colors.textSecondary),
-                        onTap: () {
-                          final nextOthers =
-                          List<Store>.from(widget.otherStores)
-                            ..removeWhere((s) => s.id == newStore.id)
-                            ..add(widget.store);
-                          Navigator.pop(ctx);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StoreDetailScreen(
-                                store: newStore,
-                                userType: widget.userType,
-                                otherStores: nextOthers,
-                              ),
-                            ),
-                          );
-                        },
-                      )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                  );
+                },
+              )),
+            ],
           ),
         );
       },
@@ -510,102 +448,35 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   Widget _buildBottomNav(BuildContext context, DashColors colors) {
     final items = [
-      _NavItemData(Icons.home_outlined, Icons.home_rounded, "Accueil"),
-      _NavItemData(Icons.receipt_long_outlined, Icons.receipt_long_rounded,
-          "Ventes"),
-      _NavItemData(
-          Icons.inventory_2_outlined, Icons.inventory_2_rounded, "Stock"),
-      _NavItemData(Icons.settings_outlined, Icons.settings_rounded, "Plus"),
+      AppBottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: "Accueil"),
+      AppBottomNavItem(
+          icon: Icons.receipt_long_outlined,
+          activeIcon: Icons.receipt_long_rounded,
+          label: "Ventes"),
+      AppBottomNavItem(
+          icon: Icons.inventory_2_outlined,
+          activeIcon: Icons.inventory_2_rounded,
+          label: "Stock"),
+      AppBottomNavItem(
+          icon: Icons.settings_outlined,
+          activeIcon: Icons.settings_rounded,
+          label: "Plus"),
     ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.card,
-        boxShadow: colors.subtleShadow,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (index) {
-              final selected  = _currentIndex == index;
-              final item      = items[index];
-              final showBadge = index == 2 && lowStockProducts.isNotEmpty;
-
-              return Expanded(
-                child: InkWell(
-                  onTap: () => setState(() => _currentIndex = index),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Icon(
-                              selected ? item.filledIcon : item.icon,
-                              color: selected
-                                  ? colors.primary
-                                  : colors.textSecondary,
-                              size: 24,
-                            ),
-                            if (showBadge)
-                              Positioned(
-                                right: -3,
-                                top: -3,
-                                child: Container(
-                                  width: 7,
-                                  height: 7,
-                                  decoration: BoxDecoration(
-                                    color: colors.accent,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: selected
-                                ? FontWeight.w700
-                                : FontWeight.w400,
-                            color: selected
-                                ? colors.primary
-                                : colors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
+    return AppBottomNav(
+      items: items,
+      currentIndex: _currentIndex,
+      onTap: (index) => setState(() => _currentIndex = index),
+      badges: [0, 0, lowStockProducts.length, 0],
     );
   }
 
   // =========================================================================
-  // HELPERS DÉCORATIONS
+  // SECTION CARD générique
   // =========================================================================
-  BoxDecoration _cardDecoration(DashColors colors, {double radius = 20}) {
-    return BoxDecoration(
-      color: colors.card,
-      borderRadius: BorderRadius.circular(radius),
-      boxShadow: colors.cardShadow,
-    );
-  }
-
   Widget _sectionCard({
     required String title,
     required DashColors colors,
@@ -616,50 +487,38 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }) {
     return Container(
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: _cardDecoration(colors),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: colors.border),
+        boxShadow: colors.cardShadow,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                    color: colors.textPrimary,
-                  ),
-                ),
-                if (icon != null)
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: colors.primary.withOpacity(0.3)),
-                    ),
-                    child: Icon(icon, color: colors.primary, size: 20),
-                  ),
-              ],
+            child: SectionHeader(
+              title: title,
+              subtitle: subtitle,
+              trailing: icon != null
+                  ? Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: colors.primarySoft,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: colors.primary
+                                .withValues(alpha: 0.3)),
+                      ),
+                      child:
+                          Icon(icon, color: colors.primary, size: 20),
+                    )
+                  : null,
             ),
           ),
-          if (subtitle != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 6, 18, 0),
-              child: Text(
-                subtitle,
-                style: TextStyle(
-                    fontSize: 13.5,
-                    color: colors.textSecondary,
-                    height: 1.45),
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.all(18),
             child: child,
@@ -676,6 +535,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return RefreshIndicator(
       onRefresh: _fetchAllData,
       color: colors.primary,
+      backgroundColor: colors.card,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -686,13 +546,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "Inventaire",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colors.textPrimary,
-                  ),
+                child: SectionHeader(
+                  title: "Inventaire",
+                  subtitle:
+                      "${categories.length} catégorie(s)",
                 ),
               ),
             ),
@@ -723,25 +580,17 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(
-          "Gestion du stock",
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: colors.textPrimary),
+        SectionHeader(
+          title: "Gestion du stock",
+          subtitle: "Suivez votre inventaire en temps réel",
         ),
-        const SizedBox(height: 4),
-        Text(
-          "Suivez votre inventaire en temps réel",
-          style: TextStyle(color: colors.textSecondary, fontSize: 13),
-        ),
-        const SizedBox(height: 22),
-        _buildHubCard(
+        const SizedBox(height: 20),
+        ActionTile(
           icon: Icons.history_edu_rounded,
           color: colors.primary,
+          softColor: colors.primarySoft,
           title: "Historique de restockage",
           subtitle: "Consultez les réapprovisionnements passés",
-          colors: colors,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -751,9 +600,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        _buildHubCard(
+        ActionTile(
           icon: Icons.warning_amber_rounded,
           color: colors.accent,
+          softColor: colors.accentSoft,
           title: "Produits en alerte",
           subtitle: lowStockProducts.isEmpty
               ? "Aucune alerte pour le moment"
@@ -761,7 +611,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           badge: lowStockProducts.isNotEmpty
               ? lowStockProducts.length
               : null,
-          colors: colors,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -776,81 +625,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  Widget _buildHubCard({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required DashColors colors,
-    int? badge,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: _cardDecoration(colors, radius: 16),
-        child: Row(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 22),
-                ),
-                if (badge != null)
-                  Positioned(
-                    top: -4,
-                    right: -4,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      constraints: const BoxConstraints(
-                          minWidth: 17, minHeight: 17),
-                      decoration: BoxDecoration(
-                          color: colors.accent,
-                          shape: BoxShape.circle),
-                      child: Text(
-                        "$badge",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14.5,
-                          color: colors.textPrimary)),
-                  const SizedBox(height: 3),
-                  Text(subtitle,
-                      style: TextStyle(
-                          color: colors.textSecondary, fontSize: 12)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: colors.textSecondary, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
   // =========================================================================
   // ONGLET 3 — PLUS
   // =========================================================================
@@ -859,15 +633,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       children: [
         // Carte profil
-        Container(
+        AppCard(
           padding: const EdgeInsets.all(16),
-          decoration: _cardDecoration(colors),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 24,
                 backgroundColor: colors.primarySoft,
-                child: Icon(Icons.person, color: colors.primary, size: 24),
+                child:
+                    Icon(Icons.person, color: colors.primary, size: 24),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -876,9 +650,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   children: [
                     Text(
                       "${UserService.username}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           fontSize: 15,
+                          letterSpacing: -0.2,
                           color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
@@ -895,8 +672,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             : "PROPRIÉTAIRE",
                         style: TextStyle(
                           color: colors.primary,
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
+                          letterSpacing: 0.4,
                         ),
                       ),
                     ),
@@ -909,11 +687,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         const SizedBox(height: 16),
 
         // Actions
-        Container(
-          decoration: _cardDecoration(colors),
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
             children: [
               ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -945,6 +726,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     endIndent: 16,
                     color: colors.border),
                 ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -984,9 +768,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         const SizedBox(height: 16),
 
         // Déconnexion
-        Container(
-          decoration: _cardDecoration(colors),
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -1023,6 +810,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           heroTag: "btnExpense",
           onPressed: () => _showExpenseDialog(context, colors),
           backgroundColor: colors.accent,
+          foregroundColor: Colors.white,
           elevation: 2,
           icon: const Icon(Icons.money_off, color: Colors.white, size: 20),
           label: const Text("Dépense",
@@ -1034,12 +822,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           heroTag: "btnSale",
           onPressed: () => _showStartSaleDialog(context, colors),
           backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
           elevation: 3,
-          icon: const Icon(Icons.shopping_cart_checkout,
-              color: Colors.white, size: 20),
-          label: const Text("Vendre",
+          icon: Icon(Icons.shopping_cart_checkout,
+              color: colors.onPrimary, size: 20),
+          label: Text("Vendre",
               style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
+                  color: colors.onPrimary,
+                  fontWeight: FontWeight.w700)),
         ),
       ],
     );
@@ -1066,7 +856,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.person_add_alt_1_outlined,
-                        color: colors.textSecondary.withOpacity(0.5),
+                        color: colors.textSecondary
+                            .withValues(alpha: 0.5),
                         size: 32),
                     const SizedBox(height: 8),
                     Text(
@@ -1096,15 +887,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         decoration: BoxDecoration(
                           color: colors.cardElevated,
                           shape: BoxShape.circle,
-                          border: Border.all(color: colors.border),
+                          border: Border.all(
+                            color: colors.primary
+                                .withValues(alpha: 0.35),
+                            width: 1.4,
+                          ),
                         ),
                         child: Icon(Icons.add_rounded,
-                            color: colors.textSecondary, size: 22),
+                            color: colors.primary, size: 22),
                       ),
                       const SizedBox(height: 5),
                       Text("Ajouter",
                           style: TextStyle(
                               color: colors.textSecondary,
+                              fontWeight: FontWeight.w600,
                               fontSize: 12)),
                     ],
                   ),
@@ -1143,7 +939,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: colors.textPrimary, fontSize: 12),
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12),
               ),
             ],
           ),
@@ -1174,19 +972,22 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
                 color: colors.card,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: colors.border),
-                boxShadow: colors.cardShadow,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.35),
+                  width: 1.3,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.add_rounded,
-                      color: colors.textSecondary, size: 20),
+                      color: colors.primary, size: 20),
                   const SizedBox(width: 8),
                   Text("Ajouter une catégorie",
                       style: TextStyle(
-                          color: colors.textSecondary,
+                          color: colors.primary,
+                          fontWeight: FontWeight.w600,
                           fontSize: 13.5)),
                 ],
               ),
@@ -1226,23 +1027,47 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.card,
+      barrierColor: colors.barrier,
       shape: const RoundedRectangleBorder(
           borderRadius:
-          BorderRadius.vertical(top: Radius.circular(22))),
+          BorderRadius.vertical(top: Radius.circular(26))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 14),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: colors.border,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             const SizedBox(height: 10),
             ListTile(
-              leading: Icon(Icons.delete, color: colors.danger),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colors.dangerSoft,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.delete_outline_rounded,
+                    color: colors.danger, size: 20),
+              ),
               title: Text("Supprimer l'employé",
-                  style: TextStyle(color: colors.textPrimary)),
+                  style: TextStyle(
+                      color: colors.danger,
+                      fontWeight: FontWeight.w600)),
               onTap: () {
                 Navigator.pop(ctx);
                 _confirmDeleteEmployee(context, emp, colors);
               },
             ),
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -1258,45 +1083,88 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Text("Confirmation",
-                  style: TextStyle(color: colors.textPrimary)),
-              content: Text(
-                "Voulez-vous vraiment supprimer ${emp.username} ?",
-                style: TextStyle(color: colors.textSecondary),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              contentPadding:
+              const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              actionsPadding:
+              const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.dangerSoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person_remove_rounded,
+                        color: colors.danger, size: 30),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    "Confirmation",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Voulez-vous vraiment supprimer ${emp.username} ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 13.5,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    setDelState(() => isDeletingEmployee = false);
-                    Navigator.pop(ctx);
-                  },
-                  child: Text("Annuler",
-                      style: TextStyle(color: colors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.danger),
-                  onPressed: isDeletingEmployee
-                      ? null
-                      : () async {
-                    setDelState(() => isDeletingEmployee = true);
-                    final deleted = await EmployeeService()
-                        .deleteEmployee(emp, context);
-                    if (mounted)
-                      setDelState(() => isDeletingEmployee = false);
-                    if (deleted) {
-                      showSuccessMessage(
-                          "employée ${emp.username} supprimé",
-                          context);
-                    }
-                    Navigator.pop(ctx);
-                    _fetchAllData();
-                  },
-                  child: isDeletingEmployee
-                      ? const BouTikaLoader.compact()
-                      : const Text("Supprimer",
-                      style: TextStyle(color: Colors.white)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          setDelState(
+                              () => isDeletingEmployee = false);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppButton.danger(
+                        label: "Supprimer",
+                        height: 48,
+                        isLoading: isDeletingEmployee,
+                        onPressed: isDeletingEmployee
+                            ? null
+                            : () async {
+                          setDelState(
+                              () => isDeletingEmployee = true);
+                          final deleted = await EmployeeService()
+                              .deleteEmployee(emp, context);
+                          if (mounted)
+                            setDelState(() =>
+                            isDeletingEmployee = false);
+                          if (deleted) {
+                            showSuccessMessage(
+                                "employée ${emp.username} supprimé",
+                                context);
+                          }
+                          Navigator.pop(ctx);
+                          _fetchAllData();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -1312,62 +1180,47 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final orderService = OrderService();
     Order? createdOrder;
 
-    final bool? wantsToCreate = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) =>
-          StatefulBuilder(builder: (_, setPopupState) {
-            return AlertDialog(
-              backgroundColor: colors.card,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Text("Nouvelle Vente",
-                  style: TextStyle(color: colors.textPrimary)),
-              content: Text(
-                "Voulez-vous créer un nouvel ordre de vente ?",
-                style: TextStyle(color: colors.textSecondary),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext, false);
-                    setPopupState(() => isCreatingOrder = false);
-                  },
-                  child: Text("Non",
-                      style: TextStyle(color: colors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary),
-                  onPressed: isCreatingOrder
-                      ? null
-                      : () async {
-                    setPopupState(() => isCreatingOrder = true);
-                    createdOrder = await orderService
-                        .createOrder(widget.store.id, context);
-                    if (mounted)
-                      setPopupState(() => isCreatingOrder = false);
-                    Navigator.pop(
-                        dialogContext, createdOrder != null);
-                  },
-                  child: isCreatingOrder
-                      ? const BouTikaLoader.compact()
-                      : const Text("Oui",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            );
-          }),
+    final bool? wantsToCreate = await AppDialog.show<bool>(
+      context,
+      barrierDismissible: false,
+      icon: Icons.point_of_sale_rounded,
+      iconColor: colors.primary,
+      iconSoftColor: colors.primarySoft,
+      title: "Nouvelle Vente",
+      message: "Voulez-vous créer un nouvel ordre de vente ?",
+      actions: [
+        AppButton.secondary(
+          label: "Non",
+          height: 48,
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+        ),
+        StatefulBuilder(
+          builder: (_, setPopupState) => AppButton.primary(
+            label: "Oui, créer",
+            height: 48,
+            isLoading: isCreatingOrder,
+            onPressed: isCreatingOrder
+                ? null
+                : () async {
+              setPopupState(() => isCreatingOrder = true);
+              createdOrder = await orderService
+                  .createOrder(widget.store.id, context);
+              if (mounted) {
+                setPopupState(() => isCreatingOrder = false);
+              }
+              Navigator.pop(context, createdOrder != null);
+            },
+          ),
+        ),
+      ],
     );
 
     if (wantsToCreate == true && createdOrder != null) {
       _showSaleForm(context, createdOrder!.orderId!, colors);
     } else if (wantsToCreate == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Erreur lors de la création de l'ordre."),
-          backgroundColor: colors.danger,
-        ),
-      );
+      showErrorMessage("Erreur lors de la création de l'ordre.", context);
     }
   }
 
@@ -1388,31 +1241,60 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     (item.product?.stock?.sellingPrice ?? 0) *
                         item.quantity);
 
-            return AlertDialog(
+            return Dialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Text("Choix des produits",
-                  style: TextStyle(color: colors.textPrimary)),
-              content: ConstrainedBox(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              child: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxWidth: 550,
-                  maxHeight: MediaQuery.sizeOf(context).height * 0.65,
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.8,
                 ),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
                   child: Form(
                     key: formKey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Ordre de vente",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: colors.textSecondary)),
-                          Divider(color: colors.border),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: colors.primarySoft,
+                                  borderRadius:
+                                  BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                    Icons.shopping_cart_checkout_rounded,
+                                    color: colors.primary,
+                                    size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "Choix des produits",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
+                                    color: colors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                              Text("Ordre n°${orderId.substring(0, 8)}",
+                                  style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: colors.textSecondary)),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
                           ...saleLines.asMap().entries.map((entry) {
                             final index = entry.key;
                             final line  = entry.value;
@@ -1438,10 +1320,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                       items: allStoreProducts,
                                       itemAsString: (p) => p.name,
                                       dropdownDecoratorProps:
-                                      const DropDownDecoratorProps(
+                                      DropDownDecoratorProps(
                                         dropdownSearchDecoration:
                                         InputDecoration(
                                           labelText: "Produit",
+                                          helperText:
+                                          index == 0
+                                              ? null
+                                              : "Ligne ${index + 1}",
                                           isDense: true,
                                         ),
                                       ),
@@ -1513,14 +1399,94 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               style: TextStyle(color: colors.primary),
                             ),
                           ),
-                          Divider(color: colors.border),
-                          Text(
-                            "TOTAL: ${calculateTotal().toStringAsFixed(0)} F",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 17,
-                              color: colors.primary,
+                          const SizedBox(height: 6),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 13),
+                            decoration: BoxDecoration(
+                              color: colors.primarySoft,
+                              borderRadius:
+                              BorderRadius.circular(AppRadius.md),
                             ),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "TOTAL",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.1,
+                                    color: colors.textSecondary,
+                                  ),
+                                ),
+                                Text(
+                                  "${calculateTotal().toStringAsFixed(0)} F",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 17,
+                                    color: colors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AppButton.secondary(
+                                  label: "Annuler",
+                                  height: 48,
+                                  onPressed: isCancelingSale
+                                      ? null
+                                      : () async {
+                                    try {
+                                      setPopupState(() =>
+                                      isCancelingSale = true);
+                                      await OrderService()
+                                          .deleteOrder(
+                                          orderId, context);
+                                      if (mounted) {
+                                        setPopupState(() =>
+                                        isCancelingSale =
+                                        false);
+                                      }
+                                      Navigator.pop(dialogContext);
+                                      showSuccessMessage(
+                                          "ordre annulée avec succès",
+                                          context);
+                                    } catch (e) {
+                                      showErrorMessage(
+                                          "Erreur lors de la liaison avec le serveur.",
+                                          context);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: AppButton.primary(
+                                  label: "Valider",
+                                  height: 48,
+                                  onPressed: () {
+                                    if (formKey.currentState!
+                                        .validate()) {
+                                      Navigator.pop(dialogContext);
+                                      _showFinalConfirmationDialog(
+                                          context,
+                                          orderId,
+                                          saleLines,
+                                          calculateTotal(),
+                                          colors);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1528,45 +1494,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   ),
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: isCancelingSale
-                      ? null
-                      : () async {
-                    try {
-                      setPopupState(() => isCancelingSale = true);
-                      await OrderService()
-                          .deleteOrder(orderId, context);
-                      if (mounted)
-                        setPopupState(() => isCancelingSale = false);
-                      Navigator.pop(dialogContext);
-                      showSuccessMessage(
-                          "ordre annulée avec succès", context);
-                    } catch (e) {
-                      showErrorMessage(
-                          "Erreur lors de la liaison avec le serveur.",
-                          context);
-                    }
-                  },
-                  child: Text("Annuler",
-                      style: TextStyle(color: colors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary),
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      Navigator.pop(dialogContext);
-                      _showFinalConfirmationDialog(context, orderId,
-                          saleLines, calculateTotal(), colors);
-                    }
-                  },
-                  child: isCancelingSale
-                      ? const BouTikaLoader.compact()
-                      : const Text("Valider",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
             );
           }),
     );
@@ -1587,62 +1514,109 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Text("Confirmer la Vente",
-                  style: TextStyle(color: colors.textPrimary)),
-              content: Text(
-                "Valider la vente de ${total.toStringAsFixed(0)} F ?",
-                style: TextStyle(color: colors.textSecondary),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              contentPadding:
+              const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              actionsPadding:
+              const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.successSoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.check_rounded,
+                        color: colors.success, size: 32),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    "Confirmer la Vente",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Valider la vente de ${total.toStringAsFixed(0)} F ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 13.5,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    setConfirmationStat(() => isValidatingSale = false);
-                    Navigator.pop(dialogContext);
-                  },
-                  child: Text("Non",
-                      style: TextStyle(color: colors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.success),
-                  onPressed: isValidatingSale
-                      ? null
-                      : () async {
-                    final requestData = saleLines
-                        .map((line) => {
-                      "orderId": orderId,
-                      "productId": line.product!.id,
-                      "quantity": line.quantity,
-                    })
-                        .toList();
-                    setConfirmationStat(
-                            () => isValidatingSale = true);
-                    try {
-                      final order = await OrderService()
-                          .makeOrder(orderId, requestData, context);
-                      if (mounted)
-                        setConfirmationStat(
-                                () => isValidatingSale = false);
-                      Navigator.pop(dialogContext);
-                      if (order != null) {
-                        showSuccessMessage(
-                            "Vente enregistrée !", context);
-                        _loadAllProductsForSale();
-                      } else {
-                        showErrorMessage(
-                            "Erreur lors de la validation.",
-                            context);
-                      }
-                    } catch (e) {
-                      print(e);
-                      showExceptionMessage(context);
-                    }
-                  },
-                  child: isValidatingSale
-                      ? const BouTikaLoader.compact()
-                      : const Text("Oui, Valider",
-                      style: TextStyle(color: Colors.white)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Non",
+                        height: 48,
+                        onPressed: () {
+                          setConfirmationStat(
+                              () => isValidatingSale = false);
+                          Navigator.pop(dialogContext);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: "Oui, Valider",
+                        height: 48,
+                        background: colors.success,
+                        foreground: Colors.white,
+                        isLoading: isValidatingSale,
+                        onPressed: isValidatingSale
+                            ? null
+                            : () async {
+                          final requestData = saleLines
+                              .map((line) => {
+                            "orderId": orderId,
+                            "productId":
+                            line.product!.id,
+                            "quantity": line.quantity,
+                          })
+                              .toList();
+                          setConfirmationStat(
+                                  () => isValidatingSale = true);
+                          try {
+                            final order = await OrderService()
+                                .makeOrder(
+                                orderId, requestData, context);
+                            if (mounted) {
+                              setConfirmationStat(() =>
+                              isValidatingSale = false);
+                            }
+                            Navigator.pop(dialogContext);
+                            if (order != null) {
+                              showSuccessMessage(
+                                  "Vente enregistrée !", context);
+                              _loadAllProductsForSale();
+                            } else {
+                              showErrorMessage(
+                                  "Erreur lors de la validation.",
+                                  context);
+                            }
+                          } catch (e) {
+                            print(e);
+                            showExceptionMessage(context);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -1671,11 +1645,24 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               title: Row(
                 children: [
-                  Icon(Icons.category, color: colors.primary, size: 20),
-                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.category_rounded,
+                        color: colors.primary, size: 22),
+                  ),
+                  const SizedBox(width: 12),
                   Flexible(
                     child: Text(
                       category == null
@@ -1683,7 +1670,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           : "Modifier Catégorie",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: colors.textPrimary),
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
                     ),
                   ),
                 ],
@@ -1694,26 +1686,22 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextFormField(
+                      AppTextField(
                         controller: _categoryNameController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                          labelText: "Nom de la catégorie",
-                          prefixIcon: Icon(Icons.label),
-                        ),
+                        label: "Nom de la catégorie",
+                        icon: Icons.label_rounded,
+                        hint: "Ex: Boissons",
                         validator: (v) => (v == null || v.isEmpty)
                             ? 'Le nom est obligatoire'
                             : null,
                       ),
                       const SizedBox(height: 15),
-                      TextFormField(
+                      AppTextField(
                         controller: _categoryDescController,
                         maxLines: 2,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                          labelText: "Description",
-                          prefixIcon: Icon(Icons.description),
-                        ),
+                        label: "Description",
+                        icon: Icons.description_outlined,
+                        hint: "Décrivez cette catégorie",
                         validator: (v) => (v == null || v.isEmpty)
                             ? 'Veuillez ajouter une description'
                             : null,
@@ -1723,67 +1711,81 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    setCatState(() => isSavingCategory = false);
-                    _categoryNameController.clear();
-                    _categoryDescController.clear();
-                    Navigator.pop(ctx);
-                  },
-                  child: Text("Annuler",
-                      style: TextStyle(color: colors.danger)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary),
-                  onPressed: isSavingCategory
-                      ? null
-                      : () async {
-                    if (_categoryFormKey.currentState!.validate()) {
-                      setCatState(() => isSavingCategory = true);
-                      final data = {
-                        "name": _categoryNameController.text,
-                        "description":
-                        _categoryDescController.text,
-                      };
-                      final cs = CategoryService();
-                      try {
-                        if (category != null) {
-                          final cat = await cs.update(
-                              category.id, data, context);
-                          if (mounted)
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          setCatState(
+                              () => isSavingCategory = false);
+                          _categoryNameController.clear();
+                          _categoryDescController.clear();
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: category == null ? "Créer" : "Enregistrer",
+                        height: 48,
+                        isLoading: isSavingCategory,
+                        onPressed: isSavingCategory
+                            ? null
+                            : () async {
+                          if (_categoryFormKey.currentState!
+                              .validate()) {
                             setCatState(
-                                    () => isSavingCategory = false);
-                          if (cat == null) {
-                            showErrorMessage(
-                                "mise à jour a échoué", context);
-                          } else {
-                            final i = categories.indexOf(category);
-                            if (i != -1)
-                              setState(() => categories[i] = cat);
+                                () => isSavingCategory = true);
+                            final data = {
+                              "name":
+                              _categoryNameController.text,
+                              "description":
+                              _categoryDescController.text,
+                            };
+                            final cs = CategoryService();
+                            try {
+                              if (category != null) {
+                                final cat = await cs.update(
+                                    category.id, data, context);
+                                if (mounted) {
+                                  setCatState(() =>
+                                  isSavingCategory = false);
+                                }
+                                if (cat == null) {
+                                  showErrorMessage(
+                                      "mise à jour a échoué",
+                                      context);
+                                } else {
+                                  final i =
+                                  categories.indexOf(category);
+                                  if (i != -1) {
+                                    setState(() =>
+                                    categories[i] = cat);
+                                  }
+                                }
+                                showSuccessMessage(
+                                    "catégorie mise à jour",
+                                    context);
+                              } else {
+                                await cs.create(
+                                    data, widget.store.id, context);
+                                showSuccessMessage(
+                                    "catégorie ajoutée", context);
+                                _fetchAllData();
+                              }
+                              Navigator.pop(ctx);
+                            } catch (e) {
+                              showExceptionMessage(context);
+                            }
                           }
-                          showSuccessMessage(
-                              "catégorie mise à jour", context);
-                        } else {
-                          await cs.create(
-                              data, widget.store.id, context);
-                          showSuccessMessage(
-                              "catégorie ajoutée", context);
-                          _fetchAllData();
-                        }
-                        Navigator.pop(ctx);
-                      } catch (e) {
-                        showExceptionMessage(context);
-                      }
-                    }
-                  },
-                  child: isSavingCategory
-                      ? const BouTikaLoader.compact()
-                      : Text(
-                    category == null ? "Créer" : "Enregistrer",
-                    style:
-                    const TextStyle(color: Colors.white),
-                  ),
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -1809,12 +1811,40 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Text(
-                employee == null
-                    ? "Ajouter un employé"
-                    : "Modifier ${employee.username}",
-                style: TextStyle(color: colors.textPrimary),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.person_add_alt_rounded,
+                        color: colors.primary, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      employee == null
+                          ? "Ajouter un employé"
+                          : "Modifier ${employee.username}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               content: SingleChildScrollView(
                 child: Form(
@@ -1822,88 +1852,106 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextFormField(
+                      AppTextField(
                         controller: _firstnameController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                            labelText: "Prénom"),
+                        label: "Prénom",
+                        icon: Icons.person_outline,
+                        textInputAction: TextInputAction.next,
                       ),
-                      TextFormField(
+                      const SizedBox(height: 13),
+                      AppTextField(
                         controller: _secondnameController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration:
-                        const InputDecoration(labelText: "Nom"),
+                        label: "Nom",
+                        icon: Icons.person_outline,
+                        textInputAction: TextInputAction.next,
                       ),
-                      TextFormField(
+                      const SizedBox(height: 13),
+                      AppTextField(
                         controller: _usernameController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                            labelText: "Nom d'utilisateur"),
+                        label: "Nom d'utilisateur",
+                        icon: Icons.alternate_email_rounded,
+                        textInputAction: TextInputAction.next,
                       ),
-                      TextFormField(
+                      const SizedBox(height: 13),
+                      AppTextField(
                         controller: _phoneController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                            labelText: "Téléphone"),
+                        label: "Téléphone",
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
                       ),
-                      TextFormField(
+                      const SizedBox(height: 13),
+                      AppTextField(
                         controller: _passwordController,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: const InputDecoration(
-                            labelText: "Mot de passe"),
-                        obscureText: true,
+                        label: "Mot de passe",
+                        icon: Icons.lock_outline,
+                        obscure: true,
                       ),
                     ],
                   ),
                 ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    setSaveEmpState(() => isSavingEmployee = false);
-                  },
-                  child: Text("Annuler",
-                      style: TextStyle(color: colors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary),
-                  onPressed: isSavingEmployee
-                      ? null
-                      : () async {
-                    setSaveEmpState(() => isSavingEmployee = true);
-                    if (_formKey.currentState!.validate()) {
-                      final employeeMap = {
-                        "firstname": _firstnameController.text,
-                        "secondName": _secondnameController.text,
-                        "username": _usernameController.text,
-                        "post": "SALESPERSON",
-                        "password": _passwordController.text,
-                        "phone": _phoneController.text,
-                      };
-                      try {
-                        await EmployeeService().addEmployee(
-                            employeeMap, widget.store.id, context);
-                        if (mounted)
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          Navigator.pop(ctx);
                           setSaveEmpState(
-                                  () => isSavingEmployee = false);
-                        Navigator.pop(ctx);
-                        showSuccessMessage(
-                            "employé ajouté", context);
-                        _fetchAllData();
-                      } catch (e) {
-                        showExceptionMessage(context);
-                      }
-                    }
-                  },
-                  child: isSavingEmployee
-                      ? const BouTikaLoader.compact()
-                      : Text(
-                    employee == null ? "Ajouter" : "Enregistrer",
-                    style:
-                    const TextStyle(color: Colors.white),
-                  ),
+                              () => isSavingEmployee = false);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label:
+                        employee == null ? "Ajouter" : "Enregistrer",
+                        height: 48,
+                        isLoading: isSavingEmployee,
+                        onPressed: isSavingEmployee
+                            ? null
+                            : () async {
+                          setSaveEmpState(
+                              () => isSavingEmployee = true);
+                          if (_formKey.currentState!.validate()) {
+                            final employeeMap = {
+                              "firstname":
+                              _firstnameController.text,
+                              "secondName":
+                              _secondnameController.text,
+                              "username":
+                              _usernameController.text,
+                              "post": "SALESPERSON",
+                              "password":
+                              _passwordController.text,
+                              "phone": _phoneController.text,
+                            };
+                            try {
+                              await EmployeeService().addEmployee(
+                                  employeeMap,
+                                  widget.store.id,
+                                  context);
+                              if (mounted) {
+                                setSaveEmpState(() =>
+                                isSavingEmployee = false);
+                              }
+                              Navigator.pop(ctx);
+                              showSuccessMessage(
+                                  "employé ajouté", context);
+                              _fetchAllData();
+                            } catch (e) {
+                              showExceptionMessage(context);
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -1920,32 +1968,70 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18)),
-        title: Text("Déconnexion",
-            style: TextStyle(color: colors.textPrimary)),
-        content: Text(
-          "Voulez-vous vraiment quitter BouTiKa ?",
-          style: TextStyle(color: colors.textSecondary),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: colors.border),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.dangerSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.logout_rounded,
+                  color: colors.danger, size: 30),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              "Déconnexion",
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
+                color: colors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Voulez-vous vraiment quitter BouTiKa ?",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 13.5,
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text("Annuler",
-                style: TextStyle(color: colors.textSecondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: colors.danger),
-            onPressed: () async {
-              await UserService.logout();
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => LoginScreen()),
-                    (route) => false,
-              );
-            },
-            child: const Text("Se déconnecter",
-                style: TextStyle(color: Colors.white)),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  label: "Annuler",
+                  height: 48,
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton.danger(
+                  label: "Se déconnecter",
+                  height: 48,
+                  onPressed: () async {
+                    await UserService.logout();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                          (route) => false,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1966,17 +2052,36 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               title: Row(
                 children: [
-                  Icon(Icons.remove_circle_outline,
-                      color: colors.accent, size: 20),
-                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.accentSoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.remove_circle_outline,
+                        color: colors.accent, size: 20),
+                  ),
+                  const SizedBox(width: 12),
                   Flexible(
-                    child: Text("Nouvelle Dépense",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: colors.textPrimary)),
+                    child: Text(
+                      "Nouvelle Dépense",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1986,41 +2091,23 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextFormField(
+                      AppTextField(
                         controller: _expensePriceController,
                         keyboardType: TextInputType.number,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: InputDecoration(
-                          labelText: "Montant (F)",
-                          prefixIcon:
-                          const Icon(Icons.payments_outlined),
-                          filled: true,
-                          fillColor: colors.cardElevated,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        label: "Montant (F)",
+                        icon: Icons.payments_outlined,
+                        hint: "Ex: 2500",
                         validator: (v) => (v == null || v.isEmpty)
                             ? "Indiquez le montant"
                             : null,
                       ),
                       const SizedBox(height: 14),
-                      TextFormField(
+                      AppTextField(
                         controller: _expenseDescController,
                         maxLines: 2,
-                        style: TextStyle(color: colors.textPrimary),
-                        decoration: InputDecoration(
-                          labelText: "Description / Motif",
-                          prefixIcon:
-                          const Icon(Icons.description_outlined),
-                          filled: true,
-                          fillColor: colors.cardElevated,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        label: "Description / Motif",
+                        icon: Icons.description_outlined,
+                        hint: "Ex: Transport marchandises",
                         validator: (v) => (v == null || v.isEmpty)
                             ? "Indiquez le motif"
                             : null,
@@ -2030,58 +2117,67 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    _expensePriceController.clear();
-                    _expenseDescController.clear();
-                    Navigator.pop(ctx);
-                  },
-                  child: Text("Annuler",
-                      style: TextStyle(color: colors.danger)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.accent,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: isSavingExpense
-                      ? null
-                      : () async {
-                    if (_expenseFormKey.currentState!.validate()) {
-                      setPopupState(() => isSavingExpense = true);
-                      try {
-                        await SpendingServcie().saveSpending(
-                          Spending(
-                            price: double.parse(
-                                _expensePriceController.text),
-                            description:
-                            _expenseDescController.text,
-                            storeId: widget.store.id,
-                          ),
-                          context,
-                        );
-                        if (mounted) {
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
                           _expensePriceController.clear();
                           _expenseDescController.clear();
                           Navigator.pop(ctx);
-                        }
-                      } catch (e) {
-                        print(e);
-                        showErrorMessage(
-                            "Erreur lors de l'enregistrement",
-                            context);
-                      } finally {
-                        if (mounted)
-                          setPopupState(
-                                  () => isSavingExpense = false);
-                      }
-                    }
-                  },
-                  child: isSavingExpense
-                      ? const BouTikaLoader.compact()
-                      : const Text("Enregistrer",
-                      style: TextStyle(color: Colors.white)),
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: "Enregistrer",
+                        height: 48,
+                        background: colors.accent,
+                        foreground: Colors.white,
+                        isLoading: isSavingExpense,
+                        onPressed: isSavingExpense
+                            ? null
+                            : () async {
+                          if (_expenseFormKey.currentState!
+                              .validate()) {
+                            setPopupState(
+                                () => isSavingExpense = true);
+                            try {
+                              await SpendingServcie().saveSpending(
+                                Spending(
+                                  price: double.parse(
+                                      _expensePriceController.text),
+                                  description:
+                                  _expenseDescController.text,
+                                  storeId: widget.store.id,
+                                ),
+                                context,
+                              );
+                              if (mounted) {
+                                _expensePriceController.clear();
+                                _expenseDescController.clear();
+                                Navigator.pop(ctx);
+                              }
+                            } catch (e) {
+                              print(e);
+                              showErrorMessage(
+                                  "Erreur lors de l'enregistrement",
+                                  context);
+                            } finally {
+                              if (mounted) {
+                                setPopupState(() =>
+                                isSavingExpense = false);
+                              }
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -2126,12 +2222,12 @@ class _CategoryCardState extends State<_CategoryCard> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: _expanded
-              ? colors.primary.withOpacity(0.30)
+              ? colors.primary.withValues(alpha: 0.35)
               : colors.border,
-          width: 1.1,
+          width: _expanded ? 1.3 : 1,
         ),
         boxShadow: colors.cardShadow,
       ),
@@ -2141,7 +2237,7 @@ class _CategoryCardState extends State<_CategoryCard> {
         children: [
           // Header
           InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -2153,7 +2249,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                     height: 44,
                     decoration: BoxDecoration(
                       color: _expanded
-                          ? colors.primary.withOpacity(0.14)
+                          ? colors.primary.withValues(alpha: 0.14)
                           : colors.primarySoft,
                       borderRadius: BorderRadius.circular(13),
                     ),
@@ -2171,8 +2267,9 @@ class _CategoryCardState extends State<_CategoryCard> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             fontSize: 14.5,
+                            letterSpacing: -0.1,
                             color: colors.textPrimary,
                           ),
                         ),
@@ -2195,6 +2292,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                       decoration: BoxDecoration(
                         color: colors.cardElevated,
                         shape: BoxShape.circle,
+                        border: Border.all(color: colors.border),
                       ),
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -2224,30 +2322,14 @@ class _CategoryCardState extends State<_CategoryCard> {
                 children: [
                   Container(height: 1, color: colors.border),
                   const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: colors.cardElevated,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      "DESCRIPTION",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: colors.textSecondary,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
+                  OverlineLabel(text: "Description"),
                   const SizedBox(height: 8),
                   Text(
                     category.description ??
                         "Aucune description fournie.",
                     style: TextStyle(
                         color: colors.textPrimary,
-                        height: 1.4,
+                        height: 1.45,
                         fontSize: 13),
                   ),
                   const SizedBox(height: 16),
@@ -2309,25 +2391,25 @@ class _CategoryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: filled ? colors.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(
               vertical: 11, horizontal: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: filled
                 ? null
-                : Border.all(color: colors.border),
+                : Border.all(color: colors.border, width: 1.2),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon,
                   size: 16,
-                  color: filled ? Colors.white : colors.textPrimary),
+                  color: filled ? colors.onPrimary : colors.textPrimary),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -2337,8 +2419,9 @@ class _CategoryActionButton extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color:
-                    filled ? Colors.white : colors.textPrimary,
+                    color: filled
+                        ? colors.onPrimary
+                        : colors.textPrimary,
                   ),
                 ),
               ),
