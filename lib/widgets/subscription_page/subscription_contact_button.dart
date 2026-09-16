@@ -3,7 +3,6 @@ import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show DashColors;
-import 'package:mobile_store_app/utils/message.dart';
 
 class SubscriptionContactButton extends StatelessWidget {
   const SubscriptionContactButton({super.key});
