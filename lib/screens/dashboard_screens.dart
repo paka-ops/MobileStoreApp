@@ -257,7 +257,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: appDarkMode.value ? AppColors.darkCardElevated : AppColors.card,
+                color: c.cardElevated,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: c.border),
               ),
@@ -266,9 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ? Icons.light_mode_rounded
                     : Icons.dark_mode_rounded,
                 size: 20,
-                color: appDarkMode.value
-                    ? AppColors.darkWarning
-                    : AppColors.textGrey,
+                color: appDarkMode.value ? c.warning : c.textSecondary,
               ),
             ),
           ),
