@@ -244,14 +244,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
-              color: c.primarySoft,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: c.border),
+              gradient: c.primaryGradient,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: c.glowShadow,
             ),
-            child: Icon(Icons.dashboard_rounded, color: c.primary, size: 24),
+            child: const Icon(
+                Icons.dashboard_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -300,7 +301,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 size: 20,
                 color: appDarkMode.value
                     ? AppColors.darkWarning
-                    : AppColors.textGrey,
+                    : c.primary,
               ),
             ),
           ),
@@ -367,11 +368,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: GestureDetector(
                 onTap: () => setState(() => _selectedPeriodIndex = i),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: sel ? c.primary : Colors.transparent,
+                    gradient: sel ? c.primaryGradient : null,
+                    color: sel ? null : Colors.transparent,
                     borderRadius: BorderRadius.circular(11),
+                    boxShadow: sel ? c.glowShadow : null,
                   ),
                   child: Text(
                     _periods[i],
@@ -479,6 +483,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         children: [
@@ -591,6 +596,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         children: sorted.asMap().entries.map((entry) {
@@ -720,6 +726,7 @@ class _GlobalKpiCard extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -840,7 +847,11 @@ class _StoreCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.primarySoft,
+        gradient: LinearGradient(
+          colors: [c.primarySoft, c.primarySoft.withOpacity(0.35)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Row(

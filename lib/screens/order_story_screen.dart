@@ -263,7 +263,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                 border: Border.all(color: c.border),
               ),
               child: Icon(Icons.refresh_rounded,
-                  size: 20, color: c.textPrimary),
+                  size: 20, color: c.primary),
             ),
           ),
         ],
@@ -282,13 +282,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -752,8 +746,8 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
             return AlertDialog(
               backgroundColor: c.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: c.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: c.border, width: 1),
               ),
               contentPadding:
               const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -941,13 +935,7 @@ class _OrderCard extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Theme(
         data: Theme.of(context)

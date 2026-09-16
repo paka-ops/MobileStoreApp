@@ -246,6 +246,7 @@ class _EmployerCategoryDetailsState
           color: c.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: c.border),
+          boxShadow: c.cardShadow,
         ),
         child: TextField(
           onChanged: _filterProducts,
@@ -263,7 +264,7 @@ class _EmployerCategoryDetailsState
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.all(12),
-              child: Icon(Icons.search_rounded, color: c.textSecondary, size: 20),
+              child: Icon(Icons.search_rounded, color: c.primary, size: 20),
             ),
             border: InputBorder.none,
             contentPadding:
@@ -449,21 +450,27 @@ class _EmployerCategoryDetailsState
   // FAB
   // =====================================================================
   Widget _buildFab(DashColors c) {
-    return SizedBox(
-      width: 170,
-      height: 52,
-      child: FloatingActionButton.extended(
-        onPressed: () => _showAddProductDialog(context),
-        backgroundColor: c.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: const Text(
-          "Nouveau produit",
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: c.glowShadow,
+      ),
+      child: SizedBox(
+        width: 176,
+        height: 54,
+        child: FloatingActionButton.extended(
+          onPressed: () => _showAddProductDialog(context),
+          backgroundColor: c.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          icon: const Icon(Icons.add_rounded, size: 20),
+          label: const Text(
+            "Nouveau produit",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
         ),
       ),
     );
@@ -487,7 +494,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               side: BorderSide(color: c.border, width: 1.2),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -604,7 +611,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               side: BorderSide(color: c.border, width: 1.2),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -714,7 +721,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               side: BorderSide(color: c.border, width: 1.2),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -828,7 +835,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               side: BorderSide(color: c.border, width: 1.2),
             ),
             contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1179,6 +1186,7 @@ class _StatChip extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         children: [
@@ -1252,13 +1260,7 @@ class _ProductCard extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),

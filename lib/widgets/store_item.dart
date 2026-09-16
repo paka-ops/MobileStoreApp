@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:mobile_store_app/screens/store_page.dart' hide AppColors;
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors, PremiumRadii;
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/widgets/premium_kit.dart';
 import '../models/Store.dart';
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
-// Couleurs fixes indépendantes du thème
-class _Fixed {
-  static const danger     = Color(0xFFC96B6B);
-  static const dangerSoft = Color(0xFFFDEDED);
-}
-
+// =====================================================================
+// CARTE BOUTIQUE — visuel « BouTika Premium »
+// ---------------------------------------------------------------------
+// LOGIQUE INCHANGÉE : ouverture du détail, mise à jour, suppression,
+// bascule des actions (appui long) — tout est conservé à l'identique.
+// Seule la présentation change (bandeau dégradé, hiérarchie, dialogues).
+// =====================================================================
 class StoreItem extends StatefulWidget {
   final Store store;
   final List<Store> otherStores;
@@ -64,12 +67,13 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // DIALOG — Mise à jour boutique
+  // DIALOG — Mise à jour boutique (logique strictement inchangée)
   // -----------------------------------------------------------------------
   void _showUpdateDialog(BuildContext context, DashColors colors) {
-    final nameController     = TextEditingController(text: _store.name);
-    final locationController = TextEditingController(text: _store.location ?? '');
-    final formKey            = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: _store.name);
+    final locationController =
+        TextEditingController(text: _store.location ?? '');
+    final formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -82,32 +86,45 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: colors.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border, width: 1),
               ),
-              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
               actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               title: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.edit_rounded,
-                        color: colors.primary, size: 22),
+                  PremiumIconTile(
+                    icon: Icons.edit_rounded,
+                    color: colors.primary,
+                    softColor: colors.primarySoft,
+                    size: 46,
+                    iconSize: 22,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      "Modifier la boutique",
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Modifier la boutique",
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "Nom et adresse visibles par l'équipe",
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -127,15 +144,15 @@ class _StoreItemState extends State<StoreItem> {
                         ),
                         textInputAction: TextInputAction.next,
                         decoration: _fieldDecoration(
-                          label:  "Nom de la boutique",
-                          icon:   Icons.storefront_rounded,
-                          hint:   "Ex: Boutique Centre-ville",
+                          label: "Nom de la boutique",
+                          icon: Icons.storefront_rounded,
+                          hint: "Ex: Boutique Centre-ville",
                           colors: colors,
                         ),
                         validator: (v) =>
-                        (v == null || v.trim().isEmpty)
-                            ? "Le nom est obligatoire"
-                            : null,
+                            (v == null || v.trim().isEmpty)
+                                ? "Le nom est obligatoire"
+                                : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -146,73 +163,47 @@ class _StoreItemState extends State<StoreItem> {
                           color: colors.textPrimary,
                         ),
                         decoration: _fieldDecoration(
-                          label:  "Emplacement / Adresse",
-                          icon:   Icons.location_on_rounded,
-                          hint:   "Ex: Rue 12, Douala",
+                          label: "Emplacement / Adresse",
+                          icon: Icons.location_on_rounded,
+                          hint: "Ex: Rue 12, Douala",
                           colors: colors,
                         ),
                         validator: (v) =>
-                        (v == null || v.trim().isEmpty)
-                            ? "Veuillez préciser l'emplacement"
-                            : null,
+                            (v == null || v.trim().isEmpty)
+                                ? "Veuillez préciser l'emplacement"
+                                : null,
                       ),
                     ],
                   ),
                 ),
               ),
               actions: [
-                Row(
-                  children: [
-                    // Bouton Annuler
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () => Navigator.of(dialogContext).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colors.card,
-                          foregroundColor: colors.textPrimary,
-                          elevation: 0,
-                          side: BorderSide(color: colors.border, width: 1.2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: colors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Bouton Enregistrer
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () async {
+                // Callbacks strictement inchangés — présentation 52 px.
+                PremiumDialogActions(
+                  confirmLabel: "Enregistrer",
+                  onCancel: isLoading
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  onConfirm: isLoading
+                      ? null
+                      : () async {
                           if (!formKey.currentState!.validate()) return;
                           setDialogState(() => isLoading = true);
                           try {
                             final storeMap = {
-                              "name":     nameController.text.trim(),
+                              "name": nameController.text.trim(),
                               "location": locationController.text.trim(),
                             };
                             final updatedStore =
-                            await StoreService().updateStore(
-                                _store.id, storeMap, context);
+                                await StoreService().updateStore(
+                                    _store.id, storeMap, context);
 
                             if (!mounted) return;
                             setDialogState(() => isLoading = false);
 
                             if (updatedStore != null) {
                               setState(() {
-                                _store       = updatedStore;
+                                _store = updatedStore;
                                 _showActions = false;
                               });
                               Navigator.of(dialogContext).pop();
@@ -228,28 +219,12 @@ class _StoreItemState extends State<StoreItem> {
                             if (!mounted) return;
                             setDialogState(() => isLoading = false);
                             showErrorMessage(
-                                "Erreur lors de la mise à jour.",
-                                context);
+                                "Erreur lors de la mise à jour.", context);
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colors.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: isLoading
-                            ? const BouTikaLoader.compact()
-                            : const Text(
-                          "Enregistrer",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14),
-                        ),
-                      ),
-                    ),
-                  ],
+                  confirmLoading: isLoading
+                      ? const BouTikaLoader.compact()
+                      : null,
                 ),
               ],
             );
@@ -266,7 +241,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // DIALOG — Suppression boutique
+  // DIALOG — Suppression boutique (logique strictement inchangée)
   // -----------------------------------------------------------------------
   void _showDeleteDialog(BuildContext context, DashColors colors) {
     showDialog(
@@ -279,116 +254,129 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: colors.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border, width: 1),
               ),
-              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
               actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Médaillon danger feutré (thème courant, plus de fixe).
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: _Fixed.dangerSoft,
+                    width: 84,
+                    height: 84,
+                    decoration: BoxDecoration(
+                      color: colors.dangerSoft,
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: colors.danger.withOpacity(0.25),
+                        width: 1.5,
+                      ),
                     ),
-                    child: const Icon(Icons.delete_forever_rounded,
-                        color: _Fixed.danger, size: 32),
+                    child: Icon(
+                      Icons.delete_forever_rounded,
+                      color: colors.danger,
+                      size: 36,
+                    ),
                   ),
                   const SizedBox(height: 18),
                   Text(
                     "Supprimer la boutique",
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "Voulez-vous vraiment supprimer '${_store.name}' ?"
-                        " Cette action est irréversible.",
+                    " Cette action est irréversible.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: colors.textSecondary,
                       fontSize: 13.5,
-                      height: 1.45,
+                      height: 1.55,
                     ),
                   ),
                 ],
               ),
               actions: [
+                // Proportions d'origine conservées — callbacks inchangés.
                 Row(
                   children: [
-                    // Bouton Annuler
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () => Navigator.of(dialogContext).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: colors.card,
-                          foregroundColor: colors.textPrimary,
-                          elevation: 0,
-                          side: BorderSide(
-                              color: colors.border, width: 1.2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: colors.textPrimary,
+                      child: SizedBox(
+                        height: 52,
+                        child: OutlinedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () => Navigator.of(dialogContext).pop(),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: colors.card,
+                            foregroundColor: colors.textPrimary,
+                            elevation: 0,
+                            side: BorderSide(
+                                color: colors.border, width: 1.2),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    PremiumRadii.input)),
+                          ),
+                          child: const Text(
+                            "Annuler",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Bouton Supprimer
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () async {
-                          setDialogState(() => isLoading = true);
-                          try {
-                            await StoreService()
-                                .deleteStore(_store.id, context);
-                            if (!mounted) return;
-                            Navigator.of(dialogContext).pop();
-                            showSuccessMessage(
-                                "Boutique ${_store.name} supprimée",
-                                context);
-                            widget.isDeleted(true);
-                          } catch (e) {
-                            if (!mounted) return;
-                            setDialogState(() => isLoading = false);
-                            showErrorMessage(
-                                "Erreur lors de la suppression.",
-                                context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _Fixed.danger,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: isLoading
-                            ? const BouTikaLoader.compact()
-                            : const Text(
-                          "Supprimer",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14),
+                      child: SizedBox(
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  setDialogState(() => isLoading = true);
+                                  try {
+                                    await StoreService()
+                                        .deleteStore(_store.id, context);
+                                    if (!mounted) return;
+                                    Navigator.of(dialogContext).pop();
+                                    showSuccessMessage(
+                                        "Boutique ${_store.name} supprimée",
+                                        context);
+                                    widget.isDeleted(true);
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    setDialogState(
+                                        () => isLoading = false);
+                                    showErrorMessage(
+                                        "Erreur lors de la suppression.",
+                                        context);
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colors.danger,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    PremiumRadii.input)),
+                          ),
+                          child: isLoading
+                              ? const BouTikaLoader.compact()
+                              : const Text(
+                                  "Supprimer",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14),
+                                ),
                         ),
                       ),
                     ),
@@ -403,7 +391,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // =========================================================================
-  // BUILD — ValueListenableBuilder réagit à appDarkMode
+  // BUILD — mêmes gestes (tap / appui long), présentation premium
   // =========================================================================
   @override
   Widget build(BuildContext context) {
@@ -425,53 +413,61 @@ class _StoreItemState extends State<StoreItem> {
             },
             onLongPress: () => setState(() => _showActions = !_showActions),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
                 color: colors.card,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: _showActions
-                      ? colors.primary
+                      ? colors.primary.withOpacity(0.55)
                       : colors.border,
-                  width: _showActions ? 1.4 : 1,
+                  width: _showActions ? 1.5 : 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                boxShadow: colors.cardShadow,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // --- HEADER ---
+                  // --- BANDEAU HÉRO : dégradé émeraude feutré ---
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colors.primarySoft,
+                      gradient: LinearGradient(
+                        colors: [
+                          colors.primarySoft,
+                          colors.primarySoft.withOpacity(0.35),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20)),
+                          top: Radius.circular(19)),
                     ),
                     child: Row(
                       children: [
+                        // Pastille boutique blanche sur voile émeraude.
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          width: 48,
+                          height: 48,
                           decoration: BoxDecoration(
                             color: colors.card,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(
+                                PremiumRadii.sm),
                             border: Border.all(color: colors.border),
+                            boxShadow: colors.cardShadow,
                           ),
-                          child: Icon(Icons.storefront_rounded,
-                              color: colors.primary, size: 22),
+                          child: Icon(
+                            Icons.storefront_rounded,
+                            color: colors.primary,
+                            size: 24,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                                CrossAxisAlignment.start,
                             children: [
                               Text(
                                 _store.name,
@@ -479,8 +475,9 @@ class _StoreItemState extends State<StoreItem> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: colors.textPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.2,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -501,44 +498,54 @@ class _StoreItemState extends State<StoreItem> {
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(8),
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
-                            color: colors.card,
+                            color: _showActions
+                                ? colors.card
+                                : colors.primary,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: colors.border),
+                            border: _showActions
+                                ? Border.all(color: colors.border)
+                                : null,
+                            boxShadow: _showActions
+                                ? null
+                                : colors.glowShadow,
                           ),
                           child: Icon(
                             _showActions
                                 ? Icons.close_rounded
-                                : Icons.chevron_right_rounded,
+                                : Icons.arrow_forward_rounded,
                             color: _showActions
                                 ? colors.textSecondary
-                                : colors.primary,
-                            size: 20,
+                                : Colors.white,
+                            size: 19,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // --- DETAILS ---
+                  // --- DÉTAILS ---
                   Padding(
                     padding:
-                    const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                        const EdgeInsets.fromLTRB(16, 14, 16, 14),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.location_on_rounded,
-                                size: 18,
-                                color: colors.textSecondary),
+                            Icon(
+                              Icons.location_on_rounded,
+                              size: 18,
+                              color: colors.primary,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 (_store.location != null &&
-                                    _store.location!
-                                        .trim()
-                                        .isNotEmpty)
+                                        _store.location!
+                                            .trim()
+                                            .isNotEmpty)
                                     ? _store.location!
                                     : "Adresse non renseignée",
                                 maxLines: 1,
@@ -556,15 +563,16 @@ class _StoreItemState extends State<StoreItem> {
                         Row(
                           children: [
                             _buildInfoChip(
-                              icon:   Icons.store_mall_directory_outlined,
-                              label:  "Magasin",
+                              icon:
+                                  Icons.store_mall_directory_outlined,
+                              label: "Magasin",
                               colors: colors,
                             ),
                             const SizedBox(width: 8),
                             _buildInfoChip(
                               icon: Icons.verified_user_rounded,
                               label: (UserService.userType ?? '') ==
-                                  "employer"
+                                      "employer"
                                   ? "Admin"
                                   : "Staff",
                               colors: colors,
@@ -575,66 +583,70 @@ class _StoreItemState extends State<StoreItem> {
                     ),
                   ),
 
-                  // --- ACTIONS ---
+                  // --- ACTIONS (appui long) : mêmes callbacks ---
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 220),
+                    duration: const Duration(milliseconds: 240),
                     child: _showActions
                         ? Container(
-                      key: const ValueKey("actions"),
-                      margin: const EdgeInsets.fromLTRB(
-                          16, 0, 16, 16),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: colors.background,
-                        borderRadius:
-                        BorderRadius.circular(16),
-                        border: Border.all(color: colors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          _buildActionButton(
-                            icon: Icons.edit_rounded,
-                            label: "Modifier",
-                            color: colors.primary,
-                            backgroundColor: colors.primarySoft,
-                            borderColor: colors.border,
-                            labelColor: colors.primary,
-                            onTap: () {
-                              setState(
-                                      () => _showActions = false);
-                              _showUpdateDialog(
-                                  context, colors);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildActionButton(
-                            icon: Icons.delete_outline_rounded,
-                            label: "Supprimer",
-                            color: _Fixed.danger,
-                            backgroundColor: _Fixed.dangerSoft,
-                            borderColor: colors.border,
-                            labelColor: _Fixed.danger,
-                            onTap: () {
-                              setState(
-                                      () => _showActions = false);
-                              _showDeleteDialog(
-                                  context, colors);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildActionButton(
-                            icon: Icons.close_rounded,
-                            label: "Fermer",
-                            color: colors.textSecondary,
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
-                            labelColor: colors.textPrimary,
-                            onTap: () => setState(
-                                    () => _showActions = false),
-                          ),
-                        ],
-                      ),
-                    )
+                            key: const ValueKey("actions"),
+                            margin: const EdgeInsets.fromLTRB(
+                                16, 0, 16, 16),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: colors.background,
+                              borderRadius:
+                                  BorderRadius.circular(16),
+                              border:
+                                  Border.all(color: colors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                _buildActionButton(
+                                  icon: Icons.edit_rounded,
+                                  label: "Modifier",
+                                  color: colors.primary,
+                                  backgroundColor:
+                                      colors.primarySoft,
+                                  borderColor: colors.border,
+                                  labelColor: colors.primary,
+                                  onTap: () {
+                                    setState(
+                                        () => _showActions = false);
+                                    _showUpdateDialog(
+                                        context, colors);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildActionButton(
+                                  icon:
+                                      Icons.delete_outline_rounded,
+                                  label: "Supprimer",
+                                  color: colors.danger,
+                                  backgroundColor:
+                                      colors.dangerSoft,
+                                  borderColor: colors.border,
+                                  labelColor: colors.danger,
+                                  onTap: () {
+                                    setState(
+                                        () => _showActions = false);
+                                    _showDeleteDialog(
+                                        context, colors);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildActionButton(
+                                  icon: Icons.close_rounded,
+                                  label: "Fermer",
+                                  color: colors.textSecondary,
+                                  backgroundColor: colors.card,
+                                  borderColor: colors.border,
+                                  labelColor: colors.textPrimary,
+                                  onTap: () => setState(
+                                      () => _showActions = false),
+                                ),
+                              ],
+                            ),
+                          )
                         : const SizedBox.shrink(),
                   ),
                 ],
@@ -647,7 +659,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // WIDGETS HELPERS
+  // WIDGETS HELPERS — présentation uniquement
   // -----------------------------------------------------------------------
   Widget _buildInfoChip({
     required IconData icon,
@@ -655,10 +667,10 @@ class _StoreItemState extends State<StoreItem> {
     required DashColors colors,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(PremiumRadii.pill),
         border: Border.all(color: colors.border),
       ),
       child: Row(
@@ -693,16 +705,17 @@ class _StoreItemState extends State<StoreItem> {
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+          padding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 42,
-                width: 42,
+                height: 46,
+                width: 46,
                 decoration: BoxDecoration(
                   color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: borderColor),
                 ),
                 child: Icon(icon, color: color, size: 21),
@@ -725,7 +738,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // DÉCORATION DES CHAMPS TEXTE — dynamique
+  // DÉCORATION DES CHAMPS TEXTE — même signature, rendu premium
   // -----------------------------------------------------------------------
   InputDecoration _fieldDecoration({
     required String label,
@@ -733,46 +746,6 @@ class _StoreItemState extends State<StoreItem> {
     required String hint,
     required DashColors colors,
   }) {
-    return InputDecoration(
-      labelText: label,
-      hintText:  hint,
-      labelStyle: TextStyle(
-        color: colors.textSecondary,
-        fontWeight: FontWeight.w600,
-        fontSize: 13.5,
-      ),
-      hintStyle: TextStyle(
-        color: colors.textSecondary,
-        fontSize: 13.5,
-      ),
-      filled:    true,
-      fillColor: colors.background,
-      prefixIcon: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Icon(icon, color: colors.primary, size: 20),
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-          vertical: 16, horizontal: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.primary, width: 1.6),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: _Fixed.danger, width: 1.3),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: _Fixed.danger, width: 1.6),
-      ),
-    );
+    return colors.fieldDecoration(label: label, icon: icon, hint: hint);
   }
 }

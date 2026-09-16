@@ -1,23 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/widgets/premium_kit.dart';
 
-class BuildEmptyState extends StatelessWidget{
+//
+// État vide générique — médaillon premium du thème courant.
+// Même paramètre d'entrée (message), désormais réellement affiché.
+//
+class BuildEmptyState extends StatelessWidget {
   final String message;
   const BuildEmptyState({required this.message});
   @override
-  Widget build(BuildContext context){
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.store, size: 80, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          const Text(
-            "Pas de boutique trouvé",
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
-        ],
-      ),
+  Widget build(BuildContext context) {
+    return PremiumEmptyState(
+      icon: Icons.store_outlined,
+      title: "Pas de boutique trouvée",
+      message: message,
     );
   }
 }
