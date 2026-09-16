@@ -1,13 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_store_app/screens/low_stock_product.dart';
 import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
 import 'models/Store.dart';
 import 'utils/app_colors.dart';
 
-// Crée cette clé en dehors de tes classes (variable globale)
+// Clé globale du ScaffoldMessenger (snackbars au-dessus de tout)
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
