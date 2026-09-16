@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/screens/low_stock_product.dart';
@@ -8,34 +6,40 @@ import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
 import 'models/Store.dart';
 import 'utils/app_colors.dart';
-// Crée cette clé en dehors de tes classes (variable globale)
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-main() {
 
+// Crée cette clé en dehors de tes classes (variable globale)
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
+main() {
   runApp(const MyApp());
 }
-class MyApp extends StatefulWidget{
+
+class MyApp extends StatefulWidget {
   const MyApp();
+
   @override
   State createState() => _MyAppState();
 }
-class _MyAppState extends State<MyApp>{
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
       valueListenable: appDarkMode,
       builder: (context, isDark, _) => MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Store.dart App",
-      theme: buildAppTheme(isDark),
-      darkTheme: buildAppTheme(true),
-      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-      initialRoute: "/",
-      routes: {
-        "/": (context) => WelcomePreLoginScreen(),
-        "/login": (context) => LoginScreen(),
-      },
-    ),
+        debugShowCheckedModeBanner: false,
+        title: "BouTiKa",
+        theme: buildAppTheme(false),
+        darkTheme: buildAppTheme(true),
+        themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+        initialRoute: "/",
+        routes: {
+          "/": (context) => WelcomePreLoginScreen(),
+          "/login": (context) => LoginScreen(),
+        },
+      ),
     );
   }
 }
