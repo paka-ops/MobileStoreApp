@@ -239,7 +239,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
               child: Icon(
                 Icons.refresh_rounded,
                 size: 20,
-                color: c.textPrimary,
+                color: c.primary,
               ),
             ),
           ),
@@ -409,13 +409,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -617,9 +611,9 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
       children: [
         Container(
           width: 4,
-          height: 22,
+          height: 24,
           decoration: BoxDecoration(
-            color: c.primary,
+            gradient: c.primaryGradient,
             borderRadius: BorderRadius.circular(99),
           ),
         ),
@@ -717,8 +711,9 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -978,5 +973,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
       return "${(amount / 1000).toStringAsFixed(0)}K F";
     }
     return "${amount.toStringAsFixed(0)} F";
+  }
+}{amount.toStringAsFixed(0)} F";
   }
 }

@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/models/spending.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors, PremiumRadii;
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
+import 'package:mobile_store_app/widgets/premium_kit.dart';
 
+// =====================================================================
+// HISTORIQUE DES DÉPENSES — visuel « BouTika Premium »
+// ---------------------------------------------------------------------
+// LOGIQUE INCHANGÉE : chargement, tri, filtres par période, mapping des
+// cartes — tout est conservé. Seule la présentation change (résumé,
+// filtres, cartes terracotta feutrées, état vide premium).
+// =====================================================================
 class ExpensesScreen extends StatefulWidget {
   final String storeId;
   const ExpensesScreen({super.key, required this.storeId});
@@ -21,9 +30,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   DateTime? startDate;
   DateTime? endDate;
-
-  static const Color _accent = Color(0xFFC08552);
-  static const Color _danger = Color(0xFFC96B6B);
 
   @override
   void initState() {
@@ -73,7 +79,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   double get _totalFilteredAmount {
     return filteredExpenses.fold<double>(
       0,
-          (sum, item) => sum + (item.price ?? 0),
+      (sum, item) => sum + (item.price ?? 0),
     );
   }
 
@@ -87,24 +93,27 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         return Scaffold(
           backgroundColor: colors.background,
           appBar: AppBar(
-            title: Text(
-              "Historique des Dépenses",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-                color: colors.textPrimary,
-              ),
-            ),
-            backgroundColor: colors.background,
-            foregroundColor: colors.textPrimary,
-            elevation: 0,
-            centerTitle: true,
+            title: const Text("Historique des Dépenses"),
             actions: [
-              IconButton(
-                tooltip: "Actualiser",
-                onPressed: () =>
-                    _fetchExpenses(startDate: startDate, endDate: endDate),
-                icon: Icon(Icons.refresh_rounded, color: colors.primary),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(PremiumRadii.sm),
+                    border: Border.all(color: colors.border, width: 1),
+                  ),
+                  child: IconButton(
+                    tooltip: "Actualiser",
+                    onPressed: () => _fetchExpenses(
+                        startDate: startDate, endDate: endDate),
+                    icon: Icon(
+                      Icons.refresh_rounded,
+                      color: colors.primary,
+                      size: 20,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -115,23 +124,24 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               color: colors.primary,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
                   _buildSummaryCard(colors),
                   const SizedBox(height: 16),
                   _buildFilterSection(colors),
                   const SizedBox(height: 16),
                   if (isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 80),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 80),
                       child: Center(
-                        child: const BouTikaLoader(),
+                        child: BouTikaLoader(),
                       ),
                     )
                   else if (filteredExpenses.isEmpty)
                     _buildEmptyState(colors)
                   else
-                    ...filteredExpenses.map((e) => _buildExpenseCard(e, colors)),
+                    ...filteredExpenses
+                        .map((e) => _buildExpenseCard(e, colors)),
                 ],
               ),
             ),
@@ -141,65 +151,96 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
+  // Carte résumé — bandeau terracotta feutré + stats Bold.
   Widget _buildSummaryCard(DashColors colors) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border, width: 1),
-      ),
+    return PremiumCard(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: _accent.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.account_balance_wallet_outlined,
-                  color: _accent,
-                  size: 20,
-                ),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colors.accentSoft,
+                  colors.accentSoft.withOpacity(0.3),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  "Résumé des dépenses",
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15.5,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(19),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(PremiumRadii.sm),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: colors.accent,
+                    size: 22,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Résumé des dépenses",
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Période sélectionnée",
+                        style: TextStyle(
+                          color: colors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatBox(
-                  colors: colors,
-                  label: "TOTAL",
-                  value: "${_totalFilteredAmount.toStringAsFixed(0)} F",
-                  valueColor: _danger,
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildStatBox(
+                    colors: colors,
+                    label: "TOTAL",
+                    value: "${_totalFilteredAmount.toStringAsFixed(0)} F",
+                    valueColor: colors.danger,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatBox(
-                  colors: colors,
-                  label: "NOMBRE",
-                  value: "${filteredExpenses.length}",
-                  valueColor: colors.primary,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatBox(
+                    colors: colors,
+                    label: "NOMBRE",
+                    value: "${filteredExpenses.length}",
+                    valueColor: colors.primary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -216,28 +257,23 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(PremiumRadii.md),
         border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.1,
-            ),
-          ),
+          PremiumMicroLabel(label),
           const SizedBox(height: 8),
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: valueColor,
-              fontSize: 17,
+              fontSize: 18,
               fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
             ),
           ),
         ],
@@ -245,32 +281,35 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
+  // Filtres — callbacks de réinitialisation inchangés.
   Widget _buildFilterSection(DashColors colors) {
     final hasFilter = startDate != null || endDate != null;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border, width: 1),
-      ),
+    return PremiumCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.filter_alt_outlined, color: colors.primary, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                "Filtrer par période",
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14.5,
+              PremiumIconTile(
+                icon: Icons.filter_alt_outlined,
+                color: colors.primary,
+                softColor: colors.primarySoft,
+                size: 40,
+                iconSize: 19,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Filtrer par période",
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14.5,
+                  ),
                 ),
               ),
-              const Spacer(),
               if (hasFilter)
                 TextButton.icon(
                   onPressed: () {
@@ -280,18 +319,23 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     });
                     _applyFilters();
                   },
-                  icon: const Icon(Icons.close_rounded, size: 16, color: _danger),
-                  label: const Text(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: colors.danger,
+                  ),
+                  label: Text(
                     "Réinitialiser",
                     style: TextStyle(
-                      color: _danger,
+                      color: colors.danger,
                       fontWeight: FontWeight.w600,
+                      fontSize: 12.5,
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -318,6 +362,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
+  // Sélecteur de date — logique showDatePicker inchangée.
   Widget _buildDatePickerChip({
     required DashColors colors,
     required String label,
@@ -327,7 +372,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final hasDate = date != null;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(PremiumRadii.input),
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
@@ -359,12 +404,15 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 14),
+        padding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
         decoration: BoxDecoration(
-          color: hasDate ? colors.primarySoft : colors.background,
-          borderRadius: BorderRadius.circular(14),
+          color: hasDate ? colors.primarySoft : colors.fieldFill,
+          borderRadius: BorderRadius.circular(PremiumRadii.input),
           border: Border.all(
-            color: hasDate ? colors.primary.withOpacity(0.3) : colors.border,
+            color: hasDate
+                ? colors.primary.withOpacity(0.4)
+                : colors.border,
             width: 1.2,
           ),
         ),
@@ -401,7 +449,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 },
                 child: Icon(
                   Icons.close_rounded,
-                  size: 14,
+                  size: 15,
                   color: colors.primary,
                 ),
               ),
@@ -411,125 +459,87 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
+  // Carte dépense — terracotta feutré, montant Bold en pastille.
   Widget _buildExpenseCard(Spending spending, DashColors colors) {
     final amount = spending.price ?? 0;
     final dateText = spending.createdAt != null
         ? DateFormat('dd MMM yyyy • HH:mm').format(spending.createdAt!)
         : "Date inconnue";
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(11),
-            decoration: BoxDecoration(
-              color: _accent.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(14),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PremiumCard(
+        padding: const EdgeInsets.all(16),
+        radius: PremiumRadii.md,
+        child: Row(
+          children: [
+            PremiumIconTile(
+              icon: Icons.money_off_rounded,
+              color: colors.accent,
+              softColor: colors.accentSoft,
+              size: 48,
+              iconSize: 23,
             ),
-            child: const Icon(
-              Icons.money_off_rounded,
-              color: _accent,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  spending.description?.trim().isNotEmpty == true
-                      ? spending.description!
-                      : "Sans description",
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14.5,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    spending.description?.trim().isNotEmpty == true
+                        ? spending.description!
+                        : "Sans description",
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.5,
+                      height: 1.35,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  dateText,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 5),
+                  Text(
+                    dateText,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: _danger.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              "- ${amount.toStringAsFixed(0)} F",
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                color: _danger,
-                fontSize: 13.5,
+                ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 11, vertical: 8),
+              decoration: BoxDecoration(
+                color: colors.dangerSoft,
+                borderRadius: BorderRadius.circular(PremiumRadii.sm),
+              ),
+              child: Text(
+                "- ${amount.toStringAsFixed(0)} F",
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: colors.danger,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(DashColors colors) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 80),
-      child: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                color: colors.primarySoft,
-                shape: BoxShape.circle,
-                border: Border.all(color: colors.border),
-              ),
-              child: Icon(
-                Icons.receipt_long_outlined,
-                size: 52,
-                color: colors.primary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Aucune dépense trouvée",
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Aucune dépense ne correspond à la période sélectionnée.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
+    return const Padding(
+      padding: EdgeInsets.only(top: 48),
+      child: PremiumEmptyState(
+        icon: Icons.receipt_long_outlined,
+        title: "Aucune dépense trouvée",
+        message: "Aucune dépense ne correspond à la période sélectionnée.",
       ),
     );
   }

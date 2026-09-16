@@ -1,60 +1,71 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-class BuildSubscriptionCard extends StatelessWidget{
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show DashColors, PremiumRadii;
+//
+// Carte membre premium — dégradé émeraude feutré (jamais criard),
+// badge de statut, jours restants Bold. Mêmes paramètres d'entrée.
+//
+class BuildSubscriptionCard extends StatelessWidget {
   final int daysRemaining;
 
-  final String  storeName;
+  final String storeName;
 
   final String planType;
 
-  BuildSubscriptionCard({required this.daysRemaining, required this.storeName,required this.planType});
+  BuildSubscriptionCard(
+      {required this.daysRemaining,
+      required this.storeName,
+      required this.planType});
 
   @override
   Widget build(BuildContext context) {
+    final colors = DashColors(context);
     final bool isExpired = daysRemaining == 0;
-    final Color mainColor = isExpired ? const Color(0xFFEF4444) : const Color(0xFF3B82F6);
+    final Color mainColor =
+        isExpired ? colors.danger : colors.primary;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(PremiumRadii.lg),
         boxShadow: [
           BoxShadow(
-            color: mainColor.withOpacity(0.3),
-            blurRadius: 20,
+            color: mainColor.withOpacity(0.28),
+            blurRadius: 22,
             offset: const Offset(0, 10),
           )
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(PremiumRadii.lg),
         child: Stack(
           children: [
             // Cercles décoratifs en arrière-plan pour le style
             Positioned(
-              top: -20,
-              right: -20,
+              top: -24,
+              right: -24,
               child: CircleAvatar(
-                radius: 60,
-                backgroundColor: Colors.white.withOpacity(0.1),
+                radius: 64,
+                backgroundColor: Colors.white.withOpacity(0.10),
               ),
             ),
             Positioned(
-              bottom: -30,
-              left: 10,
+              bottom: -34,
+              left: 8,
               child: CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.white.withOpacity(0.05),
+                radius: 44,
+                backgroundColor: Colors.white.withOpacity(0.06),
               ),
             ),
 
             // Contenu de la carte
             Container(
-              padding: const EdgeInsets.all(25),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isExpired
-                      ? [const Color(0xFFEF4444), const Color(0xFF991B1B)]
-                      : [const Color(0xFF3B82F6), const Color(0xFF1E40AF)],
+                      ? [colors.danger, const Color(0xFF8E2F2F)]
+                      : [colors.primary, colors.primaryDeep],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -65,45 +76,71 @@ class BuildSubscriptionCard extends StatelessWidget{
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        storeName.toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          letterSpacing: 1.2,
+                      Expanded(
+                        child: Text(
+                          storeName.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            letterSpacing: 1.2,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 12),
                       // Badge de Statut Stylisé
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: isExpired ? Colors.black26 : Colors.white24,
+                          color: isExpired
+                              ? Colors.black26
+                              : Colors.white.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white30),
+                          border:
+                              Border.all(color: Colors.white30, width: 1),
                         ),
-                        child: Text(
-                          isExpired ? "EXPIRÉ" : "ACTIF",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              isExpired ? "EXPIRÉ" : "ACTIF",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 24),
                   Text(
-                    planType == "Pro" ? "MEMBRE PRO" : "PLAN ${planType.toUpperCase()}",
+                    planType == "Pro"
+                        ? "MEMBRE PRO"
+                        : "PLAN ${planType.toUpperCase()}",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -114,9 +151,10 @@ class BuildSubscriptionCard extends StatelessWidget{
                           Text(
                             "TEMPS RESTANT",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: Colors.white.withOpacity(0.65),
                               fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.0,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -125,7 +163,7 @@ class BuildSubscriptionCard extends StatelessWidget{
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
@@ -134,11 +172,15 @@ class BuildSubscriptionCard extends StatelessWidget{
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withOpacity(0.18),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.25),
+                            width: 1,
+                          ),
                         ),
                         child: const Icon(
-                          Icons.auto_awesome,
+                          Icons.auto_awesome_rounded,
                           color: Colors.white,
                           size: 20,
                         ),

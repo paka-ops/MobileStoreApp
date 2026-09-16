@@ -1,22 +1,24 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:mobile_store_app/utils/app_colors.dart' show PremiumRadii;
 
 /**
- * Class for drawer Icon Decoration;
+ * Pastille d'icône — voile coloré doux, coins 12.
+ * Mêmes paramètres d'entrée (icon, color).
  */
-class IconBox extends StatelessWidget{
-  IconData icon;
+class IconBox extends StatelessWidget {
+  final IconData icon;
 
-  Color color;
+  final Color color;
 
-  IconBox({required IconData this.icon, required Color this.color});
+  IconBox({required this.icon, required this.color});
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(PremiumRadii.sm),
       ),
       child: Icon(icon, color: color, size: 22),
     );

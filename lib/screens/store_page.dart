@@ -44,11 +44,12 @@ class OrderLine {
 
 // ---------------------------------------------------------------------------
 // Couleurs sémantiques fixes (ne changent pas avec le thème)
+// Alignées sur la palette premium : terracotta, rouge doux, émeraude.
 // ---------------------------------------------------------------------------
 class _Fixed {
-  static const accent  = Color(0xFFC08552);
-  static const danger  = Color(0xFFC96B6B);
-  static const success = Color(0xFF6FA687);
+  static const accent  = Color(0xFFC2703D);
+  static const danger  = Color(0xFFD95C5C);
+  static const success = Color(0xFF0E9F6E);
 }
 
 class _NavItemData {
@@ -228,19 +229,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Row(
         children: [
-          // Avatar boutique
+          // Avatar boutique — anneau émeraude, fond carte feutré
           GestureDetector(
             onTap: () => _showStoreSwitcherSheet(context, colors),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: colors.accent.withOpacity(0.5),
+                  color: colors.primary.withOpacity(0.45),
                   width: 2,
                 ),
-                color: colors.primarySoft,
+                color: colors.card,
+                boxShadow: colors.cardShadow,
               ),
               child: Icon(
                 Icons.storefront_rounded,
@@ -259,11 +261,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
-                  vertical: 8,
+                  vertical: 9,
                 ),
                 decoration: BoxDecoration(
-                  color: colors.greetingPill,
+                  gradient: colors.primaryGradient,
                   borderRadius: BorderRadius.circular(30),
+                  boxShadow: colors.glowShadow,
                 ),
                 child: Row(
                   children: [
@@ -360,12 +363,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               color: colors.topBarIconBg,
               shape: BoxShape.circle,
-              boxShadow: colors.subtleShadow,
+              border: Border.all(color: colors.border, width: 1),
+              boxShadow: colors.cardShadow,
             ),
             child: Icon(icon, size: 20, color: colors.topBarIcon),
           ),
@@ -469,6 +473,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(Icons.storefront_outlined,
+         utlined,
                               color: colors.textSecondary, size: 20),
                         ),
                         title: Text(newStore.name,
@@ -521,6 +526,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return Container(
       decoration: BoxDecoration(
         color: colors.card,
+        border: Border(top: BorderSide(color: colors.border, width: 1)),
         boxShadow: colors.subtleShadow,
       ),
       child: SafeArea(
@@ -537,22 +543,34 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               return Expanded(
                 child: InkWell(
                   onTap: () => setState(() => _currentIndex = index),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Icon(
-                              selected ? item.filledIcon : item.icon,
-                              color: selected
-                                  ? colors.primary
-                                  : colors.textSecondary,
-                              size: 24,
-                            ),
+                        // Pastille douce derrière l'onglet actif (anti-fatigue).
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? colors.primarySoft
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Icon(
+                                selected ? item.filledIcon : item.icon,
+                                color: selected
+                                    ? colors.primary
+                                    : colors.textSecondary,
+                                size: 23,
+                              ),
                             if (showBadge)
                               Positioned(
                                 right: -3,
@@ -566,7 +584,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                   ),
                                 ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -602,6 +621,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return BoxDecoration(
       color: colors.card,
       borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: colors.border, width: 1),
       boxShadow: colors.cardShadow,
     );
   }
@@ -626,12 +646,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                    color: colors.textPrimary,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
                 if (icon != null)
@@ -1019,27 +1042,39 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Pastille terracotta feutrée — même callback dépense.
         FloatingActionButton.extended(
           heroTag: "btnExpense",
           onPressed: () => _showExpenseDialog(context, colors),
           backgroundColor: colors.accent,
-          elevation: 2,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14)),
           icon: const Icon(Icons.money_off, color: Colors.white, size: 20),
           label: const Text("Dépense",
               style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
+                  color: Colors.white, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 12),
-        FloatingActionButton.extended(
-          heroTag: "btnSale",
-          onPressed: () => _showStartSaleDialog(context, colors),
-          backgroundColor: colors.primary,
-          elevation: 3,
-          icon: const Icon(Icons.shopping_cart_checkout,
-              color: Colors.white, size: 20),
-          label: const Text("Vendre",
-              style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
+        // CTA vente émeraude avec halo — même callback vente.
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: colors.glowShadow,
+          ),
+          child: FloatingActionButton.extended(
+            heroTag: "btnSale",
+            onPressed: () => _showStartSaleDialog(context, colors),
+            backgroundColor: colors.primary,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14)),
+            icon: const Icon(Icons.shopping_cart_checkout,
+                color: Colors.white, size: 20),
+            label: const Text("Vendre",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
         ),
       ],
     );
@@ -1258,7 +1293,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Text("Confirmation",
                   style: TextStyle(color: colors.textPrimary)),
               content: Text(
@@ -1319,7 +1354,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Text("Nouvelle Vente",
                   style: TextStyle(color: colors.textPrimary)),
               content: Text(
@@ -1391,7 +1426,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Text("Choix des produits",
                   style: TextStyle(color: colors.textPrimary)),
               content: ConstrainedBox(
@@ -1587,7 +1622,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Text("Confirmer la Vente",
                   style: TextStyle(color: colors.textPrimary)),
               content: Text(
@@ -1671,7 +1706,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Row(
                 children: [
                   Icon(Icons.category, color: colors.primary, size: 20),
@@ -1809,7 +1844,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Text(
                 employee == null
                     ? "Ajouter un employé"
@@ -1920,7 +1955,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18)),
+            borderRadius: BorderRadius.circular(20)),
         title: Text("Déconnexion",
             style: TextStyle(color: colors.textPrimary)),
         content: Text(
@@ -1966,7 +2001,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(20)),
               title: Row(
                 children: [
                   Icon(Icons.remove_circle_outline,
@@ -2126,7 +2161,7 @@ class _CategoryCardState extends State<_CategoryCard> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: _expanded
               ? colors.primary.withOpacity(0.30)
@@ -2141,7 +2176,7 @@ class _CategoryCardState extends State<_CategoryCard> {
         children: [
           // Header
           InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(20),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
               padding: const EdgeInsets.all(14),

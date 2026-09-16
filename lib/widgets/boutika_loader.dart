@@ -96,15 +96,16 @@ class _BouTikaLoaderState extends State<BouTikaLoader>
     return ValueListenableBuilder<bool>(
       valueListenable: appDarkMode,
       builder: (context, isDark, _) {
-        // Lettres « verre dépoli » (mates, peu visibles) + lueur chaude
-        // discrète — sauf si des couleurs personnalisées sont fournies
-        // (variante compacte sur bouton coloré, par exemple).
+        // Lettres « verre dépoli » (mates, peu visibles) + lueur émeraude
+        // discrète aux couleurs de la marque — sauf si des couleurs
+        // personnalisées sont fournies (variante compacte sur bouton
+        // coloré, par exemple).
         final base = widget.baseColor ??
-            (isDark ? const Color(0xFF44454C) : const Color(0xFFB6BAC3));
+            (isDark ? const Color(0xFF3A465E) : const Color(0xFFB9BEC7));
         final glow = widget.glowColor ??
-            (isDark ? const Color(0xFF6E5A43) : const Color(0xFFC99C73));
+            (isDark ? const Color(0xFF1F6F54) : const Color(0xFF7FD6B4));
         final core = widget.coreColor ??
-            (isDark ? const Color(0xFFCBA97E) : const Color(0xFFB0713C));
+            (isDark ? const Color(0xFF34D399) : const Color(0xFF10B981));
 
         final word = AnimatedBuilder(
           animation: _sweepController,

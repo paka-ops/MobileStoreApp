@@ -4,13 +4,21 @@ import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/models/stock.dart';
 import 'package:mobile_store_app/service/product_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors, PremiumRadii;
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
+import 'package:mobile_store_app/widgets/premium_kit.dart';
 
-// Note: Assure-toi d'avoir un modèle Dart correspondant à ton entité Java Stock
-
-
+// =====================================================================
+// MOUVEMENTS DE STOCK — visuel « BouTika Premium »
+// ---------------------------------------------------------------------
+// LOGIQUE INCHANGÉE : identifiants produits, chargement des stocks,
+// filtres de période, calcul des quantités ajoutées et masquage du prix
+// d'achat pour les employés — tout est conservé. La présentation passe
+// au thème (clair/sombre), cartes feutrées et badges émeraude.
+// =====================================================================
 class RestockHistoryScreen extends StatefulWidget {
-  final List<Product> products; // Correction du nom "produtIds"
+  final List<Product> products;
   const RestockHistoryScreen({super.key, required this.products});
   @override
   State<RestockHistoryScreen> createState() => _RestockHistoryScreenState();
@@ -18,31 +26,30 @@ class RestockHistoryScreen extends StatefulWidget {
 
 class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
   DateTime? startDate = DateTime.now().add(Duration(days: -30));
-  DateTime? endDate = DateTime.now().add(Duration(days:1));
+  DateTime? endDate = DateTime.now().add(Duration(days: 1));
   bool isLoading = false;
   List<String> productIds = [];
-  void _getProductIds(List<Product> products){
-      products.forEach((e){
-        productIds.add(e.id);
-      });
-      setState(() {
-        productIds;
-      });
+  void _getProductIds(List<Product> products) {
+    products.forEach((e) {
+      productIds.add(e.id);
+    });
+    setState(() {
+      productIds;
+    });
   }
-  void _applyFilter(){
 
-  }
+  void _applyFilter() {}
+
   // Cette liste sera remplie par ton appel API (List<Stock> du backend)
-
   List<Stock> stocks = [];
-  Map<String,Product> productsIdMap = {};
+  Map<String, Product> productsIdMap = {};
   void _getAllStocksByProductIds(List<String> productIds) async {
     // 1. On lance l'animation de chargement
     setState(() => isLoading = true);
 
     // 2. Appel au service (qui gère déjà ses propres erreurs)
-    List<Stock>? results = await ProductService().getAllProductStocks(
-        startDate!, endDate!, productIds, context);
+    List<Stock>? results = await ProductService()
+        .getAllProductStocks(startDate!, endDate!, productIds, context);
 
     // 3. Mise à jour des données et arrêt du chargement
     setState(() {
@@ -56,74 +63,108 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
       isLoading = false;
     });
   }
+
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     _getProductIds(widget.products);
     _getAllStocksByProductIds(productIds);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: const Text("Mouvements de Stock",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () { _getAllStocksByProductIds(productIds);},
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkMode,
+      builder: (context, _, __) {
+        final colors = DashColors(context);
+
+        return Scaffold(
+          backgroundColor: colors.background,
+          appBar: AppBar(
+            title: const Text("Mouvements de Stock"),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(PremiumRadii.sm),
+                    border: Border.all(color: colors.border, width: 1),
+                  ),
+                  child: IconButton(
+                    tooltip: "Actualiser",
+                    icon: Icon(
+                      Icons.refresh_rounded,
+                      color: colors.primary,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      _getAllStocksByProductIds(productIds);
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(child: Column(
-        children: [
-          _buildFilterBar(),
-          Expanded(
-            child: isLoading
-                ? const Center(child: BouTikaLoader())
-                :stocks.isEmpty?_buildEmptyState(): _buildRestockList(),
+          body: SafeArea(
+              child: Column(
+            children: [
+              _buildFilterBar(colors),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: BouTikaLoader())
+                    : stocks.isEmpty
+                        ? _buildEmptyState(colors)
+                        : _buildRestockList(colors),
+              ),
+            ],
+          )),
+          floatingActionButton: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(PremiumRadii.input),
+              boxShadow: colors.glowShadow,
+            ),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                /* Formulaire pour créer un nouveau Stock */
+              },
+              label: const Text(
+                "Nouvel Arrivage",
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+              icon: const Icon(Icons.add_business_outlined, size: 20),
+              backgroundColor: colors.primary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+            ),
           ),
-        ],
-      )),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () { /* Formulaire pour créer un nouveau Stock */ },
-        label: const Text("Nouvel Arrivage"),
-        icon: const Icon(Icons.add_business_outlined),
-        backgroundColor: Colors.blueAccent,
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildFilterBar() {
+  // Barre de période — carte feutrée (plus de blanc pur / ombre dure).
+  Widget _buildFilterBar(DashColors colors) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),
-        ],
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(PremiumRadii.lg),
+        border: Border.all(color: colors.border, width: 1),
+        boxShadow: colors.cardShadow,
       ),
       child: Column(
         children: [
-          const Text("Période d'analyse",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
-          const SizedBox(height: 10),
+          PremiumMicroLabel("Période d'analyse", color: colors.textSecondary),
+          const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _filterChipDate("Début", startDate, true)),
-              const SizedBox(width: 8),
-              Expanded(child: _filterChipDate("Fin", endDate, false)),
+              Expanded(
+                  child: _filterChipDate("Début", startDate, true, colors)),
+              const SizedBox(width: 12),
+              Expanded(child: _filterChipDate("Fin", endDate, false, colors)),
             ],
           ),
         ],
@@ -131,61 +172,98 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
     );
   }
 
-  Widget _filterChipDate(String label, DateTime? date, bool isStart) {
+  // Sélecteur de date — logique showDatePicker inchangée.
+  Widget _filterChipDate(
+      String label, DateTime? date, bool isStart, DashColors colors) {
+    final hasDate = date != null;
     return InkWell(
+      borderRadius: BorderRadius.circular(PremiumRadii.input),
       onTap: () async {
         DateTime? picked = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
           firstDate: DateTime(2022),
           lastDate: DateTime(2100),
+          builder: (context, child) => Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                primary: colors.primary,
+                onPrimary: Colors.white,
+                surface: colors.card,
+                onSurface: colors.textPrimary,
+              ),
+            ),
+            child: child!,
+          ),
         );
         if (picked != null) {
           setState(() {
-            if (isStart) startDate = picked; else endDate = picked;
+            if (isStart)
+              startDate = picked;
+            else
+              endDate = picked;
           });
           _getAllStocksByProductIds(productIds);
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(15),
+          color: hasDate ? colors.primarySoft : colors.fieldFill,
+          borderRadius: BorderRadius.circular(PremiumRadii.input),
+          border: Border.all(
+            color: hasDate
+                ? colors.primary.withOpacity(0.4)
+                : colors.border,
+            width: 1.2,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.calendar_today, size: 16, color: Colors.blueAccent),
+            Icon(
+              Icons.calendar_month_rounded,
+              size: 18,
+              color: hasDate ? colors.primary : colors.textSecondary,
+            ),
             const SizedBox(width: 8),
-            Text(
-              date == null ? label : DateFormat('dd/MM/yy').format(date),
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            Flexible(
+              child: Text(
+                date == null ? label : DateFormat('dd/MM/yy').format(date),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: hasDate ? colors.primary : colors.textSecondary,
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          const Text(
-            "Pas de restockage trouvée",
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
-        ],
+
+  Widget _buildEmptyState(DashColors colors) {
+    return const Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: PremiumEmptyState(
+          icon: Icons.inventory_2_outlined,
+          title: "Pas de restockage trouvée",
+          message:
+              "Aucun mouvement de stock sur cette période. Les nouveaux arrivages apparaîtront ici.",
+        ),
       ),
     );
   }
 
-  Widget _buildRestockList() {
+  // Liste des mouvements — mêmes données, cartes extensibles premium.
+  Widget _buildRestockList(DashColors colors) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
       itemCount: stocks.length,
       itemBuilder: (context, index) {
         Stock stock = stocks[index];
@@ -193,85 +271,106 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
         final addedQty = stock.baseStock - stock.previousStock!;
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 16),
+          margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            color: colors.card,
+            borderRadius: BorderRadius.circular(PremiumRadii.lg),
+            border: Border.all(color: colors.border, width: 1),
+            boxShadow: colors.cardShadow,
           ),
           child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            data: Theme.of(context)
+                .copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-              // 🔵 ICON MODERNE
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE0F2FE),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.inventory_2_outlined,
-                    color: Color(0xFF0284C7), size: 20),
+              tilePadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(PremiumRadii.lg),
+              ),
+              collapsedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(PremiumRadii.lg),
               ),
 
-              // 🏷️ TITRE
+              // Pastille produit — voile info doux.
+              leading: PremiumIconTile(
+                icon: Icons.inventory_2_outlined,
+                color: colors.info,
+                softColor: colors.infoSoft,
+                size: 46,
+                iconSize: 22,
+              ),
+
+              // Nom du produit.
               title: Text(
                 productsIdMap[stock.productId]!.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-
-              // 📅 DATE
-              subtitle: Text(
-                "Ajouté le ${stock.date!}",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.5,
+                  color: colors.textPrimary,
                 ),
               ),
 
-              // 🟢 BADGE QUANTITÉ
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDCFCE7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              // Date d'ajout.
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 3),
                 child: Text(
-                  "+${addedQty.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    color: Color(0xFF16A34A),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                  "Ajouté le ${stock.date!}",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.textSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
 
-              // 📊 DETAILS
+              // Badge quantité — émeraude feutré.
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 11, vertical: 7),
+                decoration: BoxDecoration(
+                  color: colors.successSoft,
+                  borderRadius: BorderRadius.circular(PremiumRadii.pill),
+                ),
+                child: Text(
+                  "+${addedQty.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    color: colors.success,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12.5,
+                  ),
+                ),
+              ),
+
+              // Détails chiffrés.
               children: [
+                Divider(
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                    color: colors.border),
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                   child: Column(
                     children: [
-                      _modernDetailRow("Prix de vente", "${stock.sellingPrice}"),
-                      ?(UserService.userType =='employee')?null:_modernDetailRow("Prix d'achat", "${stock.buyingPrice}"),
-                      _modernDetailRow("Total vendu", stock.totalSell.toStringAsFixed(2)),
+                      _modernDetailRow(
+                          "Prix de vente", "${stock.sellingPrice}", colors),
+                      // Prix d'achat masqué aux employés (logique d'origine).
+                      if (UserService.userType != 'employee')
+                        _modernDetailRow(
+                            "Prix d'achat", "${stock.buyingPrice}", colors),
+                      _modernDetailRow("Total vendu",
+                          stock.totalSell.toStringAsFixed(2), colors),
                       _modernDetailRow(
                         "Ancien stock",
                         stock.previousStock?.toStringAsFixed(2) ?? "0",
+                        colors,
                       ),
                       _modernDetailRow(
                         "Nouveau stock",
                         stock.baseStock.toStringAsFixed(2),
+                        colors,
                         isHighlight: true,
                       ),
                     ],
@@ -284,33 +383,16 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
       },
     );
   }
-  Widget _modernDetailRow(String label, String value,
+
+  Widget _modernDetailRow(String label, String value, DashColors colors,
       {bool isHighlight = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 13,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: isHighlight ? const Color(0xFF2563EB) : Colors.black87,
-            ),
-          ),
-        ],
-      ),
+    return PremiumInfoRow(
+      label: label,
+      value: value,
+      highlight: isHighlight,
+      valueColor: isHighlight ? colors.primary : null,
     );
   }
-
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(

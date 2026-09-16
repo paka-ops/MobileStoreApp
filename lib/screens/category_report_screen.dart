@@ -3,8 +3,17 @@ import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
 import 'package:collection/collection.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show DashColors, PremiumRadii;
+import 'package:mobile_store_app/widgets/premium_kit.dart';
 
+// =====================================================================
+// ANALYSES PAR CATÉGORIE — visuel « BouTika Premium »
+// ---------------------------------------------------------------------
+// LOGIQUE INCHANGÉE : regroupement des produits par catégorie, calculs
+// CA/bénéfice et masquage employeur — tout est conservé. Seule la
+// présentation change (cartes feutrées, barre de rentabilité douce).
+// =====================================================================
 class CategoryReportScreen extends StatelessWidget {
   final String storeId;
   final List<Category> categories;
@@ -23,32 +32,26 @@ class CategoryReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = DashColors(context);
     _filterOrderProductsByCategory(orders, categories);
-    
+
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        title: Text(
-          "Analyses par Catégorie",
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: colors.textPrimary),
-        ),
-        backgroundColor: colors.background,
-        foregroundColor: colors.textPrimary,
-        elevation: 0,
-        centerTitle: true,
+        title: const Text("Analyses par Catégorie"),
       ),
       body: SafeArea(
         child: ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           itemCount: categories.length,
           itemBuilder: (context, index) {
             Category category = categories[index];
-            Map<String, num> result = _getSalesInformationByCategory(category);
+            Map<String, num> result =
+                _getSalesInformationByCategory(category);
 
             return _buildEnhancedCategoryCard(
               category.name,
               result['sales'] ?? 0,
               result['revenues'] ?? 0,
-              _getCategoryColor(index),
+              _getCategoryColor(index, colors),
               colors,
             );
           },
@@ -57,74 +60,96 @@ class CategoryReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEnhancedCategoryCard(
-      String name, num sales, num revenue, Color color, DashColors colors) {
+  Widget _buildEnhancedCategoryCard(String name, num sales, num revenue,
+      Color color, DashColors colors) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(PremiumRadii.lg),
         border: Border.all(color: colors.border, width: 1),
+        boxShadow: colors.cardShadow,
       ),
       child: Column(
         children: [
-          // En-tête de la carte
+          // En-tête de la carte — voile teinté feutré.
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.06),
+              color: color.withOpacity(0.08),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(17),
-                topRight: Radius.circular(17),
+                topLeft: Radius.circular(19),
+                topRight: Radius.circular(19),
               ),
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.category_rounded, color: color, size: 20),
+                PremiumIconTile(
+                  icon: Icons.category_rounded,
+                  color: color,
+                  softColor: color.withOpacity(0.14),
+                  size: 44,
+                  iconSize: 21,
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15.5,
-                    color: colors.textPrimary,
+                Expanded(
+                  child: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15.5,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Statistiques Ventes vs Revenus
+          // Statistiques Ventes vs Bénéfice.
           Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 _buildStatItem("VENTES (CA)", sales, colors.primary, colors),
                 if (userType == "employer") ...[
-                  Container(width: 1, height: 40, color: colors.border),
-                  _buildStatItem("BÉNÉFICE NET", revenue, colors.success, colors),
+                  Container(width: 1, height: 44, color: colors.border),
+                  _buildStatItem(
+                      "BÉNÉFICE NET", revenue, colors.success, colors),
                 ],
               ],
             ),
           ),
-          // Barre visuelle de rentabilité (Bénéfice/Vente)
+          // Barre visuelle de rentabilité (Bénéfice/Vente).
           if (sales > 0)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(
-                  value: (revenue / sales).clamp(0, 1).toDouble(),
-                  backgroundColor: colors.background,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                  minHeight: 6,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value:
+                          (revenue / sales).clamp(0, 1).toDouble(),
+                      backgroundColor: colors.background,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(color),
+                      minHeight: 8,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Marge : ${((revenue / sales).clamp(0, 1) * 100).toStringAsFixed(1)} %",
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             )
         ],
@@ -132,26 +157,22 @@ class CategoryReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, num value, Color color, DashColors colors) {
+  Widget _buildStatItem(
+      String label, num value, Color color, DashColors colors) {
     return Expanded(
       child: Column(
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: 10,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
+          PremiumMicroLabel(label),
+          const SizedBox(height: 8),
           Text(
             "${value.toStringAsFixed(0)} F",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.w700,
-              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              fontSize: 17,
+              letterSpacing: -0.3,
             ),
           ),
         ],
@@ -159,7 +180,8 @@ class CategoryReportScreen extends StatelessWidget {
     );
   }
 
-  void _filterOrderProductsByCategory(List<Order> orders, List<Category> categories) {
+  void _filterOrderProductsByCategory(
+      List<Order> orders, List<Category> categories) {
     for (var cat in categories) {
       cat.orderContentsByCategory.clear();
     }
@@ -168,7 +190,7 @@ class CategoryReportScreen extends StatelessWidget {
     for (var order in orders) {
       order.products.forEach((product, quantity) {
         Category? category = categoriesSet.firstWhereOrNull(
-                (element) => element.name == product.category?.name);
+            (element) => element.name == product.category?.name);
 
         if (category != null) {
           category.orderContentsByCategory.add({product: quantity});
@@ -193,15 +215,16 @@ class CategoryReportScreen extends StatelessWidget {
     return result;
   }
 
-  Color _getCategoryColor(int index) {
-    List<Color> colors = [
-      const Color(0xFF4A7C82),  // primary
-      const Color(0xFFC08552),  // accent
-      const Color(0xFF6FA687),  // success
-      const Color(0xFF8A7CB8),  // Violet doux
-      const Color(0xFFD8A657),  // Or doux
-      const Color(0xFF5C8AAE),  // Bleu pétrole doux
+  // Palette premium adossée au thème (même signature d'origine enrichie).
+  Color _getCategoryColor(int index, DashColors colors) {
+    List<Color> palette = [
+      colors.primary, // émeraude
+      colors.accent, // terracotta
+      colors.info, // cobalt
+      const Color(0xFF8A7CB8), // violet doux
+      colors.warning, // ambre
+      colors.success, // vert succès
     ];
-    return colors[index % colors.length];
+    return palette[index % palette.length];
   }
 }

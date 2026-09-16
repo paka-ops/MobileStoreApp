@@ -173,6 +173,7 @@ class _LowStockProductDetailsScreenState
           color: c.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: c.border),
+          boxShadow: c.cardShadow,
         ),
         child: TextField(
           onChanged: _filterProducts,
@@ -191,7 +192,7 @@ class _LowStockProductDetailsScreenState
             prefixIcon: Padding(
               padding: const EdgeInsets.all(12),
               child: Icon(Icons.search_rounded,
-                  color: c.textSecondary, size: 20),
+                  color: c.primary, size: 20),
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
@@ -344,7 +345,7 @@ class _LowStockProductDetailsScreenState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               side: BorderSide(color: c.border, width: 1.2),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -805,6 +806,7 @@ class _StatChip extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: c.border),
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         children: [
@@ -900,13 +902,7 @@ class _LowStockProductCard extends StatelessWidget {
         color: c.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Theme(
         data: Theme.of(context)
