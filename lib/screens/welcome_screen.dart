@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/screens/dashboard_screens.dart';
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors;
 import '../widgets/store_item.dart';
 import '../models/Store.dart';
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
@@ -62,30 +65,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   // -------------------------------------------------------------------------
-  // EN-TÊTE — restructuré en 2 lignes pour éviter l'overflow
+  // EN-TÊTE — logo + stats (ligne horizontale scrollable, anti-overflow)
   // -------------------------------------------------------------------------
   Widget _buildHeader(DashColors colors) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // LIGNE 1 : Logo + Nom app + bouton thème
           Row(
             children: [
-              // Logo
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/boutika.png',
-                  height: 42,
-                  width: 42,
-                  fit: BoxFit.cover,
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: colors.card,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colors.border),
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/boutika.png',
+                    height: 38,
+                    width: 38,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-
-              // Textes — Expanded pour absorber l'espace libre
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,8 +101,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       "BouTiKa",
                       style: TextStyle(
                         color: colors.primary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 17,
+                        letterSpacing: 0.2,
                       ),
                     ),
                     Text(
@@ -104,15 +111,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: colors.textSecondary,
-                        fontSize: 12,
+                        fontSize: 11.5,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // Bouton toggle thème — taille fixe
               ValueListenableBuilder<bool>(
                 valueListenable: appDarkMode,
                 builder: (context, isDark, _) => IconButton(
@@ -136,8 +141,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
           const SizedBox(height: 12),
 
-          // LIGNE 2 : Chips d'info — ScrollView horizontal
-          // pour éviter tout overflow quelle que soit la taille d'écran
+          // Chips d'info — ScrollView horizontal
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -185,8 +189,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       }) {
     return Container(
       padding: EdgeInsets.only(
-        // Moins de padding horizontal quand c'est un bouton
-        // pour ne pas gaspiller d'espace
         left: buttonIcon != null ? 4 : 12,
         right: 12,
         top: 8,
@@ -195,12 +197,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       decoration: BoxDecoration(
         color: colors.primarySoft,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.border, width: 1),
+        border: Border.all(
+          color: colors.primary.withValues(alpha: 0.14),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Icône normale ou bouton selon le cas
           if (buttonIcon != null)
             SizedBox(
               width: 32,
@@ -226,7 +229,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 label,
                 style: TextStyle(
                   color: colors.primary,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   fontSize: 13,
                   height: 1.1,
                 ),
@@ -301,21 +304,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: FloatingActionButton.extended(
         onPressed: () => _showAddStoreForm(context, colors),
         backgroundColor: colors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
+        foregroundColor: colors.onPrimary,
+        elevation: 2,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14)),
+            borderRadius: BorderRadius.circular(16)),
         icon: const Icon(Icons.add_rounded, size: 22),
         label: const Text(
           "Nouvelle boutique",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
     );
   }
 
   // -------------------------------------------------------------------------
-  // DIALOG — Ajouter une boutique
+  // DIALOG — Ajouter une boutique (logique inchangée)
   // -------------------------------------------------------------------------
   void _showAddStoreForm(BuildContext context, DashColors colors) {
     bool isLoading = false;
@@ -327,23 +330,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return AlertDialog(
           backgroundColor: colors.card,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(color: colors.border, width: 1.2),
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: colors.border),
           ),
           titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
           contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
           actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
           title: Row(
             children: [
-              Icon(Icons.add_business_rounded,
-                  color: colors.primary, size: 24),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: colors.primarySoft,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.add_business_rounded,
+                    color: colors.primary, size: 22),
+              ),
               const SizedBox(width: 12),
-              Text(
-                "Nouvelle Boutique",
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  "Nouvelle Boutique",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 17.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
@@ -354,38 +369,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
+                  AppTextField(
                     controller: _storeNameController,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.5,
-                      color: colors.textPrimary,
-                    ),
                     textInputAction: TextInputAction.next,
-                    decoration: _fieldDecoration(
-                      colors,
-                      label: "Nom de la boutique",
-                      icon:  Icons.storefront_rounded,
-                      hint:  "Ex: Boutique Centre-ville",
-                    ),
+                    label: "Nom de la boutique",
+                    icon: Icons.storefront_rounded,
+                    hint: "Ex: Boutique Centre-ville",
                     validator: (v) => (v == null || v.isEmpty)
                         ? 'Le nom est obligatoire'
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
+                  AppTextField(
                     controller: _storeAddressController,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.5,
-                      color: colors.textPrimary,
-                    ),
-                    decoration: _fieldDecoration(
-                      colors,
-                      label: "Emplacement / Adresse",
-                      icon:  Icons.location_on_rounded,
-                      hint:  "Ex: Rue 12, Douala",
-                    ),
+                    label: "Emplacement / Adresse",
+                    icon: Icons.location_on_rounded,
+                    hint: "Ex: Rue 12, Douala",
                     validator: (v) => (v == null || v.isEmpty)
                         ? "Veuillez préciser l'emplacement"
                         : null,
@@ -398,18 +397,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: colors.card,
-                      foregroundColor: colors.textPrimary,
-                      elevation: 0,
-                      side: BorderSide(
-                          color: colors.border, width: 1.2),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
+                  child: AppButton.secondary(
+                    label: "Annuler",
+                    height: 48,
                     onPressed: isLoading
                         ? null
                         : () {
@@ -418,29 +408,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       state(() => isLoading = false);
                       Navigator.pop(ctx);
                     },
-                    child: Text(
-                      "Annuler",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: colors.textPrimary,
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: colors.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
+                  child: AppButton.primary(
+                    label: "Créer la boutique",
+                    height: 48,
+                    isLoading: isLoading,
                     onPressed: isLoading
                         ? null
                         : () async {
@@ -487,15 +463,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         print("Erreur lors de l'ajout: $e");
                       }
                     },
-                    child: isLoading
-                        ? const BouTikaLoader.compact()
-                        : const Text(
-                      "Créer la boutique",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -517,26 +484,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 160,
-              height: 160,
+              width: 150,
+              height: 150,
               decoration: BoxDecoration(
                 color: colors.primarySoft,
                 shape: BoxShape.circle,
-                border: Border.all(color: colors.border, width: 1),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.18),
+                  width: 1.5,
+                ),
               ),
               child: Icon(Icons.storefront_rounded,
-                  size: 70, color: colors.primary),
+                  size: 66, color: colors.primary),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 34),
             Text(
               "Aucune boutique trouvée",
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
+                fontSize: 21,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
                 color: colors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               widget.userType == "employer"
                   ? "Créez votre première boutique pour commencer"
@@ -545,89 +516,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: colors.textSecondary,
-                fontSize: 14,
-                height: 1.5,
+                fontSize: 13.5,
+                height: 1.55,
               ),
             ),
             if (widget.userType == "employer") ...[
-              const SizedBox(height: 30),
-              SizedBox(
-                width: 250,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final colors = DashColors(context);
-                    _showAddStoreForm(context, colors);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: const Text(
-                    "Créer une boutique",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
+              const SizedBox(height: 28),
+              AppButton.primary(
+                label: "Créer une boutique",
+                icon: Icons.add_rounded,
+                expand: false,
+                height: 52,
+                onPressed: () {
+                  final colors = DashColors(context);
+                  _showAddStoreForm(context, colors);
+                },
               ),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // DÉCORATION CHAMPS TEXTE
-  // -------------------------------------------------------------------------
-  InputDecoration _fieldDecoration(
-      DashColors colors, {
-        required String label,
-        required IconData icon,
-        required String hint,
-      }) {
-    return InputDecoration(
-      labelText: label,
-      hintText:  hint,
-      labelStyle: TextStyle(
-        color: colors.textSecondary,
-        fontWeight: FontWeight.w600,
-        fontSize: 13.5,
-      ),
-      hintStyle: TextStyle(
-        color: colors.textSecondary,
-        fontSize: 13.5,
-      ),
-      filled:    true,
-      fillColor: colors.background,
-      prefixIcon: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Icon(icon, color: colors.primary, size: 20),
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-          vertical: 16, horizontal: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.primary, width: 1.6),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.danger, width: 1.3),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.danger, width: 1.6),
       ),
     );
   }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/widgets/navigation/app_header.dart';
 import 'package:mobile_store_app/models/Store.dart';
 import 'package:mobile_store_app/screens/welcome_screen.dart';
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
-import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
+import 'package:mobile_store_app/utils/message.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -13,43 +15,45 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = DashColors(context);
-    
+
     return Scaffold(
       backgroundColor: colors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Logo en haut
+                // Marque
                 Container(
-                  width: 120,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  width: 66,
+                  height: 66,
                   decoration: BoxDecoration(
                     color: colors.primarySoft,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "BouTiKa",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colors.primary,
-                      ),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: colors.primary.withValues(alpha: 0.2),
                     ),
                   ),
+                  child: Icon(
+                    Icons.storefront_rounded,
+                    color: colors.primary,
+                    size: 30,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 18),
+                const AppBrandMark(),
+                const SizedBox(height: 34),
 
-                // Titres de la page
+                // Titres
                 Text(
                   "Connexion",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
                     color: colors.textPrimary,
                   ),
                 ),
@@ -59,10 +63,11 @@ class LoginScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: colors.textSecondary,
-                    fontSize: 13,
+                    fontSize: 13.5,
+                    height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 28),
 
                 // Formulaire
                 const LoginPage(),
@@ -90,86 +95,49 @@ class _LoginPageState extends State<LoginPage> {
   bool _isObscured = true;
   bool _isLoading = false;
 
-  // Style commun pour les champs — aligné sur le design global
-  InputDecoration _inputStyle(String label, IconData icon, DashColors colors) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
-      prefixIcon: Icon(icon, color: colors.primary, size: 20),
-      filled: true,
-      fillColor: colors.card,
-      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.border, width: 1),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = DashColors(context);
-    
+
     return Form(
       key: _formKey,
       child: Column(
         children: [
-          TextFormField(
+          AppTextField(
             controller: usernameController,
             enabled: !_isLoading,
-            decoration: _inputStyle("Nom d'utilisateur", Icons.person_outline, colors),
+            label: "Nom d'utilisateur",
+            hint: "Ex: jean.dupont",
+            icon: Icons.person_outline,
+            textInputAction: TextInputAction.next,
           ),
-          const SizedBox(height: 16),
-          TextFormField(
+          const SizedBox(height: 14),
+          AppTextField(
             controller: passwordController,
             enabled: !_isLoading,
-            obscureText: _isObscured,
-            decoration: _inputStyle("Mot de passe", Icons.lock_outline, colors).copyWith(
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: colors.textSecondary,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isObscured = !_isObscured;
-                  });
-                },
+            obscure: _isObscured,
+            label: "Mot de passe",
+            icon: Icons.lock_outline,
+            suffix: IconButton(
+              icon: Icon(
+                _isObscured ? Icons.visibility_off : Icons.visibility,
+                color: colors.textSecondary,
+                size: 20,
               ),
+              onPressed: () {
+                setState(() {
+                  _isObscured = !_isObscured;
+                });
+              },
             ),
           ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: _isLoading ? null : _handleLogin,
-              child: _isLoading
-                  ? const BouTikaLoader.compact()
-                  : const Text(
-                "Se connecter",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+          const SizedBox(height: 28),
+          AppButton.primary(
+            label: "Se connecter",
+            icon: Icons.login_rounded,
+            height: 52,
+            isLoading: _isLoading,
+            onPressed: _handleLogin,
           ),
         ],
       ),

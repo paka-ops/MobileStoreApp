@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/screens/store_page.dart' hide AppColors;
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import '../models/Store.dart';
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
-// Couleurs fixes indépendantes du thème
+// Couleurs fixes indépendantes du thème (danger)
 class _Fixed {
-  static const danger     = Color(0xFFC96B6B);
-  static const dangerSoft = Color(0xFFFDEDED);
+  static const danger     = Color(0xFFDE4A52);
+  static const dangerSoft = Color(0xFFFDEDEE);
 }
 
 class StoreItem extends StatefulWidget {
@@ -64,7 +66,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // DIALOG — Mise à jour boutique
+  // DIALOG — Mise à jour boutique (logique inchangée)
   // -----------------------------------------------------------------------
   void _showUpdateDialog(BuildContext context, DashColors colors) {
     final nameController     = TextEditingController(text: _store.name);
@@ -82,8 +84,8 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: colors.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
               contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
@@ -103,10 +105,13 @@ class _StoreItemState extends State<StoreItem> {
                   Expanded(
                     child: Text(
                       "Modifier la boutique",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: colors.textPrimary,
-                        fontSize: 18,
+                        fontSize: 17.5,
                         fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -118,39 +123,23 @@ class _StoreItemState extends State<StoreItem> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextFormField(
+                      AppTextField(
                         controller: nameController,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14.5,
-                          color: colors.textPrimary,
-                        ),
                         textInputAction: TextInputAction.next,
-                        decoration: _fieldDecoration(
-                          label:  "Nom de la boutique",
-                          icon:   Icons.storefront_rounded,
-                          hint:   "Ex: Boutique Centre-ville",
-                          colors: colors,
-                        ),
+                        label: "Nom de la boutique",
+                        icon: Icons.storefront_rounded,
+                        hint: "Ex: Boutique Centre-ville",
                         validator: (v) =>
                         (v == null || v.trim().isEmpty)
                             ? "Le nom est obligatoire"
                             : null,
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
+                      AppTextField(
                         controller: locationController,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14.5,
-                          color: colors.textPrimary,
-                        ),
-                        decoration: _fieldDecoration(
-                          label:  "Emplacement / Adresse",
-                          icon:   Icons.location_on_rounded,
-                          hint:   "Ex: Rue 12, Douala",
-                          colors: colors,
-                        ),
+                        label: "Emplacement / Adresse",
+                        icon: Icons.location_on_rounded,
+                        hint: "Ex: Rue 12, Douala",
                         validator: (v) =>
                         (v == null || v.trim().isEmpty)
                             ? "Veuillez préciser l'emplacement"
@@ -163,36 +152,22 @@ class _StoreItemState extends State<StoreItem> {
               actions: [
                 Row(
                   children: [
-                    // Bouton Annuler
                     Expanded(
-                      child: OutlinedButton(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
                         onPressed: isLoading
                             ? null
                             : () => Navigator.of(dialogContext).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colors.card,
-                          foregroundColor: colors.textPrimary,
-                          elevation: 0,
-                          side: BorderSide(color: colors.border, width: 1.2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: colors.textPrimary,
-                          ),
-                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Bouton Enregistrer
                     Expanded(
                       flex: 2,
-                      child: ElevatedButton(
+                      child: AppButton.primary(
+                        label: "Enregistrer",
+                        height: 48,
+                        isLoading: isLoading,
                         onPressed: isLoading
                             ? null
                             : () async {
@@ -232,21 +207,6 @@ class _StoreItemState extends State<StoreItem> {
                                 context);
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colors.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: isLoading
-                            ? const BouTikaLoader.compact()
-                            : const Text(
-                          "Enregistrer",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14),
-                        ),
                       ),
                     ),
                   ],
@@ -266,7 +226,7 @@ class _StoreItemState extends State<StoreItem> {
   }
 
   // -----------------------------------------------------------------------
-  // DIALOG — Suppression boutique
+  // DIALOG — Suppression boutique (logique inchangée)
   // -----------------------------------------------------------------------
   void _showDeleteDialog(BuildContext context, DashColors colors) {
     showDialog(
@@ -279,8 +239,8 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: colors.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
               ),
               contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
@@ -294,7 +254,7 @@ class _StoreItemState extends State<StoreItem> {
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.delete_forever_rounded,
-                        color: _Fixed.danger, size: 32),
+                        color: _Fixed.danger, size: 30),
                   ),
                   const SizedBox(height: 18),
                   Text(
@@ -302,6 +262,7 @@ class _StoreItemState extends State<StoreItem> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -313,7 +274,7 @@ class _StoreItemState extends State<StoreItem> {
                     style: TextStyle(
                       color: colors.textSecondary,
                       fontSize: 13.5,
-                      height: 1.45,
+                      height: 1.5,
                     ),
                   ),
                 ],
@@ -321,37 +282,21 @@ class _StoreItemState extends State<StoreItem> {
               actions: [
                 Row(
                   children: [
-                    // Bouton Annuler
                     Expanded(
-                      child: OutlinedButton(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
                         onPressed: isLoading
                             ? null
                             : () => Navigator.of(dialogContext).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: colors.card,
-                          foregroundColor: colors.textPrimary,
-                          elevation: 0,
-                          side: BorderSide(
-                              color: colors.border, width: 1.2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: colors.textPrimary,
-                          ),
-                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Bouton Supprimer
                     Expanded(
-                      child: ElevatedButton(
+                      child: AppButton.danger(
+                        label: "Supprimer",
+                        height: 48,
+                        isLoading: isLoading,
                         onPressed: isLoading
                             ? null
                             : () async {
@@ -373,23 +318,6 @@ class _StoreItemState extends State<StoreItem> {
                                 context);
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _Fixed.danger,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: isLoading
-                            ? const BouTikaLoader.compact()
-                            : const Text(
-                          "Supprimer",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14),
-                        ),
                       ),
                     ),
                   ],
@@ -432,13 +360,13 @@ class _StoreItemState extends State<StoreItem> {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: _showActions
-                      ? colors.primary
+                      ? colors.primary.withValues(alpha: 0.55)
                       : colors.border,
                   width: _showActions ? 1.4 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -480,7 +408,8 @@ class _StoreItemState extends State<StoreItem> {
                                 style: TextStyle(
                                   color: colors.textPrimary,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.2,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -556,8 +485,8 @@ class _StoreItemState extends State<StoreItem> {
                         Row(
                           children: [
                             _buildInfoChip(
-                              icon:   Icons.store_mall_directory_outlined,
-                              label:  "Magasin",
+                              icon: Icons.store_mall_directory_outlined,
+                              label: "Magasin",
                               colors: colors,
                             ),
                             const SizedBox(width: 8),
@@ -597,7 +526,6 @@ class _StoreItemState extends State<StoreItem> {
                             label: "Modifier",
                             color: colors.primary,
                             backgroundColor: colors.primarySoft,
-                            borderColor: colors.border,
                             labelColor: colors.primary,
                             onTap: () {
                               setState(
@@ -612,7 +540,6 @@ class _StoreItemState extends State<StoreItem> {
                             label: "Supprimer",
                             color: _Fixed.danger,
                             backgroundColor: _Fixed.dangerSoft,
-                            borderColor: colors.border,
                             labelColor: _Fixed.danger,
                             onTap: () {
                               setState(
@@ -627,7 +554,6 @@ class _StoreItemState extends State<StoreItem> {
                             label: "Fermer",
                             color: colors.textSecondary,
                             backgroundColor: colors.card,
-                            borderColor: colors.border,
                             labelColor: colors.textPrimary,
                             onTap: () => setState(
                                     () => _showActions = false),
@@ -658,19 +584,19 @@ class _StoreItemState extends State<StoreItem> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: colors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: colors.primary),
+          Icon(icon, size: 14, color: colors.textSecondary),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              color: colors.textPrimary,
-              fontSize: 12,
+              color: colors.textSecondary,
+              fontSize: 11.5,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -684,94 +610,36 @@ class _StoreItemState extends State<StoreItem> {
     required String label,
     required Color color,
     required Color backgroundColor,
-    required Color borderColor,
     required Color labelColor,
     required VoidCallback onTap,
   }) {
     return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 42,
-                width: 42,
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: borderColor),
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                Icon(icon, size: 18, color: color),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: labelColor,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 21),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  // -----------------------------------------------------------------------
-  // DÉCORATION DES CHAMPS TEXTE — dynamique
-  // -----------------------------------------------------------------------
-  InputDecoration _fieldDecoration({
-    required String label,
-    required IconData icon,
-    required String hint,
-    required DashColors colors,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      hintText:  hint,
-      labelStyle: TextStyle(
-        color: colors.textSecondary,
-        fontWeight: FontWeight.w600,
-        fontSize: 13.5,
-      ),
-      hintStyle: TextStyle(
-        color: colors.textSecondary,
-        fontSize: 13.5,
-      ),
-      filled:    true,
-      fillColor: colors.background,
-      prefixIcon: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Icon(icon, color: colors.primary, size: 20),
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-          vertical: 16, horizontal: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.border, width: 1.2),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colors.primary, width: 1.6),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: _Fixed.danger, width: 1.3),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: _Fixed.danger, width: 1.6),
       ),
     );
   }
