@@ -501,7 +501,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: softColor,
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -576,7 +576,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
@@ -610,7 +610,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: LinearProgressIndicator(
                     value: ratio,
                     minHeight: 8,
-                    backgroundColor: color.withOpacity(0.12),
+                    backgroundColor: color.withValues(alpha: 0.12),
                     valueColor: AlwaysStoppedAnimation<Color>(color),
                   ),
                 ),
@@ -782,7 +782,7 @@ class _StoreCard extends StatelessWidget {
             border: Border.all(color: c.border, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -939,7 +939,7 @@ class _StoreCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: soft,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
@@ -948,7 +948,7 @@ class _StoreCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: c.card,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withOpacity(0.2)),
+              border: Border.all(color: color.withValues(alpha: 0.2)),
             ),
             child: Icon(icon, color: color, size: 16),
           ),
@@ -1039,7 +1039,7 @@ class _StoreCard extends StatelessWidget {
                       width: double.infinity,
                       height: h.clamp(4, 40),
                       decoration: BoxDecoration(
-                        color: c.primary.withOpacity(0.2 + (h / 40) * 0.8),
+                        color: c.primary.withValues(alpha: 0.2 + (h / 40) * 0.8),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),

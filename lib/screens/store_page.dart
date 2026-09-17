@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/cards/app_card.dart';
+import 'package:mobile_store_app/widgets/boutika_loader.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/core/widgets/dialogs/app_dialog.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
-import 'package:mobile_store_app/core/widgets/navigation/app_bottom_nav.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
@@ -21,6 +22,7 @@ import 'package:mobile_store_app/service/spending_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/widgets/design_system.dart';
 import '../models/Store.dart';
 import '../models/employee.dart';
 import '../models/spending.dart';
@@ -96,6 +98,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   bool isCancelingSale    = false;
 
   int _currentIndex = 0;
+
+  /// Vue de l'inventaire : 0 = grille de catégories, 1 = gestion.
+  int _inventoryTab = 0;
 
   // Vrai tant que les appels API initiaux ne sont pas terminés :
   // la page affiche alors l'écran d'attente « BouTika ».
@@ -232,128 +237,34 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // TOP BAR
   // =========================================================================
   Widget _buildTopBar(BuildContext context, DashColors colors) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: Row(
-        children: [
-          // Avatar boutique
-          GestureDetector(
-            onTap: () => _showStoreSwitcherSheet(context, colors),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colors.accent.withValues(alpha: 0.5),
-                  width: 2,
-                ),
-                color: colors.primarySoft,
-              ),
-              child: Icon(
-                Icons.storefront_rounded,
-                color: colors.primary,
-                size: 20,
-              ),
-            ),
+    final String? location = widget.store.location;
+
+    return AppGreetingHeader(
+      greeting: "Bonjour, ${UserService.username} 👋",
+      title: widget.store.name,
+      subtitle: (location != null && location.trim().isNotEmpty)
+          ? location.trim()
+          : (widget.userType == "employer"
+              ? "Propriétaire"
+              : "Boutique active"),
+      subtitleIcon: Icons.location_on_outlined,
+      // Sélecteur de boutique (logique inchangée)
+      onTapTitle: () => _showStoreSwitcherSheet(context, colors),
+      onTapSubtitle: () => _showStoreSwitcherSheet(context, colors),
+      showSubtitleChevron: true,
+      // Alertes stock (logique inchangée)
+      notificationCount: lowStockProducts.length,
+      onTapNotifications: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LowStockProductDetailsScreen(
+            products: lowStockProducts,
+            userType: widget.userType,
           ),
-
-          const SizedBox(width: 8),
-
-          // Pill greeting flexible
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showStoreSwitcherSheet(context, colors),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.greetingPill,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.greetingPill.withValues(alpha: 0.30),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Text(
-                      "👋 ",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const Text(
-                      "Hello ",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        widget.store.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: Colors.white24,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.workspace_premium_rounded,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          AppIconButton(
-            icon: appDarkMode.value
-                ? Icons.light_mode_rounded
-                : Icons.dark_mode_rounded,
-            tooltip: "Thème",
-            onTap: () => appDarkMode.value = !appDarkMode.value,
-          ),
-
-          const SizedBox(width: 8),
-
-          AppIconButton(
-            icon: Icons.notifications_outlined,
-            tooltip: "Alertes stock",
-            badge: lowStockProducts.length,
-            badgeColor: colors.accent,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => LowStockProductDetailsScreen(
-                  products: lowStockProducts,
-                  userType: widget.userType,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
+      avatarIcon: Icons.storefront_rounded,
+      onTapAvatar: () => _showStoreSwitcherSheet(context, colors),
     );
   }
 
@@ -448,25 +359,25 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   Widget _buildBottomNav(BuildContext context, DashColors colors) {
     final items = [
-      AppBottomNavItem(
+      const FloatingNavItem(
           icon: Icons.home_outlined,
           activeIcon: Icons.home_rounded,
           label: "Accueil"),
-      AppBottomNavItem(
+      const FloatingNavItem(
           icon: Icons.receipt_long_outlined,
           activeIcon: Icons.receipt_long_rounded,
           label: "Ventes"),
-      AppBottomNavItem(
+      const FloatingNavItem(
           icon: Icons.inventory_2_outlined,
           activeIcon: Icons.inventory_2_rounded,
           label: "Stock"),
-      AppBottomNavItem(
+      const FloatingNavItem(
           icon: Icons.settings_outlined,
           activeIcon: Icons.settings_rounded,
           label: "Plus"),
     ];
 
-    return AppBottomNav(
+    return FloatingBottomNavBar(
       items: items,
       currentIndex: _currentIndex,
       onTap: (index) => setState(() => _currentIndex = index),
@@ -489,8 +400,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         boxShadow: colors.cardShadow,
       ),
       child: Column(
@@ -504,17 +414,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               subtitle: subtitle,
               trailing: icon != null
                   ? Container(
-                      width: 38,
-                      height: 38,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         color: colors.primarySoft,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: colors.primary
-                                .withValues(alpha: 0.3)),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      child:
-                          Icon(icon, color: colors.primary, size: 20),
+                      child: Icon(icon, color: colors.primary, size: 21),
                     )
                   : null,
             ),
@@ -542,23 +448,105 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         child: Column(
           children: [
             _buildEmployeeSection(context, colors),
+            _buildKpiRow(context, colors),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: SectionHeader(
                   title: "Inventaire",
-                  subtitle:
-                      "${categories.length} catégorie(s)",
+                  subtitle: "${categories.length} catégorie(s)",
                 ),
               ),
             ),
-            _buildCategoryList(context, categories, colors),
+            CustomTabBar(
+              tabs: const ["Catégories", "Gérer"],
+              currentIndex: _inventoryTab,
+              onTap: (i) => setState(() => _inventoryTab = i),
+            ),
+            const SizedBox(height: 16),
+            if (_inventoryTab == 0)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: CategoryGrid(
+                  itemCount: categories.length,
+                  itemBuilder: (i) => CategoryCard(
+                    label: categories[i].name,
+                    icon: Icons.category_rounded,
+                    index: i,
+                    onTap: () => _openCategoryProducts(context, categories[i]),
+                  ),
+                ),
+              )
+            else
+              _buildCategoryList(context, categories, colors),
             const SizedBox(height: 120),
           ],
         ),
       ),
     );
+  }
+
+  // =========================================================================
+  // KPI — cartes à dégradé du design system (données réelles, aucun calcul)
+  // =========================================================================
+  Widget _buildKpiRow(BuildContext context, DashColors colors) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+      // IntrinsicHeight + stretch : les deux tuiles gardent la même hauteur,
+      // quel que soit le contenu (aucun désalignement, aucun overflow).
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: GradientInfoCard(
+                icon: Icons.inventory_2_outlined,
+                label: "Produits",
+                value: "${allStoreProducts.length}",
+                caption: "en catalogue",
+                tint: colors.pastelAt(1),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GradientInfoCard(
+                icon: Icons.warning_amber_rounded,
+                label: "Alertes",
+                value: "${lowStockProducts.length}",
+                caption: "sous le seuil",
+                tint: colors.pastelAt(0),
+                showChevron: true,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LowStockProductDetailsScreen(
+                      products: lowStockProducts,
+                      userType: widget.userType,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =========================================================================
+  // OUVERTURE DES PRODUITS D'UNE CATÉGORIE (même destination qu'avant)
+  // =========================================================================
+  void _openCategoryProducts(BuildContext context, Category category) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EmployerCategoryDetailScreen(
+          category: category,
+          userType: widget.userType,
+        ),
+      ),
+    ).then((_) => _fetchAllData());
   }
 
   // =========================================================================
@@ -635,13 +623,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Carte profil
         AppCard(
           padding: const EdgeInsets.all(16),
+          borderColor: Colors.transparent,
           child: Row(
             children: [
               CircleAvatar(
-                radius: 24,
-                backgroundColor: colors.primarySoft,
+                radius: 23,
+                backgroundColor: colors.fill,
                 child:
-                    Icon(Icons.person, color: colors.primary, size: 24),
+                    Icon(Icons.person, color: colors.textSecondary, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -653,7 +642,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 15,
                           letterSpacing: -0.2,
                           color: colors.textPrimary),
@@ -663,7 +652,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 9, vertical: 3),
                       decoration: BoxDecoration(
-                        color: colors.primarySoft,
+                        color: colors.fill,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -671,9 +660,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             ? "EMPLOYÉ"
                             : "PROPRIÉTAIRE",
                         style: TextStyle(
-                          color: colors.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                          color: colors.textSecondary,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -689,28 +678,33 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Actions
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
+          borderColor: Colors.transparent,
           child: Column(
             children: [
-              ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+              // Bascule de thème (même logique qu'avant, simplement
+              // déplacée du header vers « Plus » pour alléger l'en-tête).
+              ServiceListTile(
+                icon: Icons.dark_mode_outlined,
+                title: "Thème sombre",
+                subtitle: appDarkMode.value
+                    ? "Activé"
+                    : "Désactivé",
+                pastel: colors.fill,
+                iconColor: colors.textSecondary,
+                showChevron: false,
+                trailing: Switch(
+                  value: appDarkMode.value,
+                  onChanged: (value) => appDarkMode.value = value,
                 ),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colors.accentSoft,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.account_balance_wallet_outlined,
-                      color: colors.accent, size: 20),
-                ),
-                title: Text("Mes Dépenses",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: colors.textPrimary)),
-                trailing: Icon(Icons.chevron_right_rounded,
-                    color: colors.textSecondary),
+                onTap: () => appDarkMode.value = !appDarkMode.value,
+              ),
+              Divider(height: 1, color: colors.hairline),
+              ServiceListTile(
+                icon: Icons.account_balance_wallet_outlined,
+                title: "Mes Dépenses",
+                subtitle: "Suivre les dépenses de la boutique",
+                pastel: colors.accentSoft,
+                iconColor: colors.accent,
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -725,26 +719,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     indent: 16,
                     endIndent: 16,
                     color: colors.border),
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.subscriptions,
-                        color: colors.primary, size: 20),
-                  ),
-                  title: Text("Mon abonnement",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: colors.textPrimary)),
-                  trailing: Icon(Icons.chevron_right_rounded,
-                      color: colors.textSecondary),
+                ServiceListTile(
+                  icon: Icons.subscriptions_rounded,
+                  title: "Mon abonnement",
+                  subtitle: "Gérer la formule de la boutique",
+                  pastel: colors.primarySoft,
+                  iconColor: colors.primary,
                   onTap: () {
                     final sub = widget.store.subscription!;
                     Navigator.push(
@@ -770,26 +750,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Déconnexion
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
-          child: ListTile(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: colors.dangerSoft,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(Icons.logout_rounded,
-                  color: colors.danger, size: 20),
-            ),
-            title: Text(
-              "Déconnexion",
-              style: TextStyle(
-                  color: colors.danger,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14),
-            ),
+          borderColor: Colors.transparent,
+          child: ServiceListTile(
+            icon: Icons.logout_rounded,
+            title: "Déconnexion",
+            subtitle: "Quitter la session en cours",
+            pastel: colors.dangerSoft,
+            iconColor: colors.danger,
+            showChevron: false,
             trailing: Icon(Icons.chevron_right_rounded,
                 color: colors.danger),
             onTap: () => _handleLogout(context, colors),
@@ -805,31 +773,21 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   Widget _buildSaleAndExpenseFab(BuildContext context, DashColors colors) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        FloatingActionButton.extended(
-          heroTag: "btnExpense",
-          onPressed: () => _showExpenseDialog(context, colors),
-          backgroundColor: colors.accent,
-          foregroundColor: Colors.white,
-          elevation: 2,
-          icon: const Icon(Icons.money_off, color: Colors.white, size: 20),
-          label: const Text("Dépense",
-              style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
+        RoundActionButton(
+          icon: Icons.money_off_rounded,
+          tooltip: "Dépense",
+          size: 50,
+          iconColor: colors.accent,
+          onTap: () => _showExpenseDialog(context, colors),
         ),
         const SizedBox(height: 12),
-        FloatingActionButton.extended(
-          heroTag: "btnSale",
-          onPressed: () => _showStartSaleDialog(context, colors),
-          backgroundColor: colors.primary,
-          foregroundColor: colors.onPrimary,
-          elevation: 3,
-          icon: Icon(Icons.shopping_cart_checkout,
-              color: colors.onPrimary, size: 20),
-          label: Text("Vendre",
-              style: TextStyle(
-                  color: colors.onPrimary,
-                  fontWeight: FontWeight.w700)),
+        ChatFab.labeled(
+          label: "Vendre",
+          icon: Icons.shopping_cart_checkout_rounded,
+          margin: EdgeInsets.zero,
+          onTap: () => _showStartSaleDialog(context, colors),
         ),
       ],
     );
@@ -885,16 +843,11 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: colors.cardElevated,
+                          color: colors.fill,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: colors.primary
-                                .withValues(alpha: 0.35),
-                            width: 1.4,
-                          ),
                         ),
                         child: Icon(Icons.add_rounded,
-                            color: colors.primary, size: 22),
+                            color: colors.textPrimary, size: 21),
                       ),
                       const SizedBox(height: 5),
                       Text("Ajouter",
@@ -926,11 +879,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircleAvatar(
-                radius: 23,
-                backgroundColor: colors.primarySoft,
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.pastelAt(emp.username?.length ?? 0),
+                ),
                 child: Icon(Icons.person,
-                    color: colors.primary, size: 20),
+                    color: colors.textSecondary, size: 20),
               ),
               const SizedBox(height: 5),
               Text(
@@ -969,24 +926,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: GestureDetector(
             onTap: () => _showAddCategoryForm(context, null, colors),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
-                color: colors.card,
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(
-                  color: colors.primary.withValues(alpha: 0.35),
-                  width: 1.3,
-                ),
+                color: colors.fill,
+                borderRadius: BorderRadius.circular(AppRadius.card),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.add_rounded,
-                      color: colors.primary, size: 20),
+                      color: colors.textPrimary, size: 20),
                   const SizedBox(width: 8),
                   Text("Ajouter une catégorie",
                       style: TextStyle(
-                          color: colors.primary,
+                          color: colors.textPrimary,
                           fontWeight: FontWeight.w600,
                           fontSize: 13.5)),
                 ],
@@ -1005,17 +958,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       userType: widget.userType,
       colors: colors,
       onEdit: () => _showAddCategoryForm(context, category, colors),
-      onManage: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EmployerCategoryDetailScreen(
-              category: category,
-              userType: widget.userType,
-            ),
-          ),
-        ).then((_) => _fetchAllData());
-      },
+      onManage: () => _openCategoryProducts(context, category),
     );
   }
 
@@ -2187,6 +2130,27 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 }
 
 // ===========================================================================
+// HELPERS PASTEL — présentation uniquement (aucun impact métier)
+// ===========================================================================
+/// Pastel déterministe par catégorie (même couleur à chaque affichage).
+Color _pastelFor(String name, DashColors colors) {
+  int sum = 0;
+  for (final int unit in name.codeUnits) {
+    sum += unit;
+  }
+  return colors.pastelAt(sum);
+}
+
+/// Teinte d'icône contrastée dérivée du pastel.
+Color _pastelIcon(Color pastel) {
+  final HSLColor hsl = HSLColor.fromColor(pastel);
+  return hsl
+      .withLightness((hsl.lightness - 0.30).clamp(0.0, 1.0))
+      .withSaturation((hsl.saturation + 0.12).clamp(0.0, 1.0))
+      .toColor();
+}
+
+// ===========================================================================
 // CATEGORY CARD
 // ===========================================================================
 class _CategoryCard extends StatefulWidget {
@@ -2222,14 +2186,8 @@ class _CategoryCardState extends State<_CategoryCard> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: _expanded
-              ? colors.primary.withValues(alpha: 0.35)
-              : colors.border,
-          width: _expanded ? 1.3 : 1,
-        ),
-        boxShadow: colors.cardShadow,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        boxShadow: _expanded ? colors.floatingShadow : colors.cardShadow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -2245,16 +2203,15 @@ class _CategoryCardState extends State<_CategoryCard> {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
-                    width: 44,
-                    height: 44,
+                    width: AppSizes.categoryIcon,
+                    height: AppSizes.categoryIcon,
                     decoration: BoxDecoration(
-                      color: _expanded
-                          ? colors.primary.withValues(alpha: 0.14)
-                          : colors.primarySoft,
-                      borderRadius: BorderRadius.circular(13),
+                      color: _pastelFor(category.name, colors),
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.category_rounded,
-                        color: colors.primary, size: 21),
+                        color: _pastelIcon(_pastelFor(category.name, colors)),
+                        size: 22),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -2288,11 +2245,10 @@ class _CategoryCardState extends State<_CategoryCard> {
                     turns: _expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 220),
                     child: Container(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: colors.cardElevated,
+                        color: colors.fill,
                         shape: BoxShape.circle,
-                        border: Border.all(color: colors.border),
                       ),
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -2320,7 +2276,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(height: 1, color: colors.border),
+                  Container(height: 1, color: colors.hairline),
                   const SizedBox(height: 14),
                   OverlineLabel(text: "Description"),
                   const SizedBox(height: 8),

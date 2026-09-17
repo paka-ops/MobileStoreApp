@@ -6,6 +6,7 @@ import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
+import 'package:mobile_store_app/core/widgets/navigation/app_header.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/enums.dart';
 import 'package:mobile_store_app/models/order.dart';
@@ -813,13 +814,17 @@ class _OrderCardState extends State<_OrderCard> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              "N°${order.orderId.substring(0, 8)}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14.5,
-                                letterSpacing: -0.1,
-                                color: c.textPrimary,
+                            Flexible(
+                              child: Text(
+                                "N°${order.orderId.substring(0, 8)}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.5,
+                                  letterSpacing: -0.1,
+                                  color: c.textPrimary,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),

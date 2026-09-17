@@ -5,6 +5,7 @@ import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 import '../../constants/app_durations.dart';
 import '../../constants/app_spacing.dart';
+import '../common/primitives.dart';
 import '../../constants/app_spacing.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -53,7 +54,7 @@ class AppButton extends StatefulWidget {
     this.background,
     this.foreground,
     this.height = AppSizes.buttonHeight,
-    this.radius = AppRadius.md,
+    this.radius = AppRadius.button,
     this.fontSize,
   })  : variant = _AppButtonVariant.primary,
         borderColor = null;
@@ -70,7 +71,7 @@ class AppButton extends StatefulWidget {
     this.foreground,
     this.borderColor,
     this.height = AppSizes.buttonHeight,
-    this.radius = AppRadius.md,
+    this.radius = AppRadius.button,
     this.fontSize,
   }) : variant = _AppButtonVariant.secondary;
 
@@ -85,7 +86,7 @@ class AppButton extends StatefulWidget {
     this.isLoading = false,
     this.expand = true,
     this.height = AppSizes.buttonHeight,
-    this.radius = AppRadius.md,
+    this.radius = AppRadius.button,
     this.fontSize,
   })  : variant = _AppButtonVariant.soft,
         background = softColor,
@@ -103,7 +104,7 @@ class AppButton extends StatefulWidget {
     this.background,
     this.foreground,
     this.height = AppSizes.buttonHeight,
-    this.radius = AppRadius.md,
+    this.radius = AppRadius.button,
     this.fontSize,
   })  : variant = _AppButtonVariant.danger,
         borderColor = null;
@@ -118,7 +119,7 @@ class AppButton extends StatefulWidget {
     this.expand = false,
     this.foreground,
     this.height = 44,
-    this.radius = AppRadius.md,
+    this.radius = AppRadius.button,
     this.fontSize,
   })  : variant = _AppButtonVariant.ghost,
         background = null,
@@ -144,8 +145,9 @@ class _AppButtonState extends State<AppButton> {
 
     switch (widget.variant) {
       case _AppButtonVariant.primary:
-        bg = widget.background ?? c.primary;
-        fg = widget.foreground ?? c.onPrimary;
+        // Design system : le bouton primaire est navy (pilule).
+        bg = widget.background ?? c.buttonPrimary;
+        fg = widget.foreground ?? c.buttonOnPrimary;
         break;
       case _AppButtonVariant.secondary:
         bg = widget.background ?? Colors.transparent;
@@ -284,8 +286,8 @@ class AppIconButton extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: background ?? c.card,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: c.border),
+          shape: BoxShape.circle,
+          boxShadow: c.cardShadow,
         ),
         child: Icon(
           icon,
@@ -338,8 +340,8 @@ class AppBackButton extends StatelessWidget {
         height: AppSizes.iconButtonSize,
         decoration: BoxDecoration(
           color: c.card,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: c.border),
+          shape: BoxShape.circle,
+          boxShadow: c.cardShadow,
         ),
         child: Icon(
           Icons.arrow_back_ios_new_rounded,

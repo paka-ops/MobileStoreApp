@@ -62,6 +62,15 @@ ThemeData buildAppTheme(bool dark) {
   final Color textSecondary =
       isDark ? AppColors.darkTextSecondary : AppColors.textGrey;
 
+  // Couleurs signature du design system
+  final Color ink = isDark ? AppColors.darkInk : AppColors.ink;
+  final Color onInk = isDark ? AppColors.darkOnInk : AppColors.onInk;
+  final Color fill = isDark ? AppColors.darkFill : AppColors.fill;
+  final Color rating = isDark ? AppColors.darkRating : AppColors.rating;
+  final Color ratingSoft =
+      isDark ? AppColors.darkRatingSoft : AppColors.ratingSoft;
+  final Color hairline = isDark ? AppColors.darkHairline : AppColors.hairline;
+
   final ColorScheme scheme = ColorScheme.fromSeed(
     seedColor: primary,
     brightness: isDark ? Brightness.dark : Brightness.light,
@@ -83,8 +92,21 @@ ThemeData buildAppTheme(bool dark) {
     surface: card,
     onSurface: textPrimary,
     onSurfaceVariant: textSecondary,
+    tertiary: rating,
+    onTertiary: AppColors.ink,
+    tertiaryContainer: ratingSoft,
+    onTertiaryContainer: textPrimary,
+    surfaceContainerLowest: card,
+    surfaceContainerLow: card,
+    surfaceContainer: fill,
+    surfaceContainerHigh: isDark
+        ? AppColors.darkCardElevated
+        : AppColors.fill,
+    surfaceContainerHighest: isDark
+        ? AppColors.darkCardElevated
+        : AppColors.fill,
     outline: border,
-    outlineVariant: border,
+    outlineVariant: hairline,
   );
 
   // ---------------------------------------------------------------------------
@@ -114,7 +136,7 @@ ThemeData buildAppTheme(bool dark) {
   // ---------------------------------------------------------------------------
   final InputDecorationTheme inputTheme = InputDecorationTheme(
     filled: true,
-    fillColor: isDark ? AppColors.darkCardElevated : background,
+    fillColor: fill,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     hintStyle: TextStyle(color: textSecondary, fontSize: 14),
     labelStyle: TextStyle(color: textSecondary, fontSize: 14),
@@ -126,27 +148,27 @@ ThemeData buildAppTheme(bool dark) {
     prefixIconColor: textSecondary,
     suffixIconColor: textSecondary,
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      borderSide: BorderSide(color: border),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      borderSide: BorderSide(color: Colors.transparent),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      borderSide: BorderSide(color: border, width: 1.2),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      borderSide: BorderSide(color: Colors.transparent),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: BorderSide(color: primary, width: 1.8),
     ),
     errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       borderSide: BorderSide(color: danger, width: 1.2),
     ),
     focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       borderSide: BorderSide(color: danger, width: 1.8),
     ),
     disabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       borderSide: BorderSide(color: border),
     ),
   );
@@ -162,7 +184,7 @@ ThemeData buildAppTheme(bool dark) {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       side: BorderSide(color: border, width: 1.4),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppRadius.button),
       ),
       textStyle: AppTextStyles.button.copyWith(color: textPrimary),
     ),
@@ -190,9 +212,9 @@ ThemeData buildAppTheme(bool dark) {
     canvasColor: background,
     cardColor: card,
     dividerColor: border,
-    splashFactory: InkRipple.splashFactory,
-    highlightColor: primary.withValues(alpha: 0.06),
-    splashColor: primary.withValues(alpha: 0.10),
+    splashFactory: InkSparkle.splashFactory,
+    highlightColor: ink.withValues(alpha: 0.03),
+    splashColor: ink.withValues(alpha: 0.05),
 
     appBarTheme: AppBarTheme(
       backgroundColor: background,
@@ -211,19 +233,19 @@ ThemeData buildAppTheme(bool dark) {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primary,
-        foregroundColor: onPrimary,
+        backgroundColor: ink,
+        foregroundColor: onInk,
         disabledBackgroundColor:
             isDark ? AppColors.darkCardElevated : const Color(0xFFD6DAE3),
         disabledForegroundColor: isDark
             ? AppColors.darkTextSecondary
             : const Color(0xFF9AA1AD),
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        textStyle: AppTextStyles.button.copyWith(color: onPrimary),
+        textStyle: AppTextStyles.button.copyWith(color: onInk),
       ),
     ),
     outlinedButtonTheme: outlinedBtn,
@@ -231,14 +253,14 @@ ThemeData buildAppTheme(bool dark) {
 
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: primary,
-        foregroundColor: onPrimary,
+        backgroundColor: ink,
+        foregroundColor: onInk,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        textStyle: AppTextStyles.button.copyWith(color: onPrimary),
+        textStyle: AppTextStyles.button.copyWith(color: onInk),
       ),
     ),
 
@@ -249,13 +271,11 @@ ThemeData buildAppTheme(bool dark) {
     ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primary,
-      foregroundColor: onPrimary,
-      elevation: 2,
-      highlightElevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
+      backgroundColor: ink,
+      foregroundColor: onInk,
+      elevation: 6,
+      highlightElevation: 8,
+      shape: const CircleBorder(),
     ),
 
     dialogTheme: DialogThemeData(
@@ -265,7 +285,7 @@ ThemeData buildAppTheme(bool dark) {
         borderRadius: BorderRadius.circular(AppRadius.xl),
         side: BorderSide(color: border),
       ),
-      elevation: isDark ? 12 : 10,
+      elevation: isDark ? 14 : 12,
       titleTextStyle: AppTextStyles.h3.copyWith(
         fontSize: 17.5,
         color: textPrimary,
@@ -307,7 +327,7 @@ ThemeData buildAppTheme(bool dark) {
 
     listTileTheme: ListTileThemeData(
       tileColor: Colors.transparent,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
@@ -319,19 +339,16 @@ ThemeData buildAppTheme(bool dark) {
     ),
 
     chipTheme: ChipThemeData(
-      backgroundColor: isDark
-          ? AppColors.darkCardElevated
-          : const Color(0xFFF0F1F4),
-      labelStyle: AppTextStyles.caption.copyWith(color: textPrimary),
+      backgroundColor: fill,
+      labelStyle: AppTextStyles.chip.copyWith(color: textPrimary),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      side: BorderSide(color: border),
+      side: BorderSide(color: Colors.transparent),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
     ),
 
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
-      backgroundColor:
-          isDark ? AppColors.darkCardElevated : AppColors.textDark,
+      backgroundColor: ink,
       contentTextStyle: AppTextStyles.body.copyWith(
         color: Colors.white,
         fontWeight: FontWeight.w500,
