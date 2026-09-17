@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile_store_app/utils/app_colors.dart';
+import 'package:mobile_store_app/utils/app_colors.dart' show DashColors, appDarkMode;
+import 'package:mobile_store_app/utils/message.dart' show showSuccessMessage;
 
 // =====================================================================
 // MODÈLE FICTIF
@@ -117,106 +118,81 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // On wrap dans un Theme pour basculer light/dark
-    return Theme(
-      data: appDarkMode.value ? _buildDarkTheme() : _buildLightTheme(),
-      child: Builder(builder: (context) {
-        final c = DashColors(context);
+    // Le thème global (main.dart) gère déjà la bascule light/dark
+    final c = DashColors(context);
 
-        // Ajuster la status bar
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness:
-          appDarkMode.value ? Brightness.light : Brightness.dark,
-        ));
+    // Ajuster la status bar
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness:
+      Theme.of(context).brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
+    ));
 
-        return Scaffold(
-          backgroundColor: c.background,
-          body: SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildHeader(c)),
-                SliverToBoxAdapter(child: _buildPeriodSelector(c)),
-                SliverToBoxAdapter(child: _buildGlobalKpiSection(c)),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                    child:
-                    _buildSectionTitle(c, "Performance globale", "7 jours"),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-                    child: _buildGlobalBarChart(c),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
-                    child: _buildSectionTitle(
-                        c, "Classement boutiques", "Par CA"),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-                    child: _buildRankingBar(c),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
-                    child: _buildSectionTitle(
-                        c, "Mes boutiques", "${_stores.length} actives"),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                          (context, index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _StoreCard(
-                          store: _stores[index],
-                          rank: index + 1,
-                          maxCA: _stores.first.chiffreAffaires,
-                          weekDays: _weekDays,
-                          colors: c,
-                          onTap: () => _navigateToStore(_stores[index]),
-                        ),
-                      ),
-                      childCount: _stores.length,
+    return Scaffold(
+      backgroundColor: c.background,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader(c)),
+            SliverToBoxAdapter(child: _buildPeriodSelector(c)),
+            SliverToBoxAdapter(child: _buildGlobalKpiSection(c)),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child:
+                _buildSectionTitle(c, "Performance globale", "7 jours"),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                child: _buildGlobalBarChart(c),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
+                child: _buildSectionTitle(
+                    c, "Classement boutiques", "Par CA"),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                child: _buildRankingBar(c),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
+                child: _buildSectionTitle(
+                    c, "Mes boutiques", "${_stores.length} actives"),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _StoreCard(
+                      store: _stores[index],
+                      rank: index + 1,
+                      maxCA: _stores.first.chiffreAffaires,
+                      weekDays: _weekDays,
+                      colors: c,
+                      onTap: () => _navigateToStore(_stores[index]),
                     ),
                   ),
+                  childCount: _stores.length,
                 ),
-              ],
+              ),
             ),
-          ),
-        );
-      }),
-    );
-  }
-
-  // =====================================================================
-  // THEMES
-  // =====================================================================
-  ThemeData _buildLightTheme() {
-    // Preserve the global application theme instead of replacing it locally.
-    return Theme.of(context).copyWith(
-      brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.background,
-    );
-  }
-
-  ThemeData _buildDarkTheme() {
-    // Preserve all global component themes (inputs, dialogs, buttons, etc.).
-    return Theme.of(context).copyWith(
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.darkBackground,
-      canvasColor: AppColors.darkBackground,
-      cardColor: AppColors.darkCard,
-      dividerColor: AppColors.darkBorder,
+          ],
+        ),
+      ),
     );
   }
 
@@ -224,15 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // NAVIGATION
   // =====================================================================
   void _navigateToStore(_StoreDashData store) {
-    final c = DashColors(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Ouverture de ${store.name}..."),
-        backgroundColor: c.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    showSuccessMessage("Ouverture de ${store.name}...", context);
   }
 
   // =====================================================================
@@ -289,7 +257,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: appDarkMode.value ? AppColors.darkCardElevated : AppColors.card,
+                color: c.cardElevated,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: c.border),
               ),
@@ -298,9 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ? Icons.light_mode_rounded
                     : Icons.dark_mode_rounded,
                 size: 20,
-                color: appDarkMode.value
-                    ? AppColors.darkWarning
-                    : AppColors.textGrey,
+                color: appDarkMode.value ? c.warning : c.textSecondary,
               ),
             ),
           ),

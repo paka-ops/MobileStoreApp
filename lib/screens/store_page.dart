@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/common/primitives.dart';
+import 'package:mobile_store_app/core/widgets/dialogs/app_dialog.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/widgets/navigation/app_bottom_nav.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
@@ -12,7 +18,8 @@ import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart';
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import '../models/Store.dart';
 import '../models/employee.dart';
@@ -22,7 +29,6 @@ import '../service/user_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import '../widgets/store_page/functions/get_low_stock_product.dart';
 import 'login_screen.dart';
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 // ---------------------------------------------------------------------------
 // Modèle ligne de vente — logique métier inchangée
@@ -45,13 +51,9 @@ class OrderLine {
 // Couleurs sémantiques fixes — mises à jour vers palette sobre premium
 // ---------------------------------------------------------------------------
 class _Fixed {
-  // Désormais sobre, plus d'orange saturé
-  static const accent = Color(0xFF64748B);
-  static const accentSoft = Color(0xFFF1F5F9);
-  static const danger = Color(0xFF9F6B6B);
-  static const dangerSoft = Color(0xFFFDF2F2);
-  static const success = Color(0xFF5A8A7A);
-  static const successSoft = Color(0xFFEEF5F2);
+  static const accent  = Color(0xFFC08552);
+  static const danger  = Color(0xFFDE4A52);
+  static const success = Color(0xFF2F9E68);
 }
 
 class _NavItemData {
@@ -177,14 +179,19 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
         if (_isLoading) {
           return Scaffold(
-            backgroundColor: ext.background,
-            body: const Center(child: BouTikaLoader()),
+            backgroundColor: colors.background,
+            body: Center(
+              child: const BouTikaLoader(
+                message: "Préparation de votre boutique…",
+              ),
+            ),
           );
         }
 
         return Scaffold(
           backgroundColor: ext.background,
           body: SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 _buildTopBar(context, colors),
@@ -219,48 +226,88 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         children: [
-          // Sélecteur boutique — avatar + nom sobre
+          // Avatar boutique
+          GestureDetector(
+            onTap: () => _showStoreSwitcherSheet(context, colors),
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colors.accent.withValues(alpha: 0.5),
+                  width: 2,
+                ),
+                color: colors.primarySoft,
+              ),
+              child: Icon(
+                Icons.storefront_rounded,
+                color: colors.primary,
+                size: 20,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          // Pill greeting flexible
           Expanded(
             child: GestureDetector(
               onTap: () => _showStoreSwitcherSheet(context, colors),
-              behavior: HitTestBehavior.opaque,
-              child: Row(
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: ext.surfaceMuted,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: ext.border, width: 1),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.greetingPill,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.greetingPill.withValues(alpha: 0.30),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
-                    child: Icon(Icons.storefront_rounded, color: ext.mutedForeground, size: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.store.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: ext.foreground, letterSpacing: -0.1),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Text(
+                      "👋 ",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const Text(
+                      "Hello ",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        widget.store.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
                         ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(color: ext.success, shape: BoxShape.circle),
-                            ),
-                            const SizedBox(width: 6),
-                            Text("Boutique active", style: TextStyle(fontSize: 11.5, color: ext.mutedForeground, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Colors.white24,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.workspace_premium_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -273,18 +320,23 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          _topIconButton(
-            icon: appDarkMode.value ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            colors: colors,
+
+          const SizedBox(width: 8),
+
+          AppIconButton(
+            icon: appDarkMode.value
+                ? Icons.light_mode_rounded
+                : Icons.dark_mode_rounded,
+            tooltip: "Thème",
             onTap: () => appDarkMode.value = !appDarkMode.value,
           ),
           const SizedBox(width: 8),
-          _topIconButton(
+
+          AppIconButton(
             icon: Icons.notifications_outlined,
-            colors: colors,
-            badge: lowStockProducts.isNotEmpty,
-            badgeCount: lowStockProducts.length,
+            tooltip: "Alertes stock",
+            badge: lowStockProducts.length,
+            badgeColor: colors.accent,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => LowStockProductDetailsScreen(products: lowStockProducts, userType: widget.userType)),
@@ -295,162 +347,86 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  Widget _topIconButton({
-    required IconData icon,
-    required DashColors colors,
-    bool badge = false,
-    int badgeCount = 0,
-    required VoidCallback onTap,
-  }) {
-    final ext = colors.ext;
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: ext.card,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: ext.border, width: 1),
-            ),
-            child: Icon(icon, size: 18, color: ext.mutedForeground),
-          ),
-          if (badge)
-            Positioned(
-              top: -4,
-              right: -4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                decoration: BoxDecoration(
-                  color: ext.danger,
-                  borderRadius: BorderRadius.circular(9),
-                  border: Border.all(color: ext.background, width: 1.5),
-                ),
-                child: badgeCount > 0
-                    ? Text("$badgeCount", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700))
-                    : const SizedBox(width: 8, height: 8),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   // =========================================================================
-  // STORE SWITCHER SHEET — sobre, lisible, hiérarchie claire
+  // STORE SWITCHER SHEET (logique de navigation inchangée)
   // =========================================================================
   void _showStoreSwitcherSheet(BuildContext context, DashColors colors) {
-    final ext = colors.ext;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ext.card,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl2))),
+    AppSheet.show(
+      context,
+      title: "Mes boutiques",
       builder: (ctx) {
-        final maxHeight = MediaQuery.sizeOf(ctx).height * 0.72;
-        return SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: maxHeight),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                Center(
-                  child: Container(width: 32, height: 4, decoration: BoxDecoration(color: ext.border, borderRadius: BorderRadius.circular(4))),
+        return Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+            children: [
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Mes boutiques", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: ext.foreground, letterSpacing: -0.2)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(20)),
-                        child: Text("${displayStore.length + 1}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ext.mutedForeground)),
-                      ),
-                    ],
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.primarySoft,
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: Icon(Icons.check_circle_rounded,
+                      color: colors.primary, size: 20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text("Sélectionnez la boutique à gérer", style: TextStyle(fontSize: 13, color: ext.mutedForeground)),
+                title: Text(
+                  widget.store.name,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary),
                 ),
-                const SizedBox(height: 16),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
-                    children: [
-                      // Boutique active
-                      Container(
-                        decoration: BoxDecoration(
-                          color: ext.primarySoft,
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                          border: Border.all(color: ext.primary.withOpacity(0.12), width: 1),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: ext.card, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.border)),
-                            child: Icon(Icons.check_rounded, color: ext.primary, size: 18),
-                          ),
-                          title: Text(widget.store.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: ext.foreground)),
-                          subtitle: Text("Boutique active • ${categories.length} catégories", style: TextStyle(fontSize: 12, color: ext.mutedForeground)),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: ext.card, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.border)),
-                            child: Text("ACTIF", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: ext.primary)),
-                          ),
-                        ),
-                      ),
-                      if (displayStore.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Text("AUTRES BOUTIQUES", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.8, color: ext.mutedForeground)),
-                        ),
-                        const SizedBox(height: 8),
-                        ...displayStore.map((newStore) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: ext.card,
-                                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                                  border: Border.all(color: ext.border, width: 1),
-                                ),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                                  leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.sm)),
-                                    child: Icon(Icons.storefront_outlined, color: ext.mutedForeground, size: 18),
-                                  ),
-                                  title: Text(newStore.name, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: ext.foreground)),
-                                  subtitle: Text("Appuyer pour ouvrir", style: TextStyle(fontSize: 12, color: ext.mutedForeground)),
-                                  trailing: Icon(Icons.chevron_right_rounded, color: ext.mutedForeground, size: 20),
-                                  onTap: () {
-                                    final nextOthers = List<Store>.from(widget.otherStores)
-                                      ..removeWhere((s) => s.id == newStore.id)
-                                      ..add(widget.store);
-                                    Navigator.pop(ctx);
-                                    Navigator.push(context, MaterialPageRoute(builder: (_) => StoreDetailScreen(store: newStore, userType: widget.userType, otherStores: nextOthers)));
-                                  },
-                                ),
-                              ),
-                            )),
-                      ],
-                    ],
+                subtitle: Text(
+                  "Boutique active",
+                  style: TextStyle(color: colors.textSecondary),
+                ),
+              ),
+              if (displayStore.isNotEmpty)
+                Divider(
+                    height: 1,
+                    indent: 20,
+                    endIndent: 20,
+                    color: colors.border),
+              ...displayStore.map((newStore) => ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.cardElevated,
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: Icon(Icons.storefront_outlined,
+                      color: colors.textSecondary, size: 20),
                 ),
-              ],
-            ),
+                title: Text(newStore.name,
+                    style:
+                    TextStyle(color: colors.textPrimary)),
+                trailing: Icon(Icons.chevron_right_rounded,
+                    color: colors.textSecondary),
+                onTap: () {
+                  final nextOthers =
+                  List<Store>.from(widget.otherStores)
+                    ..removeWhere((s) => s.id == newStore.id)
+                    ..add(widget.store);
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StoreDetailScreen(
+                        store: newStore,
+                        userType: widget.userType,
+                        otherStores: nextOthers,
+                      ),
+                    ),
+                  );
+                },
+              )),
+            ],
           ),
         );
       },
@@ -463,94 +439,35 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   Widget _buildBottomNav(BuildContext context, DashColors colors) {
     final ext = colors.ext;
     final items = [
-      _NavItemData(Icons.home_outlined, Icons.home_rounded, "Accueil"),
-      _NavItemData(Icons.receipt_long_outlined, Icons.receipt_long_rounded, "Ventes"),
-      _NavItemData(Icons.inventory_2_outlined, Icons.inventory_2_rounded, "Stock"),
-      _NavItemData(Icons.settings_outlined, Icons.settings_rounded, "Plus"),
+      AppBottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: "Accueil"),
+      AppBottomNavItem(
+          icon: Icons.receipt_long_outlined,
+          activeIcon: Icons.receipt_long_rounded,
+          label: "Ventes"),
+      AppBottomNavItem(
+          icon: Icons.inventory_2_outlined,
+          activeIcon: Icons.inventory_2_rounded,
+          label: "Stock"),
+      AppBottomNavItem(
+          icon: Icons.settings_outlined,
+          activeIcon: Icons.settings_rounded,
+          label: "Plus"),
     ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: ext.card,
-        border: Border(top: BorderSide(color: ext.border, width: 1)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            children: List.generate(items.length, (index) {
-              final selected = _currentIndex == index;
-              final item = items[index];
-              final showBadge = index == 2 && lowStockProducts.isNotEmpty;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _currentIndex = index),
-                  behavior: HitTestBehavior.opaque,
-                  child: AnimatedContainer(
-                    duration: AppDurations.normal,
-                    curve: Curves.easeOut,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: selected ? ext.surfaceMuted : Colors.transparent,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            AnimatedContainer(
-                              duration: AppDurations.normal,
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: selected ? ext.card : Colors.transparent,
-                                borderRadius: BorderRadius.circular(AppRadius.full),
-                                border: Border.all(color: selected ? ext.border : Colors.transparent, width: 1),
-                              ),
-                              child: Icon(selected ? item.filledIcon : item.icon, color: selected ? ext.foreground : ext.mutedForeground, size: 20),
-                            ),
-                            if (showBadge)
-                              Positioned(
-                                right: 6,
-                                top: 2,
-                                child: Container(width: 6, height: 6, decoration: BoxDecoration(color: ext.danger, shape: BoxShape.circle)),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 11, fontWeight: selected ? FontWeight.w600 : FontWeight.w400, color: selected ? ext.foreground : ext.mutedForeground, letterSpacing: 0.1),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
+    return AppBottomNav(
+      items: items,
+      currentIndex: _currentIndex,
+      onTap: (index) => setState(() => _currentIndex = index),
+      badges: [0, 0, lowStockProducts.length, 0],
     );
   }
 
   // =========================================================================
-  // HELPERS DÉCORATIONS — cohérence totale, ombres ultra subtiles
+  // SECTION CARD générique
   // =========================================================================
-  BoxDecoration _cardDecoration(DashColors colors, {double radius = 16}) {
-    final ext = colors.ext;
-    return BoxDecoration(
-      color: ext.card,
-      borderRadius: BorderRadius.circular(radius),
-      border: Border.all(color: ext.border, width: 1),
-      boxShadow: colors.cardShadow,
-    );
-  }
-
   Widget _sectionCard({
     required String title,
     required DashColors colors,
@@ -562,38 +479,42 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final ext = colors.ext;
     return Container(
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: _cardDecoration(colors, radius: AppRadius.lg),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: colors.border),
+        boxShadow: colors.cardShadow,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: ext.foreground, letterSpacing: -0.2)),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 3),
-                        Text(subtitle, style: TextStyle(fontSize: 13, color: ext.mutedForeground, height: 1.3)),
-                      ],
-                    ],
-                  ),
-                ),
-                if (icon != null)
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.border)),
-                    child: Icon(icon, color: ext.mutedForeground, size: 18),
-                  ),
-              ],
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+            child: SectionHeader(
+              title: title,
+              subtitle: subtitle,
+              trailing: icon != null
+                  ? Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: colors.primarySoft,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: colors.primary
+                                .withValues(alpha: 0.3)),
+                      ),
+                      child:
+                          Icon(icon, color: colors.primary, size: 20),
+                    )
+                  : null,
             ),
           ),
-          Padding(padding: const EdgeInsets.all(20), child: child),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: child,
+          ),
         ],
       ),
     );
@@ -606,8 +527,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final ext = colors.ext;
     return RefreshIndicator(
       onRefresh: _fetchAllData,
-      color: ext.foreground,
-      backgroundColor: ext.card,
+      color: colors.primary,
+      backgroundColor: colors.card,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -616,17 +537,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           children: [
             _buildEmployeeSection(context, colors),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Inventaire", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ext.foreground, letterSpacing: -0.1)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.border)),
-                    child: Text("${categories.length} catégories", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: ext.mutedForeground)),
-                  ),
-                ],
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SectionHeader(
+                  title: "Inventaire",
+                  subtitle:
+                      "${categories.length} catégorie(s)",
+                ),
               ),
             ),
             _buildCategoryList(context, categories, colors),
@@ -652,82 +570,48 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text("Gestion du stock", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ext.foreground, letterSpacing: -0.3)),
-        const SizedBox(height: 6),
-        Text("Suivez votre inventaire en temps réel", style: TextStyle(color: ext.mutedForeground, fontSize: 13, height: 1.4)),
-        const SizedBox(height: 24),
-        _buildHubCard(
-          icon: Icons.history_rounded,
-          color: ext.foreground,
+        SectionHeader(
+          title: "Gestion du stock",
+          subtitle: "Suivez votre inventaire en temps réel",
+        ),
+        const SizedBox(height: 20),
+        ActionTile(
+          icon: Icons.history_edu_rounded,
+          color: colors.primary,
+          softColor: colors.primarySoft,
           title: "Historique de restockage",
           subtitle: "Consultez les réapprovisionnements passés",
-          colors: colors,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RestockHistoryScreen(products: allStoreProducts))),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  RestockHistoryScreen(products: allStoreProducts),
+            ),
+          ),
         ),
         const SizedBox(height: 12),
-        _buildHubCard(
+        ActionTile(
           icon: Icons.warning_amber_rounded,
-          color: ext.danger,
+          color: colors.accent,
+          softColor: colors.accentSoft,
           title: "Produits en alerte",
-          subtitle: lowStockProducts.isEmpty ? "Aucune alerte pour le moment" : "${lowStockProducts.length} produit(s) sous le seuil",
-          badge: lowStockProducts.isNotEmpty ? lowStockProducts.length : null,
-          colors: colors,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LowStockProductDetailsScreen(products: lowStockProducts, userType: widget.userType))),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHubCard({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required DashColors colors,
-    int? badge,
-  }) {
-    final ext = colors.ext;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: _cardDecoration(colors, radius: AppRadius.lg),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: ext.border)),
-              child: Icon(icon, color: color == ext.danger ? ext.danger : ext.mutedForeground, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text(title, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: ext.foreground))),
-                      if (badge != null)
-                        Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(color: ext.dangerSoft, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.danger.withOpacity(0.15))),
-                          child: Text("$badge", style: TextStyle(color: ext.danger, fontSize: 11, fontWeight: FontWeight.w700)),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(subtitle, style: TextStyle(color: ext.mutedForeground, fontSize: 12.5, height: 1.3)),
-                ],
+          subtitle: lowStockProducts.isEmpty
+              ? "Aucune alerte pour le moment"
+              : "${lowStockProducts.length} produit(s) sous le seuil",
+          badge: lowStockProducts.isNotEmpty
+              ? lowStockProducts.length
+              : null,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LowStockProductDetailsScreen(
+                products: lowStockProducts,
+                userType: widget.userType,
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(Icons.chevron_right_rounded, color: ext.mutedForeground, size: 20),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -740,30 +624,45 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       children: [
         // Carte profil
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: _cardDecoration(colors, radius: AppRadius.lg),
+        AppCard(
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.full), border: Border.all(color: ext.border)),
-                child: Icon(Icons.person_rounded, color: ext.mutedForeground, size: 22),
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: colors.primarySoft,
+                child:
+                    Icon(Icons.person, color: colors.primary, size: 24),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${UserService.username}", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: ext.foreground, letterSpacing: -0.1)),
-                    const SizedBox(height: 6),
+                    Text(
+                      "${UserService.username}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          letterSpacing: -0.2,
+                          color: colors.textPrimary),
+                    ),
+                    const SizedBox(height: 5),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                       decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.border)),
                       child: Text(
-                        widget.userType == 'employee' ? "EMPLOYÉ" : "PROPRIÉTAIRE",
-                        style: TextStyle(color: ext.mutedForeground, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.6),
+                        widget.userType == 'employee'
+                            ? "EMPLOYÉ"
+                            : "PROPRIÉTAIRE",
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.4,
+                        ),
                       ),
                     ),
                   ],
@@ -773,24 +672,66 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: _cardDecoration(colors, radius: AppRadius.lg),
+
+        // Actions
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
             children: [
-              _buildMoreActionTile(
-                icon: Icons.account_balance_wallet_outlined,
-                title: "Mes Dépenses",
-                subtitle: "Suivi des sorties de caisse",
-                colors: colors,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ExpensesScreen(storeId: widget.store.id))),
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.accentSoft,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.account_balance_wallet_outlined,
+                      color: colors.accent, size: 20),
+                ),
+                title: Text("Mes Dépenses",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: colors.textPrimary)),
+                trailing: Icon(Icons.chevron_right_rounded,
+                    color: colors.textSecondary),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ExpensesScreen(storeId: widget.store.id),
+                  ),
+                ),
               ),
               if (widget.store.subscription != null) ...[
-                Divider(height: 1, color: ext.border),
-                _buildMoreActionTile(
-                  icon: Icons.workspace_premium_outlined,
-                  title: "Mon abonnement",
-                  subtitle: "Gérer votre plan",
-                  colors: colors,
+                Divider(
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                    color: colors.border),
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.subscriptions,
+                        color: colors.primary, size: 20),
+                  ),
+                  title: Text("Mon abonnement",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: colors.textPrimary)),
+                  trailing: Icon(Icons.chevron_right_rounded,
+                      color: colors.textSecondary),
                   onTap: () {
                     final sub = widget.store.subscription!;
                     Navigator.push(context, MaterialPageRoute(builder: (_) => SubscriptionScreen(storeName: widget.store.name, planType: sub.plan!, duration: sub.duration!, startDate: sub.startDate!, expiryDate: sub.expirationDate!)));
@@ -801,14 +742,32 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: _cardDecoration(colors, radius: AppRadius.lg),
-          child: _buildMoreActionTile(
-            icon: Icons.logout_rounded,
-            title: "Déconnexion",
-            subtitle: "Quitter la session",
-            colors: colors,
-            isDestructive: true,
+
+        // Déconnexion
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: colors.dangerSoft,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.logout_rounded,
+                  color: colors.danger, size: 20),
+            ),
+            title: Text(
+              "Déconnexion",
+              style: TextStyle(
+                  color: colors.danger,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14),
+            ),
+            trailing: Icon(Icons.chevron_right_rounded,
+                color: colors.danger),
             onTap: () => _handleLogout(context, colors),
           ),
         ),
@@ -855,50 +814,30 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Dépense — secondaire, outline
-        Material(
-          color: ext.card,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          elevation: 0,
-          child: InkWell(
-            onTap: () => _showExpenseDialog(context, colors),
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.lg), border: Border.all(color: ext.border, width: 1)),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.remove_circle_outline_rounded, color: ext.mutedForeground, size: 18),
-                  const SizedBox(width: 8),
-                  Text("Dépense", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 13.5)),
-                ],
-              ),
-            ),
-          ),
+        FloatingActionButton.extended(
+          heroTag: "btnExpense",
+          onPressed: () => _showExpenseDialog(context, colors),
+          backgroundColor: colors.accent,
+          foregroundColor: Colors.white,
+          elevation: 2,
+          icon: const Icon(Icons.money_off, color: Colors.white, size: 20),
+          label: const Text("Dépense",
+              style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w600)),
         ),
-        const SizedBox(height: 10),
-        // Vendre — primaire sobre
-        Material(
-          color: ext.foreground,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          elevation: 0,
-          child: InkWell(
-            onTap: () => _showStartSaleDialog(context, colors),
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.lg)),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.shopping_bag_outlined, color: ext.background, size: 18),
-                  const SizedBox(width: 8),
-                  Text("Vendre", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600, fontSize: 14, letterSpacing: 0.1)),
-                ],
-              ),
-            ),
-          ),
+        const SizedBox(height: 12),
+        FloatingActionButton.extended(
+          heroTag: "btnSale",
+          onPressed: () => _showStartSaleDialog(context, colors),
+          backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
+          elevation: 3,
+          icon: Icon(Icons.shopping_cart_checkout,
+              color: colors.onPrimary, size: 20),
+          label: Text("Vendre",
+              style: TextStyle(
+                  color: colors.onPrimary,
+                  fontWeight: FontWeight.w700)),
         ),
       ],
     );
@@ -923,11 +862,17 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                 child: Row(
                   children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.full), border: Border.all(color: ext.border)),
-                      child: Icon(Icons.person_add_alt_1_outlined, color: ext.mutedForeground.withOpacity(0.6), size: 20),
+                    Icon(Icons.person_add_alt_1_outlined,
+                        color: colors.textSecondary
+                            .withValues(alpha: 0.5),
+                        size: 32),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Aucun employé pour le moment",
+                      style: TextStyle(
+                          color: colors.textSecondary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(width: 12),
                     Text("Aucun employé pour le moment", style: TextStyle(color: ext.mutedForeground, fontSize: 13, fontWeight: FontWeight.w500)),
@@ -947,11 +892,24 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       Container(
                         width: 46,
                         height: 46,
-                        decoration: BoxDecoration(color: ext.card, shape: BoxShape.circle, border: Border.all(color: ext.border, width: 1)),
-                        child: Icon(Icons.add_rounded, color: ext.mutedForeground, size: 20),
+                        decoration: BoxDecoration(
+                          color: colors.cardElevated,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: colors.primary
+                                .withValues(alpha: 0.35),
+                            width: 1.4,
+                          ),
+                        ),
+                        child: Icon(Icons.add_rounded,
+                            color: colors.primary, size: 22),
                       ),
-                      const SizedBox(height: 6),
-                      Text("Ajouter", style: TextStyle(color: ext.mutedForeground, fontSize: 11, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 5),
+                      Text("Ajouter",
+                          style: TextStyle(
+                              color: colors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12)),
                     ],
                   ),
                 ),
@@ -978,11 +936,22 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(color: ext.surfaceMuted, shape: BoxShape.circle, border: Border.all(color: ext.border, width: 1)),
-                child: Icon(Icons.person_rounded, color: ext.mutedForeground, size: 20),
+              CircleAvatar(
+                radius: 23,
+                backgroundColor: colors.primarySoft,
+                child: Icon(Icons.person,
+                    color: colors.primary, size: 20),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                emp.username ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12),
               ),
               const SizedBox(height: 6),
               Text(emp.username ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TextStyle(color: ext.foreground, fontSize: 11.5, fontWeight: FontWeight.w500)),
@@ -1012,18 +981,26 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: GestureDetector(
             onTap: () => _showAddCategoryForm(context, null, colors),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              decoration: BoxDecoration(color: ext.card, borderRadius: BorderRadius.circular(AppRadius.lg), border: Border.all(color: ext.border, style: BorderStyle.solid, width: 1)),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: colors.card,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.35),
+                  width: 1.3,
+                ),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(6)),
-                    child: Icon(Icons.add_rounded, color: ext.mutedForeground, size: 16),
-                  ),
+                  Icon(Icons.add_rounded,
+                      color: colors.primary, size: 20),
                   const SizedBox(width: 8),
-                  Text("Nouvelle catégorie", style: TextStyle(color: ext.mutedForeground, fontSize: 13.5, fontWeight: FontWeight.w500)),
+                  Text("Ajouter une catégorie",
+                      style: TextStyle(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13.5)),
                 ],
               ),
             ),
@@ -1052,57 +1029,49 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final ext = colors.ext;
     showModalBottomSheet(
       context: context,
-      backgroundColor: ext.card,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl2))),
+      backgroundColor: colors.card,
+      barrierColor: colors.barrier,
+      shape: const RoundedRectangleBorder(
+          borderRadius:
+          BorderRadius.vertical(top: Radius.circular(26))),
       builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(child: Container(width: 32, height: 4, decoration: BoxDecoration(color: ext.border, borderRadius: BorderRadius.circular(4)))),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.full), border: Border.all(color: ext.border)),
-                    child: Icon(Icons.person_rounded, color: ext.mutedForeground, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(emp.username ?? '', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: ext.foreground)),
-                        Text("Appuyez pour gérer", style: TextStyle(fontSize: 12.5, color: ext.mutedForeground)),
-                      ],
-                    ),
-                  ),
-                ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 14),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: colors.border,
+                borderRadius: BorderRadius.circular(10),
               ),
-              const SizedBox(height: 20),
-              Container(height: 1, color: ext.border),
-              const SizedBox(height: 12),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: ext.dangerSoft, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.danger.withOpacity(0.15))),
-                  child: Icon(Icons.delete_outline_rounded, color: ext.danger, size: 18),
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colors.dangerSoft,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                title: Text("Supprimer l'employé", style: TextStyle(color: ext.danger, fontWeight: FontWeight.w500, fontSize: 14)),
-                subtitle: Text("Action irréversible", style: TextStyle(color: ext.mutedForeground, fontSize: 12)),
-                trailing: Icon(Icons.chevron_right_rounded, color: ext.mutedForeground.withOpacity(0.5), size: 20),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _confirmDeleteEmployee(context, emp, colors);
-                },
+                child: Icon(Icons.delete_outline_rounded,
+                    color: colors.danger, size: 20),
               ),
-            ],
-          ),
+              title: Text("Supprimer l'employé",
+                  style: TextStyle(
+                      color: colors.danger,
+                      fontWeight: FontWeight.w600)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmDeleteEmployee(context, emp, colors);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
     );
@@ -1112,38 +1081,97 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final ext = colors.ext;
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(builder: (_, setDelState) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Text("Supprimer l'employé ?", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 16, letterSpacing: -0.2)),
-          content: Text("Voulez-vous vraiment supprimer ${emp.username} ? Cette action est irréversible.", style: TextStyle(color: ext.mutedForeground, fontSize: 14, height: 1.4)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setDelState(() => isDeletingEmployee = false);
-                Navigator.pop(ctx);
-              },
-              child: Text("Annuler", style: TextStyle(color: ext.mutedForeground, fontWeight: FontWeight.w500)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.danger, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-              onPressed: isDeletingEmployee
-                  ? null
-                  : () async {
-                      setDelState(() => isDeletingEmployee = true);
-                      final deleted = await EmployeeService().deleteEmployee(emp, context);
-                      if (mounted) setDelState(() => isDeletingEmployee = false);
-                      if (deleted) showSuccessMessage("employée ${emp.username} supprimé", context);
-                      Navigator.pop(ctx);
-                      _fetchAllData();
-                    },
-              child: isDeletingEmployee ? const BouTikaLoader.compact() : const Text("Supprimer", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
+      builder: (ctx) =>
+          StatefulBuilder(builder: (_, setDelState) {
+            return AlertDialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              contentPadding:
+              const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              actionsPadding:
+              const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.dangerSoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person_remove_rounded,
+                        color: colors.danger, size: 30),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    "Confirmation",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Voulez-vous vraiment supprimer ${emp.username} ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 13.5,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          setDelState(
+                              () => isDeletingEmployee = false);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppButton.danger(
+                        label: "Supprimer",
+                        height: 48,
+                        isLoading: isDeletingEmployee,
+                        onPressed: isDeletingEmployee
+                            ? null
+                            : () async {
+                          setDelState(
+                              () => isDeletingEmployee = true);
+                          final deleted = await EmployeeService()
+                              .deleteEmployee(emp, context);
+                          if (mounted)
+                            setDelState(() =>
+                            isDeletingEmployee = false);
+                          if (deleted) {
+                            showSuccessMessage(
+                                "employée ${emp.username} supprimé",
+                                context);
+                          }
+                          Navigator.pop(ctx);
+                          _fetchAllData();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
     );
   }
 
@@ -1155,36 +1183,47 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     final orderService = OrderService();
     Order? createdOrder;
 
-    final bool? wantsToCreate = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(builder: (_, setPopupState) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Text("Nouvelle vente", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 16)),
-          content: Text("Voulez-vous créer un nouvel ordre de vente ?", style: TextStyle(color: ext.mutedForeground, fontSize: 14, height: 1.4)),
-          actions: [
-            TextButton(onPressed: () { Navigator.pop(dialogContext, false); setPopupState(() => isCreatingOrder = false); }, child: Text("Non", style: TextStyle(color: ext.mutedForeground))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.foreground, foregroundColor: ext.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
-              onPressed: isCreatingOrder ? null : () async {
-                setPopupState(() => isCreatingOrder = true);
-                createdOrder = await orderService.createOrder(widget.store.id, context);
-                if (mounted) setPopupState(() => isCreatingOrder = false);
-                Navigator.pop(dialogContext, createdOrder != null);
-              },
-              child: isCreatingOrder ? const BouTikaLoader.compact() : Text("Oui, créer", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
+    final bool? wantsToCreate = await AppDialog.show<bool>(
+      context,
+      barrierDismissible: false,
+      icon: Icons.point_of_sale_rounded,
+      iconColor: colors.primary,
+      iconSoftColor: colors.primarySoft,
+      title: "Nouvelle Vente",
+      message: "Voulez-vous créer un nouvel ordre de vente ?",
+      actions: [
+        AppButton.secondary(
+          label: "Non",
+          height: 48,
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+        ),
+        StatefulBuilder(
+          builder: (_, setPopupState) => AppButton.primary(
+            label: "Oui, créer",
+            height: 48,
+            isLoading: isCreatingOrder,
+            onPressed: isCreatingOrder
+                ? null
+                : () async {
+              setPopupState(() => isCreatingOrder = true);
+              createdOrder = await orderService
+                  .createOrder(widget.store.id, context);
+              if (mounted) {
+                setPopupState(() => isCreatingOrder = false);
+              }
+              Navigator.pop(context, createdOrder != null);
+            },
+          ),
+        ),
+      ],
     );
 
     if (wantsToCreate == true && createdOrder != null) {
       _showSaleForm(context, createdOrder!.orderId!, colors);
     } else if (wantsToCreate == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Erreur lors de la création de l'ordre."), backgroundColor: ext.danger));
+      showErrorMessage("Erreur lors de la création de l'ordre.", context);
     }
   }
 
@@ -1196,52 +1235,130 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(builder: (_, setPopupState) {
-        double calculateTotal() => saleLines.fold<double>(0.0, (sum, item) => sum + (item.product?.stock?.sellingPrice ?? 0) * item.quantity);
+      builder: (dialogContext) =>
+          StatefulBuilder(builder: (_, setPopupState) {
+            double calculateTotal() => saleLines.fold<double>(
+                0.0,
+                    (sum, item) =>
+                sum +
+                    (item.product?.stock?.sellingPrice ?? 0) *
+                        item.quantity);
 
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Row(
-            children: [
-              Container(padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.border)), child: Icon(Icons.shopping_bag_outlined, size: 16, color: ext.mutedForeground)),
-              const SizedBox(width: 10),
-              Text("Choix des produits", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 15)),
-            ],
-          ),
-          content: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 520, maxHeight: MediaQuery.sizeOf(context).height * 0.62),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.88,
-              child: Form(
-                key: formKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.border)),
-                        child: Text("ORDRE #${orderId.substring(0, 8)}", style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: ext.mutedForeground)),
-                      ),
-                      const SizedBox(height: 16),
-                      ...saleLines.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final line = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            return Dialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 550,
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.8,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Form(
+                    key: formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: colors.primarySoft,
+                                  borderRadius:
+                                  BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                    Icons.shopping_cart_checkout_rounded,
+                                    color: colors.primary,
+                                    size: 20),
+                              ),
+                              const SizedBox(width: 12),
                               Expanded(
-                                flex: 3,
-                                child: DropdownSearch<Product>(
-                                  popupProps: const PopupProps.modalBottomSheet(
-                                    showSearchBox: true,
-                                    title: Padding(padding: EdgeInsets.all(14), child: Text("Sélectionner un produit")),
+                                child: Text(
+                                  "Choix des produits",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
+                                    color: colors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                              Text("Ordre n°${orderId.substring(0, 8)}",
+                                  style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: colors.textSecondary)),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          ...saleLines.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final line  = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: DropdownSearch<Product>(
+                                      popupProps:
+                                      const PopupProps.modalBottomSheet(
+                                        showSearchBox: true,
+                                        title: Padding(
+                                          padding: EdgeInsets.all(12),
+                                          child:
+                                          Text("Entrez un produit"),
+                                        ),
+                                      ),
+                                      items: allStoreProducts,
+                                      itemAsString: (p) => p.name,
+                                      dropdownDecoratorProps:
+                                      DropDownDecoratorProps(
+                                        dropdownSearchDecoration:
+                                        InputDecoration(
+                                          labelText: "Produit",
+                                          helperText:
+                                          index == 0
+                                              ? null
+                                              : "Ligne ${index + 1}",
+                                          isDense: true,
+                                        ),
+                                      ),
+                                      onChanged: (Product? product) {
+                                        setPopupState(() {
+                                          line.product     = product;
+                                          line.salingPrice = product
+                                              ?.stock?.sellingPrice ??
+                                              0;
+                                          line.maxStock =
+                                              (product?.stock?.baseStock ??
+                                                  0.0) -
+                                                  (product?.stock
+                                                      ?.totalSell ??
+                                                      0.0);
+                                          formKey.currentState?.validate();
+                                        });
+                                      },
+                                      validator: (item) {
+                                        if (item == null) return 'Requis';
+                                        for (int i = 0; i < index; i++) {
+                                          if (saleLines[i].product?.id ==
+                                              item.id)
+                                            return "Déjà ajouté plus haut";
+                                        }
+                                        return null;
+                                      },
+                                    ),
                                   ),
                                   items: allStoreProducts,
                                   itemAsString: (p) => p.name,
@@ -1289,21 +1406,93 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               ),
                             ],
                           ),
-                        );
-                      }),
-                      const SizedBox(height: 4),
-                      InkWell(
-                        onTap: () => setPopupState(() => saleLines.add(OrderLine())),
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(border: Border.all(color: ext.border), borderRadius: BorderRadius.circular(AppRadius.md)),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          const SizedBox(height: 6),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 13),
+                            decoration: BoxDecoration(
+                              color: colors.primarySoft,
+                              borderRadius:
+                              BorderRadius.circular(AppRadius.md),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "TOTAL",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.1,
+                                    color: colors.textSecondary,
+                                  ),
+                                ),
+                                Text(
+                                  "${calculateTotal().toStringAsFixed(0)} F",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 17,
+                                    color: colors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
                             children: [
-                              Icon(Icons.add_rounded, color: ext.mutedForeground, size: 16),
-                              const SizedBox(width: 6),
-                              Text("Ajouter un produit", style: TextStyle(color: ext.mutedForeground, fontSize: 13, fontWeight: FontWeight.w500)),
+                              Expanded(
+                                child: AppButton.secondary(
+                                  label: "Annuler",
+                                  height: 48,
+                                  onPressed: isCancelingSale
+                                      ? null
+                                      : () async {
+                                    try {
+                                      setPopupState(() =>
+                                      isCancelingSale = true);
+                                      await OrderService()
+                                          .deleteOrder(
+                                          orderId, context);
+                                      if (mounted) {
+                                        setPopupState(() =>
+                                        isCancelingSale =
+                                        false);
+                                      }
+                                      Navigator.pop(dialogContext);
+                                      showSuccessMessage(
+                                          "ordre annulée avec succès",
+                                          context);
+                                    } catch (e) {
+                                      showErrorMessage(
+                                          "Erreur lors de la liaison avec le serveur.",
+                                          context);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: AppButton.primary(
+                                  label: "Valider",
+                                  height: 48,
+                                  onPressed: () {
+                                    if (formKey.currentState!
+                                        .validate()) {
+                                      Navigator.pop(dialogContext);
+                                      _showFinalConfirmationDialog(
+                                          context,
+                                          orderId,
+                                          saleLines,
+                                          calculateTotal(),
+                                          colors);
+                                    }
+                                  },
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1325,18 +1514,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   ),
                 ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: isCancelingSale ? null : () async { try { setPopupState(() => isCancelingSale = true); await OrderService().deleteOrder(orderId, context); if (mounted) setPopupState(() => isCancelingSale = false); Navigator.pop(dialogContext); showSuccessMessage("ordre annulée avec succès", context); } catch (e) { showErrorMessage("Erreur lors de la liaison avec le serveur.", context); } }, child: Text("Annuler", style: TextStyle(color: ext.mutedForeground))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.foreground, foregroundColor: ext.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
-              onPressed: () { if (formKey.currentState!.validate()) { Navigator.pop(dialogContext); _showFinalConfirmationDialog(context, orderId, saleLines, calculateTotal(), colors); } },
-              child: isCancelingSale ? const BouTikaLoader.compact() : Text("Valider", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
+            );
+          }),
     );
   }
 
@@ -1345,26 +1524,113 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(builder: (_, setConfirmationStat) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Text("Confirmer la vente ?", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 16)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Valider la vente de", style: TextStyle(color: ext.mutedForeground, fontSize: 13)),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: ext.border)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (dialogContext) =>
+          StatefulBuilder(builder: (_, setConfirmationStat) {
+            return AlertDialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              contentPadding:
+              const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              actionsPadding:
+              const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.successSoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.check_rounded,
+                        color: colors.success, size: 32),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    "Confirmer la Vente",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Valider la vente de ${total.toStringAsFixed(0)} F ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 13.5,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
                   children: [
-                    Text("Montant total", style: TextStyle(fontSize: 12, color: ext.mutedForeground)),
-                    Text("${total.toStringAsFixed(0)} F", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: ext.foreground)),
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Non",
+                        height: 48,
+                        onPressed: () {
+                          setConfirmationStat(
+                              () => isValidatingSale = false);
+                          Navigator.pop(dialogContext);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: "Oui, Valider",
+                        height: 48,
+                        background: colors.success,
+                        foreground: Colors.white,
+                        isLoading: isValidatingSale,
+                        onPressed: isValidatingSale
+                            ? null
+                            : () async {
+                          final requestData = saleLines
+                              .map((line) => {
+                            "orderId": orderId,
+                            "productId":
+                            line.product!.id,
+                            "quantity": line.quantity,
+                          })
+                              .toList();
+                          setConfirmationStat(
+                                  () => isValidatingSale = true);
+                          try {
+                            final order = await OrderService()
+                                .makeOrder(
+                                orderId, requestData, context);
+                            if (mounted) {
+                              setConfirmationStat(() =>
+                              isValidatingSale = false);
+                            }
+                            Navigator.pop(dialogContext);
+                            if (order != null) {
+                              showSuccessMessage(
+                                  "Vente enregistrée !", context);
+                              _loadAllProductsForSale();
+                            } else {
+                              showErrorMessage(
+                                  "Erreur lors de la validation.",
+                                  context);
+                            }
+                          } catch (e) {
+                            print(e);
+                            showExceptionMessage(context);
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1408,71 +1674,156 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(builder: (_, setCatState) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Row(
-            children: [
-              Container(padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.border)), child: Icon(Icons.category_outlined, color: ext.mutedForeground, size: 16)),
-              const SizedBox(width: 10),
-              Flexible(child: Text(category == null ? "Nouvelle catégorie" : "Modifier catégorie", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 15))),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: _categoryFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      builder: (ctx) =>
+          StatefulBuilder(builder: (_, setCatState) {
+            return AlertDialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              title: Row(
                 children: [
-                  TextFormField(
-                    controller: _categoryNameController,
-                    style: TextStyle(color: ext.foreground, fontSize: 14),
-                    decoration: InputDecoration(labelText: "Nom de la catégorie", hintText: "Ex: Téléphones, Accessoires", prefixIcon: Icon(Icons.label_outline_rounded, size: 18, color: ext.mutedForeground), filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
-                    validator: (v) => (v == null || v.isEmpty) ? 'Le nom est obligatoire' : null,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.category_rounded,
+                        color: colors.primary, size: 22),
                   ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _categoryDescController,
-                    maxLines: 3,
-                    style: TextStyle(color: ext.foreground, fontSize: 14),
-                    decoration: InputDecoration(labelText: "Description", hintText: "Décrivez cette catégorie", prefixIcon: Icon(Icons.description_outlined, size: 18, color: ext.mutedForeground), filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
-                    validator: (v) => (v == null || v.isEmpty) ? 'Veuillez ajouter une description' : null,
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      category == null
+                          ? "Nouvelle Catégorie"
+                          : "Modifier Catégorie",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () { setCatState(() => isSavingCategory = false); _categoryNameController.clear(); _categoryDescController.clear(); Navigator.pop(ctx); }, child: Text("Annuler", style: TextStyle(color: ext.mutedForeground))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.foreground, foregroundColor: ext.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-              onPressed: isSavingCategory ? null : () async {
-                if (_categoryFormKey.currentState!.validate()) {
-                  setCatState(() => isSavingCategory = true);
-                  final data = {"name": _categoryNameController.text, "description": _categoryDescController.text};
-                  final cs = CategoryService();
-                  try {
-                    if (category != null) {
-                      final cat = await cs.update(category.id, data, context);
-                      if (mounted) setCatState(() => isSavingCategory = false);
-                      if (cat == null) { showErrorMessage("mise à jour a échoué", context); } else { final i = categories.indexOf(category); if (i != -1) setState(() => categories[i] = cat); }
-                      showSuccessMessage("catégorie mise à jour", context);
-                    } else {
-                      await cs.create(data, widget.store.id, context);
-                      showSuccessMessage("catégorie ajoutée", context);
-                      _fetchAllData();
-                    }
-                    Navigator.pop(ctx);
-                  } catch (e) { showExceptionMessage(context); }
-                }
-              },
-              child: isSavingCategory ? const BouTikaLoader.compact() : Text(category == null ? "Créer" : "Enregistrer", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _categoryFormKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppTextField(
+                        controller: _categoryNameController,
+                        label: "Nom de la catégorie",
+                        icon: Icons.label_rounded,
+                        hint: "Ex: Boissons",
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Le nom est obligatoire'
+                            : null,
+                      ),
+                      const SizedBox(height: 15),
+                      AppTextField(
+                        controller: _categoryDescController,
+                        maxLines: 2,
+                        label: "Description",
+                        icon: Icons.description_outlined,
+                        hint: "Décrivez cette catégorie",
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Veuillez ajouter une description'
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          setCatState(
+                              () => isSavingCategory = false);
+                          _categoryNameController.clear();
+                          _categoryDescController.clear();
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: category == null ? "Créer" : "Enregistrer",
+                        height: 48,
+                        isLoading: isSavingCategory,
+                        onPressed: isSavingCategory
+                            ? null
+                            : () async {
+                          if (_categoryFormKey.currentState!
+                              .validate()) {
+                            setCatState(
+                                () => isSavingCategory = true);
+                            final data = {
+                              "name":
+                              _categoryNameController.text,
+                              "description":
+                              _categoryDescController.text,
+                            };
+                            final cs = CategoryService();
+                            try {
+                              if (category != null) {
+                                final cat = await cs.update(
+                                    category.id, data, context);
+                                if (mounted) {
+                                  setCatState(() =>
+                                  isSavingCategory = false);
+                                }
+                                if (cat == null) {
+                                  showErrorMessage(
+                                      "mise à jour a échoué",
+                                      context);
+                                } else {
+                                  final i =
+                                  categories.indexOf(category);
+                                  if (i != -1) {
+                                    setState(() =>
+                                    categories[i] = cat);
+                                  }
+                                }
+                                showSuccessMessage(
+                                    "catégorie mise à jour",
+                                    context);
+                              } else {
+                                await cs.create(
+                                    data, widget.store.id, context);
+                                showSuccessMessage(
+                                    "catégorie ajoutée", context);
+                                _fetchAllData();
+                              }
+                              Navigator.pop(ctx);
+                            } catch (e) {
+                              showExceptionMessage(context);
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
     );
   }
 
@@ -1489,73 +1840,156 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(builder: (_, setSaveEmpState) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Text(employee == null ? "Ajouter un employé" : "Modifier ${employee.username}", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 15)),
-          content: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      builder: (ctx) =>
+          StatefulBuilder(builder: (_, setSaveEmpState) {
+            return AlertDialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              title: Row(
                 children: [
-                  _buildPremiumTextField(controller: _firstnameController, label: "Prénom", hint: "Ex: Jean", icon: Icons.person_outline_rounded, colors: colors),
-                  const SizedBox(height: 12),
-                  _buildPremiumTextField(controller: _secondnameController, label: "Nom", hint: "Ex: Dupont", icon: Icons.person_outline_rounded, colors: colors),
-                  const SizedBox(height: 12),
-                  _buildPremiumTextField(controller: _usernameController, label: "Nom d'utilisateur", hint: "Ex: jean.d", icon: Icons.alternate_email_rounded, colors: colors),
-                  const SizedBox(height: 12),
-                  _buildPremiumTextField(controller: _phoneController, label: "Téléphone", hint: "Ex: 6XX XXX XXX", icon: Icons.phone_outlined, colors: colors),
-                  const SizedBox(height: 12),
-                  _buildPremiumTextField(controller: _passwordController, label: "Mot de passe", hint: "••••••••", icon: Icons.lock_outline_rounded, colors: colors, obscure: true),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.person_add_alt_rounded,
+                        color: colors.primary, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      employee == null
+                          ? "Ajouter un employé"
+                          : "Modifier ${employee.username}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () { Navigator.pop(ctx); setSaveEmpState(() => isSavingEmployee = false); }, child: Text("Annuler", style: TextStyle(color: ext.mutedForeground))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.foreground, foregroundColor: ext.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
-              onPressed: isSavingEmployee ? null : () async {
-                setSaveEmpState(() => isSavingEmployee = true);
-                if (_formKey.currentState!.validate()) {
-                  final employeeMap = {"firstname": _firstnameController.text, "secondName": _secondnameController.text, "username": _usernameController.text, "post": "SALESPERSON", "password": _passwordController.text, "phone": _phoneController.text};
-                  try {
-                    await EmployeeService().addEmployee(employeeMap, widget.store.id, context);
-                    if (mounted) setSaveEmpState(() => isSavingEmployee = false);
-                    Navigator.pop(ctx);
-                    showSuccessMessage("employé ajouté", context);
-                    _fetchAllData();
-                  } catch (e) { showExceptionMessage(context); }
-                }
-              },
-              child: isSavingEmployee ? const BouTikaLoader.compact() : Text(employee == null ? "Ajouter" : "Enregistrer", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
-    );
-  }
-
-  Widget _buildPremiumTextField({required TextEditingController controller, required String label, String? hint, required IconData icon, required DashColors colors, bool obscure = false}) {
-    final ext = colors.ext;
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      style: TextStyle(color: ext.foreground, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 18, color: ext.mutedForeground),
-        filled: true,
-        fillColor: ext.surfaceMuted,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.foreground.withOpacity(0.4), width: 1.2)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      ),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppTextField(
+                        controller: _firstnameController,
+                        label: "Prénom",
+                        icon: Icons.person_outline,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 13),
+                      AppTextField(
+                        controller: _secondnameController,
+                        label: "Nom",
+                        icon: Icons.person_outline,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 13),
+                      AppTextField(
+                        controller: _usernameController,
+                        label: "Nom d'utilisateur",
+                        icon: Icons.alternate_email_rounded,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 13),
+                      AppTextField(
+                        controller: _phoneController,
+                        label: "Téléphone",
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 13),
+                      AppTextField(
+                        controller: _passwordController,
+                        label: "Mot de passe",
+                        icon: Icons.lock_outline,
+                        obscure: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          setSaveEmpState(
+                              () => isSavingEmployee = false);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label:
+                        employee == null ? "Ajouter" : "Enregistrer",
+                        height: 48,
+                        isLoading: isSavingEmployee,
+                        onPressed: isSavingEmployee
+                            ? null
+                            : () async {
+                          setSaveEmpState(
+                              () => isSavingEmployee = true);
+                          if (_formKey.currentState!.validate()) {
+                            final employeeMap = {
+                              "firstname":
+                              _firstnameController.text,
+                              "secondName":
+                              _secondnameController.text,
+                              "username":
+                              _usernameController.text,
+                              "post": "SALESPERSON",
+                              "password":
+                              _passwordController.text,
+                              "phone": _phoneController.text,
+                            };
+                            try {
+                              await EmployeeService().addEmployee(
+                                  employeeMap,
+                                  widget.store.id,
+                                  context);
+                              if (mounted) {
+                                setSaveEmpState(() =>
+                                isSavingEmployee = false);
+                              }
+                              Navigator.pop(ctx);
+                              showSuccessMessage(
+                                  "employé ajouté", context);
+                              _fetchAllData();
+                            } catch (e) {
+                              showExceptionMessage(context);
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
     );
   }
 
@@ -1567,20 +2001,72 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: ext.card,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-        title: Text("Déconnexion", style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 16)),
-        content: Text("Voulez-vous vraiment quitter BouTiKa ?", style: TextStyle(color: ext.mutedForeground, fontSize: 14, height: 1.4)),
+        backgroundColor: colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: colors.border),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.dangerSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.logout_rounded,
+                  color: colors.danger, size: 30),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              "Déconnexion",
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
+                color: colors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Voulez-vous vraiment quitter BouTiKa ?",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 13.5,
+              ),
+            ),
+          ],
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text("Annuler", style: TextStyle(color: ext.mutedForeground))),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: ext.danger, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
-            onPressed: () async {
-              await UserService.logout();
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => LoginScreen()), (route) => false);
-            },
-            child: const Text("Se déconnecter", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  label: "Annuler",
+                  height: 48,
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton.danger(
+                  label: "Se déconnecter",
+                  height: 48,
+                  onPressed: () async {
+                    await UserService.logout();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                          (route) => false,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1597,61 +2083,141 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(builder: (_, setPopupState) {
-        return AlertDialog(
-          backgroundColor: ext.card,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          title: Row(
-            children: [
-              Container(padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.sm), border: Border.all(color: ext.border)), child: Icon(Icons.remove_circle_outline_rounded, color: ext.mutedForeground, size: 16)),
-              const SizedBox(width: 10),
-              Flexible(child: Text("Nouvelle dépense", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ext.foreground, fontWeight: FontWeight.w600, fontSize: 15))),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: _expenseFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      builder: (ctx) =>
+          StatefulBuilder(builder: (_, setPopupState) {
+            return AlertDialog(
+              backgroundColor: colors.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.border),
+              ),
+              titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              title: Row(
                 children: [
-                  TextFormField(
-                    controller: _expensePriceController,
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(color: ext.foreground, fontSize: 14),
-                    decoration: InputDecoration(labelText: "Montant (F)", hintText: "Ex: 5000", prefixIcon: Icon(Icons.payments_outlined, size: 18, color: ext.mutedForeground), filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
-                    validator: (v) => (v == null || v.isEmpty) ? "Indiquez le montant" : null,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colors.accentSoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.remove_circle_outline,
+                        color: colors.accent, size: 20),
                   ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _expenseDescController,
-                    maxLines: 3,
-                    style: TextStyle(color: ext.foreground, fontSize: 14),
-                    decoration: InputDecoration(labelText: "Description / Motif", hintText: "Ex: Achat de fournitures", prefixIcon: Icon(Icons.description_outlined, size: 18, color: ext.mutedForeground), filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
-                    validator: (v) => (v == null || v.isEmpty) ? "Indiquez le motif" : null,
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      "Nouvelle Dépense",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () { _expensePriceController.clear(); _expenseDescController.clear(); Navigator.pop(ctx); }, child: Text("Annuler", style: TextStyle(color: ext.mutedForeground))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: ext.foreground, foregroundColor: ext.background, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
-              onPressed: isSavingExpense ? null : () async {
-                if (_expenseFormKey.currentState!.validate()) {
-                  setPopupState(() => isSavingExpense = true);
-                  try {
-                    await SpendingServcie().saveSpending(Spending(price: double.parse(_expensePriceController.text), description: _expenseDescController.text, storeId: widget.store.id), context);
-                    if (mounted) { _expensePriceController.clear(); _expenseDescController.clear(); Navigator.pop(ctx); }
-                  } catch (e) { print(e); showErrorMessage("Erreur lors de l'enregistrement", context); } finally { if (mounted) setPopupState(() => isSavingExpense = false); }
-                }
-              },
-              child: isSavingExpense ? const BouTikaLoader.compact() : Text("Enregistrer", style: TextStyle(color: ext.background, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      }),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _expenseFormKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppTextField(
+                        controller: _expensePriceController,
+                        keyboardType: TextInputType.number,
+                        label: "Montant (F)",
+                        icon: Icons.payments_outlined,
+                        hint: "Ex: 2500",
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? "Indiquez le montant"
+                            : null,
+                      ),
+                      const SizedBox(height: 14),
+                      AppTextField(
+                        controller: _expenseDescController,
+                        maxLines: 2,
+                        label: "Description / Motif",
+                        icon: Icons.description_outlined,
+                        hint: "Ex: Transport marchandises",
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? "Indiquez le motif"
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
+                        onPressed: () {
+                          _expensePriceController.clear();
+                          _expenseDescController.clear();
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: AppButton.primary(
+                        label: "Enregistrer",
+                        height: 48,
+                        background: colors.accent,
+                        foreground: Colors.white,
+                        isLoading: isSavingExpense,
+                        onPressed: isSavingExpense
+                            ? null
+                            : () async {
+                          if (_expenseFormKey.currentState!
+                              .validate()) {
+                            setPopupState(
+                                () => isSavingExpense = true);
+                            try {
+                              await SpendingServcie().saveSpending(
+                                Spending(
+                                  price: double.parse(
+                                      _expensePriceController.text),
+                                  description:
+                                  _expenseDescController.text,
+                                  storeId: widget.store.id,
+                                ),
+                                context,
+                              );
+                              if (mounted) {
+                                _expensePriceController.clear();
+                                _expenseDescController.clear();
+                                Navigator.pop(ctx);
+                              }
+                            } catch (e) {
+                              print(e);
+                              showErrorMessage(
+                                  "Erreur lors de l'enregistrement",
+                                  context);
+                            } finally {
+                              if (mounted) {
+                                setPopupState(() =>
+                                isSavingExpense = false);
+                              }
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
     );
   }
 }
@@ -1685,35 +2251,56 @@ class _CategoryCardState extends State<_CategoryCard> {
       curve: Curves.easeOut,
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: ext.card,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: _expanded ? ext.foreground.withOpacity(0.15) : ext.border, width: 1),
-        boxShadow: widget.colors.cardShadow,
+        color: colors.card,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(
+          color: _expanded
+              ? colors.primary.withValues(alpha: 0.35)
+              : colors.border,
+          width: _expanded ? 1.3 : 1,
+        ),
+        boxShadow: colors.cardShadow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
                   AnimatedContainer(
-                    duration: AppDurations.normal,
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(color: _expanded ? ext.surfaceMuted : ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: ext.border)),
-                    child: Icon(Icons.category_outlined, color: _expanded ? ext.foreground : ext.mutedForeground, size: 18),
+                    duration: const Duration(milliseconds: 220),
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _expanded
+                          ? colors.primary.withValues(alpha: 0.14)
+                          : colors.primarySoft,
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Icon(Icons.category_rounded,
+                        color: colors.primary, size: 21),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(category.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: ext.foreground, letterSpacing: -0.1)),
+                        Text(
+                          category.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14.5,
+                            letterSpacing: -0.1,
+                            color: colors.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text("Gérer le stock et les prix", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ext.mutedForeground, fontSize: 12)),
                       ],
@@ -1724,10 +2311,17 @@ class _CategoryCardState extends State<_CategoryCard> {
                     turns: _expanded ? 0.5 : 0,
                     duration: AppDurations.normal,
                     child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(color: ext.surfaceMuted, shape: BoxShape.circle, border: Border.all(color: ext.border)),
-                      child: Icon(Icons.keyboard_arrow_down_rounded, color: ext.mutedForeground, size: 18),
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: colors.cardElevated,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.border),
+                      ),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: colors.textSecondary,
+                        size: 19,
+                      ),
                     ),
                   ),
                 ],
@@ -1746,13 +2340,16 @@ class _CategoryCardState extends State<_CategoryCard> {
                 children: [
                   Container(height: 1, color: ext.border),
                   const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(6), border: Border.all(color: ext.border)),
-                    child: Text("DESCRIPTION", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: ext.mutedForeground, letterSpacing: 0.8)),
-                  ),
+                  OverlineLabel(text: "Description"),
                   const SizedBox(height: 8),
-                  Text(category.description ?? "Aucune description fournie.", style: TextStyle(color: ext.foreground, height: 1.5, fontSize: 13)),
+                  Text(
+                    category.description ??
+                        "Aucune description fournie.",
+                    style: TextStyle(
+                        color: colors.textPrimary,
+                        height: 1.45,
+                        fontSize: 13),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -1788,20 +2385,41 @@ class _CategoryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ext = colors.ext;
     return Material(
-      color: filled ? ext.foreground : Colors.transparent,
+      color: filled ? colors.primary : Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadius.md),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.md), border: filled ? null : Border.all(color: ext.border, width: 1)),
+          padding: const EdgeInsets.symmetric(
+              vertical: 11, horizontal: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: filled
+                ? null
+                : Border.all(color: colors.border, width: 1.2),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 16, color: filled ? ext.background : ext.mutedForeground),
+              Icon(icon,
+                  size: 16,
+                  color: filled ? colors.onPrimary : colors.textPrimary),
               const SizedBox(width: 6),
-              Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: filled ? ext.background : ext.foreground))),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: filled
+                        ? colors.onPrimary
+                        : colors.textPrimary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

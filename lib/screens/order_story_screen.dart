@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/core/widgets/common/primitives.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/enums.dart';
 import 'package:mobile_store_app/models/order.dart';
@@ -208,66 +213,19 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   // HEADER (mode autonome)
   // =====================================================================
   Widget _buildHeader(DashColors c) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: c.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: c.border),
-              ),
-              child: Icon(Icons.arrow_back_ios_new_rounded,
-                  size: 18, color: c.textPrimary),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Historique des ventes",
-                  style: TextStyle(
-                    color: c.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "Toutes les commandes",
-                  style: TextStyle(
-                    color: c.textSecondary,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => _getOrders(
-                storeId: widget.storeId,
-                startDate: startDate,
-                endDate: endDate),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: c.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: c.border),
-              ),
-              child: Icon(Icons.refresh_rounded,
-                  size: 20, color: c.textPrimary),
-            ),
-          ),
-        ],
-      ),
+    return AppScreenHeader(
+      title: "Historique des ventes",
+      subtitle: "Toutes les commandes",
+      actions: [
+        AppIconButton(
+          icon: Icons.refresh_rounded,
+          tooltip: "Actualiser",
+          onTap: () => _getOrders(
+              storeId: widget.storeId,
+              startDate: startDate,
+              endDate: endDate),
+        ),
+      ],
     );
   }
 
@@ -276,19 +234,13 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   // =====================================================================
   Widget _buildFilterBar(DashColors c) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: c.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +250,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: c.primarySoft,
                     borderRadius: BorderRadius.circular(10),
@@ -314,6 +266,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                       color: c.textPrimary,
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ),
@@ -340,10 +293,32 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           Row(
             children: [
               Expanded(
-                  child: _dateChip(c, "Date début", startDate, true)),
+                child: FilterDateChip(
+                  label: "Date début",
+                  date: startDate,
+                  onTap: () => _pickDate(true),
+                  onClear: () {
+                    setState(() {
+                      startDate = null;
+                    });
+                    _applyFilters();
+                  },
+                ),
+              ),
               const SizedBox(width: 8),
               Expanded(
-                  child: _dateChip(c, "Date fin", endDate, false)),
+                child: FilterDateChip(
+                  label: "Date fin",
+                  date: endDate,
+                  onTap: () => _pickDate(false),
+                  onClear: () {
+                    setState(() {
+                      endDate = null;
+                    });
+                    _applyFilters();
+                  },
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -351,8 +326,8 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           // Dropdown statut
           Container(
             decoration: BoxDecoration(
-              color: c.background,
-              borderRadius: BorderRadius.circular(14),
+              color: c.cardElevated,
+              borderRadius: BorderRadius.circular(AppRadius.mlg),
               border: Border.all(color: c.border, width: 1.2),
             ),
             child: DropdownButtonFormField<OrderStatus>(
@@ -406,92 +381,37 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
     );
   }
 
-  Widget _dateChip(
-      DashColors c, String label, DateTime? date, bool isStart) {
-    final bool hasDate = date != null;
-    return GestureDetector(
-      onTap: () async {
-        DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2022),
-          lastDate: DateTime(2100),
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: c.primary,
-                  onPrimary: Colors.white,
-                  surface: c.card,
-                  onSurface: c.textPrimary,
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
-        if (picked != null) {
-          setState(() {
-            if (isStart) {
-              startDate = picked;
-            } else {
-              endDate = picked;
-            }
-          });
-          _applyFilters();
-        }
-      },
-      child: Container(
-        padding:
-        const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-        decoration: BoxDecoration(
-          color: hasDate ? c.primarySoft : c.background,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: hasDate
-                ? c.primary.withOpacity(0.3)
-                : c.border,
-            width: 1.2,
+  Future<void> _pickDate(bool isStart) async {
+    final c = DashColors(context);
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: c.primary,
+              onPrimary: Colors.white,
+              surface: c.card,
+              onSurface: c.textPrimary,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_month_rounded,
-              size: 16,
-              color: hasDate ? c.primary : c.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                hasDate
-                    ? DateFormat('dd/MM/yy').format(date!)
-                    : label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: hasDate ? c.primary : c.textSecondary,
-                ),
-              ),
-            ),
-            if (hasDate)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isStart) startDate = null;
-                    else endDate = null;
-                  });
-                  _applyFilters();
-                },
-                child: Icon(Icons.close_rounded,
-                    size: 14, color: c.primary),
-              ),
-          ],
-        ),
-      ),
+          child: child!,
+        );
+      },
     );
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          startDate = picked;
+        } else {
+          endDate = picked;
+        }
+      });
+      _applyFilters();
+    }
   }
 
   Widget _buildShortcuts(DashColors c) {
@@ -530,35 +450,38 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         required Color softColor,
         required VoidCallback onTap,
       }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding:
-        const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: softColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
+    return Material(
+      color: softColor,
+      borderRadius: BorderRadius.circular(AppRadius.mlg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.mlg),
+        child: Container(
+          padding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.mlg),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -572,7 +495,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       return Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min,           // <-- au lieu de max
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const BouTikaLoader(),
@@ -583,7 +506,9 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   "Chargement des commandes...",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
+                      color: c.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -593,7 +518,14 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
     }
 
     if (filteredOrders.isEmpty) {
-      return _buildEmptyState(c);
+      return EmptyState(
+        icon: Icons.receipt_long_rounded,
+        title: "Aucune commande trouvée",
+        message:
+        "Modifiez les filtres ou la période pour afficher les commandes.",
+        actionLabel: "Rafraîchir",
+        onAction: () => _getOrders(storeId: widget.storeId),
+      );
     }
 
     return RefreshIndicator(
@@ -606,7 +538,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       ),
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         itemCount: filteredOrders.length,
         itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -622,85 +554,6 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildEmptyState(DashColors c) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Si la hauteur dispo est faible, on réduit l'illustration
-        final bool compact = constraints.maxHeight < 320;
-        final double circle = compact ? 64 : 120;
-
-        return SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: compact ? 12 : 24,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,           // <-- clé
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: circle,
-                      height: circle,
-                      decoration: BoxDecoration(
-                        color: c.primarySoft,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: c.border),
-                      ),
-                      child: Icon(Icons.receipt_long_rounded,
-                          size: compact ? 28 : 50, color: c.primary),
-                    ),
-                    SizedBox(height: compact ? 12 : 28),
-                    Text(
-                      "Aucune commande trouvée",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: compact ? 16 : 20,
-                        fontWeight: FontWeight.w700,
-                        color: c.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: compact ? 6 : 10),
-                    Text(
-                      "Modifiez les filtres ou la période pour afficher les commandes.",
-                      textAlign: TextAlign.center,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: c.textSecondary,
-                        fontSize: compact ? 12.5 : 14,
-                        height: 1.4,
-                      ),
-                    ),
-                    SizedBox(height: compact ? 14 : 24),
-                    OutlinedButton.icon(
-                      onPressed: () => _getOrders(storeId: widget.storeId),
-                      icon: Icon(Icons.refresh_rounded, color: c.primary, size: 18),
-                      label: Text("Rafraîchir",
-                          style: TextStyle(
-                              color: c.primary, fontWeight: FontWeight.w600)),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 24, vertical: compact ? 10 : 14),
-                        side: BorderSide(color: c.primary),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -752,13 +605,13 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
             return AlertDialog(
               backgroundColor: c.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: c.border, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: c.border),
               ),
               contentPadding:
               const EdgeInsets.fromLTRB(24, 24, 24, 0),
               actionsPadding:
-              const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              const EdgeInsets.fromLTRB(24, 20, 24, 24),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -769,7 +622,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.delete_forever_rounded,
-                        color: c.danger, size: 32),
+                        color: c.danger, size: 30),
                   ),
                   const SizedBox(height: 18),
                   Text(
@@ -779,6 +632,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                       color: c.textPrimary,
                     ),
                   ),
@@ -791,7 +645,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     style: TextStyle(
                       color: c.textSecondary,
                       fontSize: 13.5,
-                      height: 1.45,
+                      height: 1.5,
                     ),
                   ),
                 ],
@@ -800,40 +654,24 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
-                          foregroundColor: c.textPrimary,
-                          side: BorderSide(
-                              color: c.border, width: 1.2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
+                      child: AppButton.secondary(
+                        label: "Annuler",
+                        height: 48,
                         onPressed: isDeleting
                             ? null
-                            : () =>
-                            Navigator.pop(dialogContext),
-                        child: const Text("Annuler",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600)),
+                            : () => Navigator.pop(dialogContext),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 2,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
-                          backgroundColor: c.danger,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
+                      child: AppButton.danger(
+                        label: widget.userType == 'employee'
+                            ? "Demander l'annulation"
+                            : "Supprimer",
+                        height: 48,
+                        fontSize: 13,
+                        isLoading: isDeleting,
                         onPressed: isDeleting
                             ? null
                             : () async {
@@ -877,16 +715,6 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
 
                           Navigator.pop(dialogContext);
                         },
-                        child: isDeleting
-                            ? const BouTikaLoader.compact()
-                            : Text(
-                          widget.userType == 'employee'
-                              ? "Demander l'annulation"
-                              : "Supprimer",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13),
-                        ),
                       ),
                     ),
                   ],
@@ -901,9 +729,9 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
 }
 
 // =====================================================================
-// ORDER CARD — Widget extrait
+// ORDER CARD — carte extensible
 // =====================================================================
-class _OrderCard extends StatelessWidget {
+class _OrderCard extends StatefulWidget {
   final Order order;
   final DashColors c;
   final String userType;
@@ -924,133 +752,165 @@ class _OrderCard extends StatelessWidget {
     required this.statusSoftColor,
   });
 
+  @override
+  State<_OrderCard> createState() => _OrderCardState();
+}
 
+class _OrderCardState extends State<_OrderCard> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
-    final Color sColor = statusColor(order.status);
-    final Color sSoft = statusSoftColor(order.status);
-    final double totalAmount = calculateTotal(order);
+    final c = widget.c;
+    final order = widget.order;
+    final Color sColor = widget.statusColor(order.status);
+    final Color sSoft = widget.statusSoftColor(order.status);
+    final double totalAmount = widget.calculateTotal(order);
     final String? username = UserService.username;
     final bool canAct = username == order.maker['username'] ||
-        (userType == 'employer' &&
+        (widget.userType == 'employer' &&
             order.status == OrderStatus.DELETION_PENDING);
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: c.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(
+          color: _expanded
+              ? sColor.withValues(alpha: 0.35)
+              : c.border,
+          width: _expanded ? 1.3 : 1,
+        ),
+        boxShadow: c.cardShadow,
       ),
-      child: Theme(
-        data: Theme.of(context)
-            .copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          childrenPadding: EdgeInsets.zero,
-          leading: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: sSoft,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: sColor.withOpacity(0.2)),
-            ),
-            child: Icon(Icons.receipt_rounded,
-                color: sColor, size: 22),
-          ),
-          title: Text(
-            "N°${order.orderId.substring(0, 8)}",
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-              color: c.textPrimary,
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Row(
+      child: Column(
+        children: [
+          // --- Header ---
+          InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
                 children: [
-                  Icon(Icons.access_time_rounded,
-                      size: 12, color: c.textSecondary),
-                  const SizedBox(width: 4),
-                  Text(
-                    DateFormat('dd MMM yyyy • HH:mm')
-                        .format(order.createdAt),
-                    style: TextStyle(
-                      color: c.textSecondary,
-                      fontSize: 11.5,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: sSoft,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: sColor.withValues(alpha: 0.2)),
                     ),
+                    child: Icon(Icons.receipt_rounded,
+                        color: sColor, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "N°${order.orderId.substring(0, 8)}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 14.5,
+                                letterSpacing: -0.1,
+                                color: c.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: sSoft,
+                                borderRadius:
+                                BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                widget.getStatusLabel(order.status),
+                                style: TextStyle(
+                                  color: sColor,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(Icons.access_time_rounded,
+                                size: 12, color: c.textSecondary),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                DateFormat('dd MMM yyyy • HH:mm')
+                                    .format(order.createdAt),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: c.textSecondary,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "$totalAmount F",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: c.primary,
+                          fontSize: 14.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      AnimatedRotation(
+                        turns: _expanded ? 0.5 : 0,
+                        duration:
+                        const Duration(milliseconds: 220),
+                        child: Icon(Icons.expand_more_rounded,
+                            size: 18, color: c.textSecondary),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: sSoft,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  getStatusLabel(order.status),
-                  style: TextStyle(
-                    color: sColor,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                "$totalAmount F",
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  color: c.primary,
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Icon(Icons.expand_more_rounded,
-                  size: 18, color: c.textSecondary),
-            ],
-          ),
-          children: [
-            Container(
+
+          // --- Contenu extensible ---
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            sizeCurve: Curves.easeOut,
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox(width: double.infinity),
+            secondChild: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Divider(color: c.border, height: 1),
+                  Container(height: 1, color: c.border),
                   const SizedBox(height: 16),
 
-                  // Titre section produits
-                  Text(
-                    "DÉTAILS PRODUITS",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: c.textSecondary,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  OverlineLabel(text: "Détails produits"),
                   const SizedBox(height: 12),
 
-                  // Produits
                   if (order.products.isNotEmpty)
                     ...order.products.entries.map((entry) {
                       final product = entry.key;
@@ -1066,7 +926,7 @@ class _OrderCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
-                            color: c.background,
+                            color: c.cardElevated,
                             borderRadius:
                             BorderRadius.circular(12),
                             border:
@@ -1113,7 +973,7 @@ class _OrderCard extends StatelessWidget {
                     }).toList(),
 
                   const SizedBox(height: 12),
-                  Divider(color: c.border, height: 1),
+                  Container(height: 1, color: c.border),
                   const SizedBox(height: 12),
 
                   // Vendeur
@@ -1123,7 +983,8 @@ class _OrderCard extends StatelessWidget {
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: c.infoSoft,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius:
+                          BorderRadius.circular(8),
                         ),
                         child: Icon(Icons.person_rounded,
                             size: 14, color: c.info),
@@ -1137,27 +998,33 @@ class _OrderCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text(
-                        order.maker?['username'] ?? 'N/A',
-                        style: TextStyle(
-                          color: c.textPrimary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          order.maker?['username'] ?? 'N/A',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: c.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
                   ),
 
-                  // Total
                   const SizedBox(height: 12),
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: c.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius:
+                      BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                          color: c.primary.withOpacity(0.2)),
+                          color:
+                          c.primary.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       mainAxisAlignment:
@@ -1186,61 +1053,30 @@ class _OrderCard extends StatelessWidget {
                   // Actions
                   if (canAct) ...[
                     const SizedBox(height: 12),
-                    Divider(color: c.border, height: 1),
+                    Container(height: 1, color: c.border),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton.icon(
+                          child: AppButton.soft(
+                            label: "Modifier",
+                            icon: Icons.edit_rounded,
+                            color: c.warning,
+                            softColor: c.warningSoft,
+                            height: 44,
                             onPressed: () {},
-                            icon: Icon(Icons.edit_rounded,
-                                size: 16, color: c.warning),
-                            label: Text("Modifier",
-                                style: TextStyle(
-                                    color: c.warning,
-                                    fontWeight:
-                                    FontWeight.w600)),
-                            style: OutlinedButton.styleFrom(
-                              padding:
-                              const EdgeInsets.symmetric(
-                                  vertical: 12),
-                              side: BorderSide(
-                                  color: c.warning
-                                      .withOpacity(0.4)),
-                              backgroundColor: c.warningSoft,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(12),
-                              ),
-                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: onDelete,
-                            icon: const Icon(
-                                Icons.delete_outline_rounded,
-                                size: 16),
-                            label: Text(
-                              userType == 'employee'
-                                  ? "Annuler"
-                                  : "Supprimer",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              padding:
-                              const EdgeInsets.symmetric(
-                                  vertical: 12),
-                              backgroundColor: c.danger,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(12),
-                              ),
-                            ),
+                          child: AppButton.danger(
+                            label: widget.userType == 'employee'
+                                ? "Annuler"
+                                : "Supprimer",
+                            icon:
+                            Icons.delete_outline_rounded,
+                            height: 44,
+                            onPressed: widget.onDelete,
                           ),
                         ),
                       ],
@@ -1249,8 +1085,8 @@ class _OrderCard extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

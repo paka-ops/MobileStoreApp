@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/models/employer.dart';
 import 'package:mobile_store_app/screens/login_screen.dart';
 import 'package:mobile_store_app/service/employer_service.dart';
@@ -246,11 +247,15 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   Widget _buildStepControls(BuildContext context, ControlsDetails details, DashColors colors) {
     bool isLastStep = _currentStep == 2;
 
-    _isLoading == true ? Future.delayed(const Duration(seconds: 7), () {
-      setState(() {
-        _isLoading = false;
+    if (_isLoading) {
+      Future.delayed(const Duration(seconds: 7), () {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       });
-    }) : null;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 30),
@@ -258,32 +263,20 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
         children: [
           if (_currentStep > 0)
             Expanded(
-              child: OutlinedButton(
+              child: AppButton.secondary(
+                label: "Retour",
+                height: 48,
                 onPressed: details.onStepCancel,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  side: BorderSide(color: colors.border, width: 1.1),
-                  foregroundColor: colors.textPrimary,
-                  backgroundColor: colors.card,
-                ),
-                child: const Text("Retour", style: TextStyle(fontWeight: FontWeight.w600)),
               ),
             ),
           if (_currentStep > 0) const SizedBox(width: 15),
           Expanded(
-            child: ElevatedButton(
+            flex: 2,
+            child: AppButton.primary(
+              label: isLastStep ? "Terminer l'inscription" : "Suivant",
+              height: 48,
+              isLoading: _isLoading,
               onPressed: _isLoading ? null : details.onStepContinue,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: _isLoading
-                  ? const BouTikaLoader.compact()
-                  : Text(isLastStep ? "Terminer l'inscription" : "Suivant", style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
