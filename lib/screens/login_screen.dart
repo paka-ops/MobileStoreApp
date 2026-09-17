@@ -28,24 +28,17 @@ class LoginScreen extends StatelessWidget {
               children: [
                 // Marque
                 Container(
-                  width: 66,
-                  height: 66,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
-                    gradient: colors.accentGradient,
+                    color: colors.primarySoft,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: colors.gradientColors.first
-                            .withValues(alpha: 0.28),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    boxShadow: colors.cardShadow,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.storefront_rounded,
-                    color: Colors.white,
-                    size: 30,
+                    color: colors.primary,
+                    size: 28,
                   ),
                 ),
                 const SizedBox(height: 18),

@@ -77,7 +77,8 @@ class CustomTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashColors c = DashColors(context);
-    final Color active = activeColor ?? c.primary;
+    // Onglet actif en ENCRE (sobre) plutôt qu'en couleur vive.
+    final Color active = activeColor ?? c.ink;
 
     final List<CustomTabItem> tabs = items.isNotEmpty
         ? items
@@ -116,7 +117,7 @@ class CustomTabBar extends StatelessWidget {
                         vertical: 1,
                       ),
                       decoration: BoxDecoration(
-                        color: selected ? c.primarySoft : c.fill,
+                        color: c.fill,
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                       child: Text(
@@ -124,7 +125,7 @@ class CustomTabBar extends StatelessWidget {
                         style: AppTextStyles.label.copyWith(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: selected ? active : c.textSecondary,
+                          color: selected ? c.textPrimary : c.textSecondary,
                         ),
                       ),
                     ),
@@ -136,8 +137,8 @@ class CustomTabBar extends StatelessWidget {
               AnimatedContainer(
                 duration: AppDurations.normal,
                 curve: AppCurves.standard,
-                height: 3,
-                width: selected ? 24 : 0,
+                height: 2.5,
+                width: selected ? 22 : 0,
                 decoration: BoxDecoration(
                   color: active,
                   borderRadius: BorderRadius.circular(AppRadius.pill),

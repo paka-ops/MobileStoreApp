@@ -87,14 +87,17 @@ class FloatingRatingCard extends StatelessWidget {
 
     return PressableScale(
       onTap: onTap,
-      child: Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          color: background ?? c.card,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          boxShadow: c.floatingShadow,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: background ?? c.card,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            boxShadow: c.floatingShadow,
+          ),
+          child: compact ? _buildCompact(c) : _buildFull(c),
         ),
-        child: compact ? _buildCompact(c) : _buildFull(c),
       ),
     );
   }
@@ -219,18 +222,17 @@ class _Avatar extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: hasInitials ? c.accentGradient : null,
-        color: hasInitials ? null : c.primarySoft,
+        color: hasInitials ? c.primarySoft : c.fill,
       ),
       child: hasInitials
           ? Text(
               initials!.trim().substring(0, 1).toUpperCase(),
               style: AppTextStyles.cardTitle.copyWith(
-                color: Colors.white,
+                color: c.primary,
                 fontSize: size * 0.38,
               ),
             )
-          : Icon(icon, size: size * 0.5, color: c.primary),
+          : Icon(icon, size: size * 0.5, color: c.textSecondary),
     );
   }
 }

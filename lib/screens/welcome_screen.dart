@@ -101,10 +101,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     Text(
                       "BouTiKa",
-                      style: AppTextStyles.greeting.copyWith(
-                        color: colors.primary,
-                        fontSize: 17,
-                      ),
+                      style: AppTextStyles.brand
+                          .copyWith(color: colors.textPrimary),
                     ),
                     Text(
                       "Mes Boutiques",
@@ -480,22 +478,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 150,
-              height: 150,
+              width: 148,
+              height: 148,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: colors.accentGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: colors.gradientColors.first
-                        .withValues(alpha: 0.28),
-                    blurRadius: 30,
-                    offset: const Offset(0, 14),
-                  ),
-                ],
+                color: colors.primarySoft,
+                boxShadow: colors.cardShadow,
               ),
-              child: const Icon(Icons.storefront_rounded,
-                  size: 66, color: Colors.white),
+              child: Icon(Icons.storefront_rounded,
+                  size: 60, color: colors.primary),
             ),
             const SizedBox(height: 34),
             Text(

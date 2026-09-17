@@ -265,15 +265,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       ),
       avatarIcon: Icons.storefront_rounded,
       onTapAvatar: () => _showStoreSwitcherSheet(context, colors),
-      extraActions: [
-        AppIconButton(
-          icon: appDarkMode.value
-              ? Icons.light_mode_rounded
-              : Icons.dark_mode_rounded,
-          tooltip: "Thème",
-          onTap: () => appDarkMode.value = !appDarkMode.value,
-        ),
-      ],
     );
   }
 
@@ -502,34 +493,43 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   Widget _buildKpiRow(BuildContext context, DashColors colors) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: GradientInfoCard(
-              icon: Icons.inventory_2_outlined,
-              label: "Produits",
-              value: "${allStoreProducts.length}",
+      // IntrinsicHeight + stretch : les deux tuiles gardent la même hauteur,
+      // quel que soit le contenu (aucun désalignement, aucun overflow).
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: GradientInfoCard(
+                icon: Icons.inventory_2_outlined,
+                label: "Produits",
+                value: "${allStoreProducts.length}",
+                caption: "en catalogue",
+                tint: colors.pastelAt(1),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: GradientInfoCard(
-              icon: Icons.warning_amber_rounded,
-              label: "Alertes",
-              value: "${lowStockProducts.length}",
-              navyVariant: true,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => LowStockProductDetailsScreen(
-                    products: lowStockProducts,
-                    userType: widget.userType,
+            const SizedBox(width: 12),
+            Expanded(
+              child: GradientInfoCard(
+                icon: Icons.warning_amber_rounded,
+                label: "Alertes",
+                value: "${lowStockProducts.length}",
+                caption: "sous le seuil",
+                tint: colors.pastelAt(0),
+                showChevron: true,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LowStockProductDetailsScreen(
+                      products: lowStockProducts,
+                      userType: widget.userType,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -627,10 +627,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: Row(
             children: [
               CircleAvatar(
-                radius: 24,
-                backgroundColor: colors.primarySoft,
+                radius: 23,
+                backgroundColor: colors.fill,
                 child:
-                    Icon(Icons.person, color: colors.primary, size: 24),
+                    Icon(Icons.person, color: colors.textSecondary, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -642,7 +642,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 15,
                           letterSpacing: -0.2,
                           color: colors.textPrimary),
@@ -652,7 +652,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 9, vertical: 3),
                       decoration: BoxDecoration(
-                        color: colors.primarySoft,
+                        color: colors.fill,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -660,9 +660,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             ? "EMPLOYÉ"
                             : "PROPRIÉTAIRE",
                         style: TextStyle(
-                          color: colors.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                          color: colors.textSecondary,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -681,6 +681,24 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           borderColor: Colors.transparent,
           child: Column(
             children: [
+              // Bascule de thème (même logique qu'avant, simplement
+              // déplacée du header vers « Plus » pour alléger l'en-tête).
+              ServiceListTile(
+                icon: Icons.dark_mode_outlined,
+                title: "Thème sombre",
+                subtitle: appDarkMode.value
+                    ? "Activé"
+                    : "Désactivé",
+                pastel: colors.fill,
+                iconColor: colors.textSecondary,
+                showChevron: false,
+                trailing: Switch(
+                  value: appDarkMode.value,
+                  onChanged: (value) => appDarkMode.value = value,
+                ),
+                onTap: () => appDarkMode.value = !appDarkMode.value,
+              ),
+              Divider(height: 1, color: colors.hairline),
               ServiceListTile(
                 icon: Icons.account_balance_wallet_outlined,
                 title: "Mes Dépenses",
@@ -825,11 +843,11 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: colors.primarySoft,
+                          color: colors.fill,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(Icons.add_rounded,
-                            color: colors.primary, size: 22),
+                            color: colors.textPrimary, size: 21),
                       ),
                       const SizedBox(height: 5),
                       Text("Ajouter",
@@ -864,20 +882,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               Container(
                 width: 46,
                 height: 46,
-                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.card,
-                  boxShadow: colors.cardShadow,
+                  color: colors.pastelAt(emp.username?.length ?? 0),
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: colors.accentGradient,
-                  ),
-                  child: const Icon(Icons.person,
-                      color: Colors.white, size: 20),
-                ),
+                child: Icon(Icons.person,
+                    color: colors.textSecondary, size: 20),
               ),
               const SizedBox(height: 5),
               Text(
@@ -918,18 +928,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
-                color: colors.primarySoft,
+                color: colors.fill,
                 borderRadius: BorderRadius.circular(AppRadius.card),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.add_rounded,
-                      color: colors.primary, size: 20),
+                      color: colors.textPrimary, size: 20),
                   const SizedBox(width: 8),
                   Text("Ajouter une catégorie",
                       style: TextStyle(
-                          color: colors.primary,
+                          color: colors.textPrimary,
                           fontWeight: FontWeight.w600,
                           fontSize: 13.5)),
                 ],

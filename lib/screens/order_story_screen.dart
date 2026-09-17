@@ -814,13 +814,17 @@ class _OrderCardState extends State<_OrderCard> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              "N°${order.orderId.substring(0, 8)}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14.5,
-                                letterSpacing: -0.1,
-                                color: c.textPrimary,
+                            Flexible(
+                              child: Text(
+                                "N°${order.orderId.substring(0, 8)}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.5,
+                                  letterSpacing: -0.1,
+                                  color: c.textPrimary,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),

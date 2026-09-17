@@ -77,41 +77,41 @@ class ChatFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashColors c = DashColors(context);
-    final Gradient g = gradient ?? c.accentGradient;
+    // Pastille encre par défaut (comme les boutons pillules des apps premium).
+    final Gradient g = gradient ?? c.inkWash;
     final bool isPill = label != null;
 
     Widget content;
     if (isPill) {
-      content = Container(
+      content = ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 220),
+        child: Container(
         height: size,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           gradient: g,
           borderRadius: BorderRadius.circular(AppRadius.button),
-          boxShadow: [
-            BoxShadow(
-              color: c.gradientColors.first.withValues(alpha: 0.32),
-              blurRadius: 22,
-              offset: const Offset(0, 10),
-            ),
-          ],
+          boxShadow: c.floatingShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(leadingIcon ?? icon, size: 20, color: Colors.white),
             const SizedBox(width: 8),
-            Text(
-              label!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.button.copyWith(
-                color: Colors.white,
-                fontSize: 14.5,
+            Flexible(
+              child: Text(
+                label!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.button.copyWith(
+                  color: Colors.white,
+                  fontSize: 14.5,
+                ),
               ),
             ),
           ],
         ),
+      ),
       );
     } else {
       content = Container(
@@ -120,13 +120,7 @@ class ChatFab extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: g,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: c.gradientColors.first.withValues(alpha: 0.34),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-          ],
+          boxShadow: c.floatingShadow,
         ),
         child: Icon(icon, size: 25, color: Colors.white),
       );

@@ -63,8 +63,8 @@ ThemeData buildAppTheme(bool dark) {
       isDark ? AppColors.darkTextSecondary : AppColors.textGrey;
 
   // Couleurs signature du design system
-  final Color navy = isDark ? AppColors.darkNavy : AppColors.navy;
-  final Color onNavy = isDark ? AppColors.darkOnNavy : AppColors.onNavy;
+  final Color ink = isDark ? AppColors.darkInk : AppColors.ink;
+  final Color onInk = isDark ? AppColors.darkOnInk : AppColors.onInk;
   final Color fill = isDark ? AppColors.darkFill : AppColors.fill;
   final Color rating = isDark ? AppColors.darkRating : AppColors.rating;
   final Color ratingSoft =
@@ -93,7 +93,7 @@ ThemeData buildAppTheme(bool dark) {
     onSurface: textPrimary,
     onSurfaceVariant: textSecondary,
     tertiary: rating,
-    onTertiary: AppColors.navy,
+    onTertiary: AppColors.ink,
     tertiaryContainer: ratingSoft,
     onTertiaryContainer: textPrimary,
     surfaceContainerLowest: card,
@@ -212,9 +212,9 @@ ThemeData buildAppTheme(bool dark) {
     canvasColor: background,
     cardColor: card,
     dividerColor: border,
-    splashFactory: InkRipple.splashFactory,
-    highlightColor: primary.withValues(alpha: 0.06),
-    splashColor: primary.withValues(alpha: 0.10),
+    splashFactory: InkSparkle.splashFactory,
+    highlightColor: ink.withValues(alpha: 0.03),
+    splashColor: ink.withValues(alpha: 0.05),
 
     appBarTheme: AppBarTheme(
       backgroundColor: background,
@@ -233,8 +233,8 @@ ThemeData buildAppTheme(bool dark) {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: navy,
-        foregroundColor: onNavy,
+        backgroundColor: ink,
+        foregroundColor: onInk,
         disabledBackgroundColor:
             isDark ? AppColors.darkCardElevated : const Color(0xFFD6DAE3),
         disabledForegroundColor: isDark
@@ -245,7 +245,7 @@ ThemeData buildAppTheme(bool dark) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        textStyle: AppTextStyles.button.copyWith(color: onNavy),
+        textStyle: AppTextStyles.button.copyWith(color: onInk),
       ),
     ),
     outlinedButtonTheme: outlinedBtn,
@@ -253,14 +253,14 @@ ThemeData buildAppTheme(bool dark) {
 
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: navy,
-        foregroundColor: onNavy,
+        backgroundColor: ink,
+        foregroundColor: onInk,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        textStyle: AppTextStyles.button.copyWith(color: onNavy),
+        textStyle: AppTextStyles.button.copyWith(color: onInk),
       ),
     ),
 
@@ -271,10 +271,10 @@ ThemeData buildAppTheme(bool dark) {
     ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primary,
-      foregroundColor: onPrimary,
-      elevation: 4,
-      highlightElevation: 6,
+      backgroundColor: ink,
+      foregroundColor: onInk,
+      elevation: 6,
+      highlightElevation: 8,
       shape: const CircleBorder(),
     ),
 
@@ -285,7 +285,7 @@ ThemeData buildAppTheme(bool dark) {
         borderRadius: BorderRadius.circular(AppRadius.xl),
         side: BorderSide(color: border),
       ),
-      elevation: isDark ? 12 : 10,
+      elevation: isDark ? 14 : 12,
       titleTextStyle: AppTextStyles.h3.copyWith(
         fontSize: 17.5,
         color: textPrimary,
@@ -348,7 +348,7 @@ ThemeData buildAppTheme(bool dark) {
 
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
-      backgroundColor: navy,
+      backgroundColor: ink,
       contentTextStyle: AppTextStyles.body.copyWith(
         color: Colors.white,
         fontWeight: FontWeight.w500,

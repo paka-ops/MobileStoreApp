@@ -6,12 +6,13 @@ import 'app_colors.dart';
 /// ============================================================================
 /// APP TEXT STYLES — hiérarchie typographique du design system.
 ///
-/// Police : **Poppins** (via le package `google_fonts`).
-/// Les styles sont `final` (et non `const`) car GoogleFonts résout la police
-/// à l'exécution : la famille est téléchargée/mise en cache au premier rendu.
+/// Police : **Poppins** (package `google_fonts`).
+/// Les styles sont `final` (GoogleFonts résout la police à l'exécution : elle
+/// est téléchargée puis mise en cache au premier rendu).
 ///
-/// Si l'appareil est hors ligne au premier lancement, Flutter retombe
-/// proprement sur la police système — aucune erreur, aucun écran cassé.
+/// Principe « calm premium » (inspiré des apps haut de gamme) :
+///   label gris discret  →  valeur encre, grande et nette.
+/// Les graisses restent en w500–w700 : jamais de w800/w900 « criards ».
 ///
 /// ⚠️ Tous les anciens noms (display, h1…h3, body, caption, overline, button,
 ///    amount, cardTitle, withColor) sont conservés à l'identique.
@@ -26,36 +27,35 @@ class AppTextStyles {
   // ÉCHELLE DE BASE
   // ==========================================================================
 
-  // ---- Display / Titres ------------------------------------------------------
-  /// 40 / Bold — écrans héro (rarement utilisé)
+  /// 32 / Bold — écrans héro (rarement utilisé)
   static final TextStyle display = GoogleFonts.poppins(
-    fontSize: 40,
-    height: 1.15,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.8,
-  );
-
-  /// 32 / Bold
-  static final TextStyle h1 = GoogleFonts.poppins(
     fontSize: 32,
-    height: 1.2,
+    height: 1.18,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.6,
   );
 
-  /// 24 / Bold — titres de section majeurs
+  /// 28 / Bold
+  static final TextStyle h1 = GoogleFonts.poppins(
+    fontSize: 28,
+    height: 1.2,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.5,
+  );
+
+  /// 22 / Bold
   static final TextStyle h2 = GoogleFonts.poppins(
-    fontSize: 24,
+    fontSize: 22,
     height: 1.25,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.4,
   );
 
-  /// 20 / Bold — titres de pages
+  /// 19 / SemiBold — titres de pages
   static final TextStyle h3 = GoogleFonts.poppins(
-    fontSize: 20,
+    fontSize: 19,
     height: 1.3,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     letterSpacing: -0.2,
   );
 
@@ -74,26 +74,26 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
   );
 
-  /// 13 / Regular — corps compact (listes denses)
+  /// 13 / Regular
   static final TextStyle bodySmall = GoogleFonts.poppins(
     fontSize: 13,
     height: 1.45,
     fontWeight: FontWeight.w400,
   );
 
-  /// 12 / Regular — petites descriptions
+  /// 12 / Regular
   static final TextStyle caption = GoogleFonts.poppins(
     fontSize: 12,
     height: 1.4,
     fontWeight: FontWeight.w400,
   );
 
-  /// 11 / Bold / espacement large — surtitres « ÉTAT DU STOCK »
+  /// 11 / SemiBold / espacement large — surtitres « ÉTAT DU STOCK »
   static final TextStyle overline = GoogleFonts.poppins(
     fontSize: 11,
     height: 1.2,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 1.2,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 1.0,
   );
 
   /// 15 / SemiBold — libellés de boutons
@@ -105,42 +105,62 @@ class AppTextStyles {
   );
 
   // ==========================================================================
-  // STYLES DU DESIGN SYSTEM (header, cards, listes, labels)
+  // STYLES DU DESIGN SYSTEM
   // ==========================================================================
 
-  /// 24 / Bold — « Bonjour Amanda » : greeting du header
-  static final TextStyle greeting = GoogleFonts.poppins(
-    fontSize: 24,
-    height: 1.2,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.4,
+  /// 13 / Medium — petite ligne grise au-dessus d'un titre
+  /// (« Bonjour, Amanda », « Total balance »)
+  static final TextStyle eyebrow = GoogleFonts.poppins(
+    fontSize: 13,
+    height: 1.3,
+    fontWeight: FontWeight.w500,
   );
 
-  /// 22 / Bold — nom principal d'une fiche (profil, produit, boutique)
+  /// Compatibilité : le « greeting » du header est désormais l'eyebrow.
+  static final TextStyle greeting = eyebrow;
+
+  /// 26 / Bold — grand chiffre (solde, total du jour)
+  static final TextStyle metric = GoogleFonts.poppins(
+    fontSize: 26,
+    height: 1.15,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.8,
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
+
+  /// 21 / Bold — valeur principale d'un en-tête (nom de boutique, profil)
   static final TextStyle name = GoogleFonts.poppins(
-    fontSize: 22,
+    fontSize: 21,
     height: 1.2,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.3,
   );
 
-  /// 16 / Medium — sous-titre de header (localisation, spécialité)
+  /// 17.5 / Bold — titre de section (« Transactions », « Dépenses »)
+  static final TextStyle sectionTitle = GoogleFonts.poppins(
+    fontSize: 17.5,
+    height: 1.25,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.3,
+  );
+
+  /// 15 / Medium — sous-titre d'en-tête (localisation, rôle)
   static final TextStyle subtitle = GoogleFonts.poppins(
-    fontSize: 15,
+    fontSize: 14.5,
     height: 1.35,
     fontWeight: FontWeight.w500,
   );
 
-  /// 15 / SemiBold — titre d'une carte / d'un item de liste
+  /// 14.5 / SemiBold — titre d'une carte / d'une ligne
   static final TextStyle cardTitle = GoogleFonts.poppins(
-    fontSize: 15,
+    fontSize: 14.5,
     height: 1.35,
     fontWeight: FontWeight.w600,
   );
 
-  /// 13 / Medium — texte secondaire d'item de liste
+  /// 12.5 / Regular — texte secondaire d'une ligne
   static final TextStyle tileSubtitle = GoogleFonts.poppins(
-    fontSize: 13,
+    fontSize: 12.5,
     height: 1.35,
     fontWeight: FontWeight.w400,
   );
@@ -159,34 +179,42 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
   );
 
-  /// 13 / Bold — note de rating posée près d'une étoile
+  /// 13 / Bold — note posée près d'une étoile
   static final TextStyle rating = GoogleFonts.poppins(
     fontSize: 13,
     height: 1.2,
     fontWeight: FontWeight.w700,
   );
 
+  /// 17 / Bold — lettrage de marque (« BouTiKa »)
+  static final TextStyle brand = GoogleFonts.poppins(
+    fontSize: 17,
+    height: 1.2,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.2,
+  );
+
   // ---- Variantes numériques -------------------------------------------------
-  /// Montants / KPI — 18 / ExtraBold / chiffres tabulaires
+  /// Montant principal — 15 / Bold / chiffres tabulaires
   static final TextStyle amount = GoogleFonts.poppins(
-    fontSize: 18,
+    fontSize: 15,
     height: 1.25,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.2,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 
-  /// Petit montant — 14 / Bold
+  /// Petit montant — 13.5 / SemiBold
   static final TextStyle amountSmall = GoogleFonts.poppins(
-    fontSize: 14,
+    fontSize: 13.5,
     height: 1.3,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 
   /// Grand chiffre de statistique (fiches profil / détail)
   static final TextStyle statValue = GoogleFonts.poppins(
-    fontSize: 17,
+    fontSize: 16.5,
     height: 1.2,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.3,
@@ -215,35 +243,33 @@ class AppTextStyles {
 }
 
 /// ============================================================================
-/// TEXT STYLES THÉMÉS — raccourcis couleurs (headers, listes, labels).
+/// TEXT STYLES THÉMÉS — raccourcis couleurs.
 ///
 ///   final t = AppTextTheme(context);
-///   Text("Bonjour", style: t.greeting)
+///   Text("Bonjour", style: t.eyebrow)
 /// ============================================================================
 class AppTextTheme {
   final DashColors c;
 
   AppTextTheme(BuildContext context) : c = DashColors(context);
 
+  TextStyle get eyebrow =>
+      AppTextStyles.eyebrow.copyWith(color: c.textSecondary);
   TextStyle get greeting =>
-      AppTextStyles.greeting.copyWith(color: c.textPrimary);
+      AppTextStyles.eyebrow.copyWith(color: c.textSecondary);
   TextStyle get name => AppTextStyles.name.copyWith(color: c.textPrimary);
-  TextStyle get title => AppTextStyles.h3.copyWith(color: c.textPrimary);
+  TextStyle get metric => AppTextStyles.metric.copyWith(color: c.textPrimary);
+  TextStyle get title =>
+      AppTextStyles.sectionTitle.copyWith(color: c.textPrimary);
   TextStyle get subtitle =>
       AppTextStyles.subtitle.copyWith(color: c.textSecondary);
-  TextStyle get cardTitle => AppTextStyles.cardTitle.copyWith(color: c.textPrimary);
+  TextStyle get cardTitle =>
+      AppTextStyles.cardTitle.copyWith(color: c.textPrimary);
   TextStyle get body => AppTextStyles.body.copyWith(color: c.textPrimary);
   TextStyle get muted => AppTextStyles.body.copyWith(color: c.textSecondary);
   TextStyle get label => AppTextStyles.label.copyWith(color: c.textSecondary);
   TextStyle get tileTitle =>
-      GoogleFonts.poppins(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-        color: c.textPrimary,
-      );
-  TextStyle get tileSubtitle => GoogleFonts.poppins(
-        fontSize: 13,
-        fontWeight: FontWeight.w400,
-        color: c.textSecondary,
-      );
+      AppTextStyles.cardTitle.copyWith(color: c.textPrimary);
+  TextStyle get tileSubtitle =>
+      AppTextStyles.tileSubtitle.copyWith(color: c.textSecondary);
 }

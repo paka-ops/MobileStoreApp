@@ -18,7 +18,6 @@ class AppDecorations {
       BoxDecoration(
         color: c.card,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: c.border, width: 1),
         boxShadow: c.cardShadow,
       );
 
@@ -91,10 +90,27 @@ class AppDecorations {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       );
 
-  /// Surface navy des barres flottantes (bottom nav).
+  /// Surface des barres flottantes (bottom nav) — claire et discrète.
   static BoxDecoration floatingNav(DashColors c) => BoxDecoration(
-        color: c.navy,
+        color: c.navSurface,
         borderRadius: BorderRadius.circular(AppRadius.navPill),
+        boxShadow: c.floatingShadow,
+      );
+
+  /// Carte « wash » : dégradé très pâle (teinte → blanc), texte encre.
+  /// C'est la carte d'information premium : la couleur n'est qu'une trace.
+  static BoxDecoration washCard(DashColors c, {Color? tint, double radius = AppRadius.xl}) =>
+      BoxDecoration(
+        gradient: c.wash(tint: tint),
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: c.cardShadow,
+      );
+
+  /// Carte encre (surface forte, texte blanc) — usage rare et volontaire.
+  static BoxDecoration inkCard(DashColors c, {double radius = AppRadius.xl}) =>
+      BoxDecoration(
+        gradient: c.inkWash,
+        borderRadius: BorderRadius.circular(radius),
         boxShadow: c.floatingShadow,
       );
 }
@@ -105,8 +121,8 @@ class AppDecorations {
 class AppGradients {
   AppGradients._();
 
-  /// Dégradé d'accent TEAL → ÉMERAUDE, diagonal (topLeft → bottomRight).
-  /// C'est LE dégradé signature (#0D9488 → #10B981) des cartes d'info.
+  /// Dégradé de marque (teal profond → teal), diagonal.
+  /// ⚠️ Réservé au logo et aux héro : jamais une grande surface saturée.
   static LinearGradient accent(DashColors c) => c.accentGradient;
 
   /// Alias explicite : dégradé teal du design system.
@@ -122,24 +138,20 @@ class AppGradients {
         end: Alignment.bottomRight,
       );
 
-  /// Dégradé caméléon : navy → teal (bandeaux premium, écrans d'accueil)
-  static LinearGradient navyToTeal(DashColors c) => LinearGradient(
-        colors: [
-          c.navy,
-          Color.lerp(c.navy, c.primary, 0.55) ?? c.primary,
-          c.gradientColors.last,
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
+  /// Dégradé encre neutre (bandeaux premium, écrans d'accueil).
+  static LinearGradient navyToTeal(DashColors c) => c.inkWash;
 
-  /// Voile doux derrière les illustrations
+  /// Wash très pâle d'une teinte (cartes d'info, tuiles teintées).
+  static LinearGradient wash(DashColors c, {Color? tint}) => c.wash(tint: tint);
+
+  /// Voile d'écran : wash très pâle en haut → fond neutre (effet premium).
   static LinearGradient heroWash(DashColors c) => LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          c.primarySoft.withValues(alpha: 0.6),
+          c.backgroundWash,
           c.background,
         ],
+        stops: const [0.0, 0.45],
       );
 }

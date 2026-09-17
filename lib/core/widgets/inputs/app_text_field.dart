@@ -78,39 +78,39 @@ class AppTextField extends StatelessWidget {
         ),
         hintStyle: TextStyle(color: c.textSecondary, fontSize: 13.5),
         filled: true,
-        fillColor: c.cardElevated,
+        fillColor: c.fill,
         prefixIcon: icon != null
             ? Padding(
                 padding: const EdgeInsets.all(13),
-                child: Icon(icon, color: c.primary, size: 20),
+                child: Icon(icon, color: c.textSecondary, size: 19),
               )
             : null,
         suffixIcon: suffix,
         contentPadding:
             const EdgeInsets.symmetric(vertical: 17, horizontal: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          borderSide: BorderSide(color: c.border, width: 1.2),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          borderSide: BorderSide(color: c.border, width: 1.2),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          borderSide: BorderSide(color: c.primary, width: 1.8),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: c.primary, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           borderSide: BorderSide(color: c.danger, width: 1.3),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          borderSide: BorderSide(color: c.danger, width: 1.8),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: c.danger, width: 1.5),
         ),
         disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          borderSide: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
       ),
     );
@@ -150,9 +150,8 @@ class _AppSearchFieldState extends State<AppSearchField> {
 
     return Container(
       decoration: BoxDecoration(
-        color: c.card,
-        borderRadius: BorderRadius.circular(AppRadius.mlg),
-        border: Border.all(color: c.border),
+        color: c.fill,
+        borderRadius: BorderRadius.circular(AppRadius.search),
       ),
       child: TextField(
         controller: _controller,
@@ -229,12 +228,8 @@ class FilterDateChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
         decoration: BoxDecoration(
-          color: hasDate ? c.primarySoft : c.cardElevated,
-          borderRadius: BorderRadius.circular(AppRadius.mlg),
-          border: Border.all(
-            color: hasDate ? c.primary.withValues(alpha: 0.35) : c.border,
-            width: 1.2,
-          ),
+          color: c.fill,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [

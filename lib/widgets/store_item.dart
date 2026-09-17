@@ -114,11 +114,11 @@ class _StoreItemState extends State<StoreItem> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: colors.primarySoft,
+                      color: colors.fill,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.edit_rounded,
-                        color: colors.primary, size: 22),
+                        color: colors.textPrimary, size: 21),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -522,17 +522,16 @@ class _StoreItemState extends State<StoreItem> {
                       decoration: BoxDecoration(
                         color: colors.background,
                         borderRadius:
-                        BorderRadius.circular(16),
-                        border: Border.all(color: colors.border),
+                        BorderRadius.circular(AppRadius.lg),
                       ),
                       child: Row(
                         children: [
                           _buildActionButton(
                             icon: Icons.edit_rounded,
                             label: "Modifier",
-                            color: colors.primary,
-                            backgroundColor: colors.primarySoft,
-                            labelColor: colors.primary,
+                            color: colors.fill,
+                            backgroundColor: colors.fill,
+                            labelColor: colors.textPrimary,
                             onTap: () {
                               setState(
                                       () => _showActions = false);
@@ -589,9 +588,8 @@ class _StoreItemState extends State<StoreItem> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colors.border),
+        color: colors.fill,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

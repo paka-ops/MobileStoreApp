@@ -40,7 +40,7 @@ class FloatingPriceTag extends StatelessWidget {
   final Alignment alignment;
   final EdgeInsetsGeometry inset;
 
-  /// Fond blanc par défaut ; `accent: true` → dégradé teal + texte blanc.
+  /// Fond blanc par défaut ; `accent: true` → surface encre + texte blanc.
   final bool accent;
 
   final Widget? trailing;
@@ -77,7 +77,7 @@ class FloatingPriceTag extends StatelessWidget {
     final DashColors c = DashColors(context);
     final Color titleColor = accent ? Colors.white : c.textPrimary;
     final Color labelColor = accent
-        ? Colors.white.withValues(alpha: 0.88)
+        ? Colors.white.withValues(alpha: 0.72)
         : c.textSecondary;
 
     return Align(
@@ -86,66 +86,72 @@ class FloatingPriceTag extends StatelessWidget {
         padding: inset,
         child: PressableScale(
           onTap: onTap,
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: accent ? null : c.card,
-              gradient: accent ? c.accentGradient : null,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              boxShadow: c.floatingShadow,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: accent
-                          ? Colors.white.withValues(alpha: 0.20)
-                          : c.primarySoft,
-                      borderRadius: BorderRadius.circular(10),
+          // Anti-overflow : largeur bornée (usage en Stack / Align).
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 230),
+            child: Container(
+              padding: padding,
+              decoration: BoxDecoration(
+                color: accent ? null : c.card,
+                gradient: accent ? c.inkWash : null,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: c.floatingShadow,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: accent
+                            ? Colors.white.withValues(alpha: 0.14)
+                            : c.fill,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        icon,
+                        size: 15,
+                        color: accent ? Colors.white : c.textPrimary,
+                      ),
                     ),
-                    child: Icon(
-                      icon,
-                      size: 16,
-                      color: accent ? Colors.white : c.primary,
+                    const SizedBox(width: 10),
+                  ],
+                  Flexible(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (label != null)
+                          Text(
+                            label!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.label.copyWith(
+                              color: labelColor,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        const SizedBox(height: 1),
+                        Text(
+                          value,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.amount.copyWith(
+                            color: titleColor,
+                            fontSize: 14.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 10),
-                ],
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (label != null)
-                      Text(
-                        label!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.label.copyWith(
-                          color: labelColor,
-                          fontSize: 10.5,
-                        ),
-                      ),
-                    const SizedBox(height: 1),
-                    Text(
-                      value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.amountSmall.copyWith(
-                        color: titleColor,
-                        fontSize: 14.5,
-                      ),
-                    ),
+                  if (trailing != null) ...[
+                    const SizedBox(width: 10),
+                    trailing!,
                   ],
-                ),
-                if (trailing != null) ...[
-                  const SizedBox(width: 10),
-                  trailing!,
                 ],
-              ],
+              ),
             ),
           ),
         ),

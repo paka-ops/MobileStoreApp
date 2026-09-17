@@ -150,7 +150,7 @@ class ProfileHeaderCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(topBadgeIcon, size: 13, color: c.rating),
+                        Icon(topBadgeIcon, size: 12.5, color: c.rating),
                         const SizedBox(width: 4),
                         Text(
                           topBadgeLabel,
@@ -289,7 +289,7 @@ class _LargeAvatar extends StatelessWidget {
                   fontSize: size * 0.36,
                 ),
               )
-            : Icon(icon, size: size * 0.4, color: c.primary),
+            : Icon(icon, size: size * 0.38, color: c.primary),
       );
     }
 
@@ -299,17 +299,11 @@ class _LargeAvatar extends StatelessWidget {
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: c.accentGradient,
-        boxShadow: [
-          BoxShadow(
-            color: c.gradientColors.first.withValues(alpha: 0.25),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: c.card,
+        boxShadow: c.cardShadow,
       ),
       child: Container(
-        decoration: BoxDecoration(shape: BoxShape.circle, color: c.card),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: c.fill),
         padding: const EdgeInsets.all(2),
         child: ClipOval(child: inner),
       ),

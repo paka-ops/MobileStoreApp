@@ -20,7 +20,14 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
     return Scaffold(
       backgroundColor: colors.background,
       body: SafeArea(
-        child: Padding(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            // Anti-overflow : sur un petit écran (ou avec une grande police
+            // système), la page défile au lieu de déborder.
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
@@ -52,10 +59,8 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                       children: [
                         Text(
                           "BouTiKa",
-                          style: AppTextStyles.greeting.copyWith(
-                            color: colors.primary,
-                            fontSize: 17,
-                          ),
+                          style: AppTextStyles.brand
+                              .copyWith(color: colors.textPrimary),
                         ),
                         Text(
                           "ma boutique autrement",
@@ -88,24 +93,17 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
 
               // --- ZONE CENTRALE : illustration + promesse ---
               Container(
-                width: 150,
-                height: 150,
+                width: 148,
+                height: 148,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: colors.accentGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.gradientColors.first
-                          .withValues(alpha: 0.30),
-                      blurRadius: 34,
-                      offset: const Offset(0, 16),
-                    ),
-                  ],
+                  color: colors.primarySoft,
+                  boxShadow: colors.cardShadow,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.storefront_rounded,
-                  size: 66,
-                  color: Colors.white,
+                  size: 60,
+                  color: colors.primary,
                 ),
               ),
               const SizedBox(height: 36),
@@ -175,6 +173,10 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               ),
               const SizedBox(height: 24),
             ],
+          ),
+                ),
+              ),
+            ),
           ),
         ),
       ),

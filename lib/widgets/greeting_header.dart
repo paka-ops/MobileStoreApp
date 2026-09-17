@@ -8,28 +8,29 @@ import '../core/widgets/common/primitives.dart';
 /// ============================================================================
 /// APP GREETING HEADER — en-tête personnalisé du design system.
 ///
-/// Structure :
-///   • Gauche  : greeting 24/Bold + sous-texte (icône localisation + chevron)
-///   • Droite  : cloche de notification (cercle gris clair) + avatar circulaire
-///   • Padding horizontal 20 px
+/// Hiérarchie « calm premium » (inspirée des apps haut de gamme) :
+///   1. petite ligne grise  : « Bonjour, Amanda 👋 »
+///   2. titre encre net     : nom de la boutique + chevron
+///   3. localisation grise  : épingle + ville
+///   À droite : cloche dans un cercle gris clair (avec point corail discret)
+///   puis l'avatar (carré arrondi, comme les apps premium).
 ///
 ///   AppGreetingHeader(
-///     greeting: "Bonjour,",
-///     title: widget.store.name,
-///     subtitle: "Lomé, Togo",
-///     onTapSubtitle: _showStoreSwitcherSheet,
+///     greeting: "Bonjour, Amanda 👋",
+///     title: store.name,
+///     subtitle: store.location,
+///     onTapTitle: () => _showStoreSwitcherSheet(context, colors),
 ///     notificationCount: lowStockProducts.length,
 ///     onTapNotifications: () => ...,
-///     onTapAvatar: () => ...,
 ///   )
 ///
-/// ⚠️ 100 % présentation : aucune logique métier, uniquement des callbacks.
+/// ⚠️ 100 % présentation : uniquement des callbacks, aucune logique métier.
 /// ============================================================================
 class AppGreetingHeader extends StatelessWidget {
-  /// Ligne d'accroche ("Bonjour," / "Hello").
+  /// Petite ligne grise d'accroche ("Bonjour," / "Hello").
   final String greeting;
 
-  /// Nom mis en avant (boutique, utilisateur…).
+  /// Nom mis en avant (boutique, utilisateur…) — grande taille, encre.
   final String title;
 
   /// Sous-texte (localisation, rôle…).
@@ -38,10 +39,10 @@ class AppGreetingHeader extends StatelessWidget {
   /// Icône du sous-texte (localisation par défaut).
   final IconData subtitleIcon;
 
-  /// Affiche le chevron de sélection à droite du sous-texte.
+  /// Affiche le chevron de sélection à droite du titre.
   final bool showSubtitleChevron;
 
-  /// Callback du bloc gauche (greeting + sous-texte).
+  /// Callbacks du bloc gauche.
   final VoidCallback? onTapTitle;
   final VoidCallback? onTapSubtitle;
 
@@ -50,11 +51,17 @@ class AppGreetingHeader extends StatelessWidget {
   final int notificationCount;
   final IconData bellIcon;
 
-  /// Avatar (avatar → priorité enfant > initiales > icône).
+  /// Avatar : priorité enfant > initiales > icône.
   final Widget? avatar;
   final String? avatarInitials;
   final IconData avatarIcon;
   final VoidCallback? onTapAvatar;
+
+  /// Forme de l'avatar : carré arrondi (défaut premium) ou cercle.
+  final bool avatarRounded;
+
+  /// Couleur de fond de l'avatar (sinon teinte de marque très pâle).
+  final Color? avatarBackground;
 
   /// Boutons supplémentaires insérés avant la cloche (ex. bascule de thème).
   final List<Widget> extraActions;
@@ -62,7 +69,7 @@ class AppGreetingHeader extends StatelessWidget {
   /// Contenu optionnel affiché sous la ligne principale (ex. recherche).
   final Widget? bottom;
 
-  /// Visibilité de la cloche (masquée, ex. libellé vide).
+  /// Visibilité de la cloche.
   final bool showBell;
 
   final EdgeInsetsGeometry padding;
@@ -83,12 +90,14 @@ class AppGreetingHeader extends StatelessWidget {
     this.avatarInitials,
     this.avatarIcon = Icons.storefront_rounded,
     this.onTapAvatar,
+    this.avatarRounded = true,
+    this.avatarBackground,
     this.extraActions = const <Widget>[],
     this.bottom,
     this.showBell = true,
     this.padding = const EdgeInsets.fromLTRB(
       AppSizes.screenPadding,
-      12,
+      14,
       AppSizes.screenPadding,
       8,
     ),
@@ -107,7 +116,7 @@ class AppGreetingHeader extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // ------------------------------------------------ Bloc gauche
+              // ------------------------------------------------- Bloc gauche
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -116,90 +125,97 @@ class AppGreetingHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Greeting — 24 / Bold
+                      // 1 — petite ligne grise
                       Text(
                         greeting,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.greeting
-                            .copyWith(color: c.textPrimary),
+                        style: AppTextStyles.eyebrow
+                            .copyWith(color: c.textSecondary),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
 
-                      // Nom / localisation — icône + texte + chevron
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: onTapSubtitle ?? onTapTitle,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              subtitleIcon,
-                              size: 15,
-                              color: c.primary,
+                      // 2 — titre encre + chevron (sélecteur de boutique)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.name
+                                  .copyWith(color: c.textPrimary),
                             ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.subtitle.copyWith(
-                                  color: c.textSecondary,
-                                  fontSize: 14.5,
+                          ),
+                          if (showSubtitleChevron)
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 20,
+                              color: c.textSecondary,
+                            ),
+                        ],
+                      ),
+
+                      // 3 — localisation (grise, discrète)
+                      if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onTapSubtitle ?? onTapTitle,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                subtitleIcon,
+                                size: 13,
+                                color: c.textTertiary,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  subtitle!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTextStyles.label
+                                      .copyWith(color: c.textSecondary),
                                 ),
                               ),
-                            ),
-                            if (showSubtitleChevron) ...[
-                              const SizedBox(width: 3),
-                              Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 18,
-                                color: c.textSecondary,
-                              ),
                             ],
-                          ],
-                        ),
-                      ),
-                      if (subtitle != null && subtitle!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 1),
-                          child: Text(
-                            subtitle!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTextStyles.label
-                                .copyWith(color: c.textSecondary),
                           ),
                         ),
+                      ],
                     ],
                   ),
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
 
-              // ------------------------------------------------ Bloc droit
+              // ------------------------------------------------- Bloc droit
               ...extraActions,
               if (extraActions.isNotEmpty) const SizedBox(width: 8),
-              if (showBell)
+              if (showBell) ...[
                 _CircleActionButton(
                   icon: bellIcon,
                   onTap: onTapNotifications,
                   badgeCount: notificationCount,
                   tooltip: "Notifications",
                 ),
-              const SizedBox(width: 10),
+                const SizedBox(width: 10),
+              ],
               _HeaderAvatar(
                 onTap: onTapAvatar,
                 initials: avatarInitials,
                 icon: avatarIcon,
+                rounded: avatarRounded,
+                background: avatarBackground,
                 child: avatar,
               ),
             ],
           ),
           if (bottom != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             bottom!,
           ],
         ],
@@ -208,7 +224,7 @@ class AppGreetingHeader extends StatelessWidget {
   }
 }
 
-/// Cercle gris clair contenant un icône (cloche, actions rapides).
+/// Cercle gris clair contenant une icône (cloche, actions rapides).
 class _CircleActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
@@ -229,38 +245,29 @@ class _CircleActionButton extends StatelessWidget {
     Widget button = PressableScale(
       onTap: onTap,
       child: Container(
-        width: 44,
-        height: 44,
+        width: 42,
+        height: 42,
         decoration: BoxDecoration(
-          color: c.card,
+          color: c.fill,
           shape: BoxShape.circle,
-          boxShadow: c.cardShadow,
         ),
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
-            Icon(icon, size: 21, color: c.textPrimary),
+            Icon(icon, size: 20, color: c.textPrimary),
+            // Simple point corail : l'accent ne prend jamais de place.
             if (badgeCount > 0)
               Positioned(
-                right: 9,
-                top: 9,
+                right: 10,
+                top: 10,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  constraints: const BoxConstraints(minWidth: 17, minHeight: 17),
+                  width: 8,
+                  height: 8,
                   decoration: BoxDecoration(
-                    gradient: c.accentGradient,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    border: Border.all(color: c.card, width: 1.5),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    badgeCount > 99 ? "99+" : "$badgeCount",
-                    style: AppTextStyles.label.copyWith(
-                      color: Colors.white,
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    color: c.accent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: c.fill, width: 1.5),
                   ),
                 ),
               ),
@@ -276,67 +283,59 @@ class _CircleActionButton extends StatelessWidget {
   }
 }
 
-/// Avatar circulaire du header (photo, initiales ou icône).
+/// Avatar d'en-tête (photo, initiales ou icône) — carré arrondi par défaut.
 class _HeaderAvatar extends StatelessWidget {
   final VoidCallback? onTap;
   final String? initials;
   final IconData icon;
   final Widget? child;
+  final bool rounded;
+  final Color? background;
 
   const _HeaderAvatar({
     this.onTap,
     this.initials,
     this.icon = Icons.storefront_rounded,
     this.child,
+    this.rounded = true,
+    this.background,
   });
 
   @override
   Widget build(BuildContext context) {
     final DashColors c = DashColors(context);
+    final BorderRadius radius =
+        BorderRadius.circular(rounded ? 15 : 999);
+    final bool hasInitials = initials != null && initials!.trim().isNotEmpty;
 
     Widget content;
     if (child != null) {
       content = child!;
-    } else if (initials != null && initials!.trim().isNotEmpty) {
+    } else if (hasInitials) {
       content = Center(
         child: Text(
           initials!.trim().substring(0, 1).toUpperCase(),
           style: AppTextStyles.cardTitle.copyWith(
-            color: Colors.white,
-            fontSize: 17,
+            color: c.primary,
+            fontSize: 16,
           ),
         ),
       );
     } else {
-      content = Icon(icon, size: 20, color: Colors.white);
+      content = Icon(icon, size: 20, color: c.primary);
     }
 
     return PressableScale(
       onTap: onTap,
       child: Container(
-        width: 46,
-        height: 46,
-        padding: const EdgeInsets.all(2.5),
+        width: 44,
+        height: 44,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: c.accentGradient,
+          color: background ?? c.primarySoft,
+          borderRadius: radius,
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: c.card,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: child == null
-              ? Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: c.accentGradient,
-                  ),
-                  child: content,
-                )
-              : content,
-        ),
+        child: content,
       ),
     );
   }

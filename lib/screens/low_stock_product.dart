@@ -645,12 +645,16 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                         const SizedBox(height: 5),
                         Row(
                           children: [
-                            Text(
-                              "${widget.product.stock!.sellingPrice} F",
-                              style: TextStyle(
-                                color: c.primary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
+                            Flexible(
+                              child: Text(
+                                "${widget.product.stock!.sellingPrice} F",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: c.textPrimary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -709,14 +713,19 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                     mainAxisAlignment:
                     MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "${stock.toStringAsFixed(2)} restant sur ${maxStock.toStringAsFixed(0)}",
-                        style: TextStyle(
-                          color: c.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
+                      Flexible(
+                        child: Text(
+                          "${stock.toStringAsFixed(2)} restant sur ${maxStock.toStringAsFixed(0)}",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         "${(progress * 100).toStringAsFixed(0)}%",
                         style: TextStyle(

@@ -8,10 +8,10 @@ import '../core/theme/app_text_styles.dart';
 /// ============================================================================
 /// FLOATING BOTTOM NAV BAR — barre de navigation flottante du design system.
 ///
-///   • Container flottant, BorderRadius.circular(30), fond navy
+///   • Container flottant, BorderRadius.circular(30), surface CLAIRE
 ///   • Margin horizontal 24 px, bottom 16 px
-///   • Icônes blanches ; l'active a un fond blanc translucide en pilule
-///   • Ombre prononcée pour l'effet flottant
+///   • Icônes grises ; l'active passe en encre sur une pilule gris clair
+///   • Ombre très diffuse (effet flottant sans lourdeur)
 ///
 ///   FloatingBottomNavBar(
 ///     items: [
@@ -84,7 +84,7 @@ class FloatingBottomNavBar extends StatelessWidget {
           height: height,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            color: background ?? c.navy,
+            color: background ?? c.navSurface,
             borderRadius: BorderRadius.circular(AppRadius.navPill),
             boxShadow: [
               BoxShadow(
@@ -113,7 +113,7 @@ class FloatingBottomNavBar extends StatelessWidget {
                         vertical: showLabels ? 7 : 10,
                       ),
                       decoration: BoxDecoration(
-                        // Pilule blanche translucide sous l'icône active
+                        // Pilule gris clair sous l'icône active
                         color: selected ? c.navPill : Colors.transparent,
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
@@ -132,8 +132,8 @@ class FloatingBottomNavBar extends StatelessWidget {
                                   key: ValueKey<bool>(selected),
                                   size: 23,
                                   color: selected
-                                      ? c.navOnNavy
-                                      : c.navOnNavyMuted,
+                                      ? c.navActive
+                                      : c.navInactive,
                                 ),
                               ),
                               if (showLabels) ...[
@@ -148,8 +148,8 @@ class FloatingBottomNavBar extends StatelessWidget {
                                         ? FontWeight.w700
                                         : FontWeight.w500,
                                     color: selected
-                                        ? c.navOnNavy
-                                        : c.navOnNavyMuted,
+                                        ? c.navActive
+                                        : c.navInactive,
                                   ),
                                 ),
                               ],
@@ -169,11 +169,11 @@ class FloatingBottomNavBar extends StatelessWidget {
                                   minHeight: 16,
                                 ),
                                 decoration: BoxDecoration(
-                                  gradient: c.accentGradient,
+                                  color: c.accent,
                                   borderRadius:
                                       BorderRadius.circular(AppRadius.pill),
                                   border: Border.all(
-                                    color: c.navy,
+                                    color: c.navSurface,
                                     width: 1.5,
                                   ),
                                 ),

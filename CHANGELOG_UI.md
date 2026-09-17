@@ -1,3 +1,56 @@
+# 🎨 Passe 3 — Palette « Calm Premium » + correctifs pixel overflow
+
+Objectif : **arrêter de fatiguer l'œil**. La couleur ne porte plus de grandes
+surfaces ; elle devient une trace, comme dans les apps haut de gamme.
+
+### Palette ré-agencée (`app_colors.dart`)
+- Base **neutre chaude** : fond `#F7F6F3`, cartes blanc pur, remplissages
+  `#F1F0EC`, hairlines `#F2F0EC`.
+- **Encre** `#17171B` : tous les boutons sont des pilules noires douces
+  (remplace les aplats navy/teal).
+- **Corail** `#E0653F` : accent réservé aux pastilles, points et chiffres clés.
+- **Teal profond désaturé** `#0F766E` : marque + états interactifs (focus).
+- Sémantiques désaturées : succès `#33946A`, note `#E0A04A`, erreur `#CF5A55`.
+- **Pastels d'icônes adoucis** (peach/bleu/violet/menthe/sable/ciel/rose/gris).
+- Mode sombre entièrement re-décliné (neutres profonds, encre inversée).
+
+### Dégradés → « washes »
+- `accentGradient` = dégradé de **marque** (teal profond), réservé au logo/héro.
+- Nouveau `c.wash(tint:)` : teinte pâle (~5 %) → blanc, **texte encre**.
+- `c.inkWash` : surface encre, pour **un seul** élément fort par écran.
+
+### Typographie
+- Hiérarchie « petit label gris → grande valeur encre » ;
+  nouveaux styles `eyebrow`, `metric`, `sectionTitle`, `brand`.
+- Graisses bornées à **w700** (fin des w800/w900).
+- `greeting` = alias de `eyebrow` (13/w500).
+
+### Composants retravaillés
+`AppGreetingHeader` (cloche cercle gris + point corail, avatar carré arrondi),
+`FloatingBottomNavBar` + `AppBottomNav` (barre **claire**, icône active encre),
+`GradientInfoCard` (wash pastel), `CategoryCard` (adaptatif), `ChatFab` (encre),
+`FloatingPriceTag`, `FloatingRatingCard`, `ProfileHeaderCard`,
+`CustomTabBar` (onglet actif encre), `AppointmentCard`, `ServiceListTile`,
+`AppTextField` / `AppSearchField` / `FilterDateChip` (fond gris, sans bordure).
+
+### Écrans
+Hub boutique (header allégé, KPI en wash, tuiles équipe en pastel,
+onglet « Plus » : bascule de thème + `ServiceListTile`), pré-login (héro pastel
+au lieu du dégradé saturé), connexion, sélection de boutique, `StoreItem`.
+
+### 🐞 Correctifs pixel overflow
+- `CategoryCard` : hauteur fixe supprimée → `LayoutBuilder` adaptatif
+  (icône 32→48 px, lignes de texte ajustées) : plus de débordement en grille.
+- `FloatingRatingCard`, `FloatingPriceTag`, `ChatFab.labeled` : largeur bornée
+  + textes `Flexible` + ellipsis (usage en `Stack`/`Align`).
+- `AppointmentCard` : blocs Date/Heure `Flexible` dans une `Row` bornée.
+- Pré-login : `SingleChildScrollView` + `minHeight` (débordement vertical).
+- KPI : `IntrinsicHeight` + `stretch` (hauteurs alignées).
+- 4 écrans : Rows « texte dynamique + pastille » passées en `Flexible` + ellipsis.
+- 7 `withOpacity` dépréciés migrés en `withValues(alpha:)`.
+
+---
+
 # 🎨 Passe 2 — Design system « Teal / Navy » (13 composants + écrans cœur)
 
 Refonte visuelle selon le design system fourni (style santé type « DocSpot »)

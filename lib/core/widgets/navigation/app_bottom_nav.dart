@@ -59,7 +59,7 @@ class AppBottomNav extends StatelessWidget {
           height: AppSizes.floatingNavHeight,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            color: c.navy,
+            color: c.navSurface,
             borderRadius: BorderRadius.circular(AppRadius.navPill),
             boxShadow: c.floatingShadow,
           ),
@@ -105,8 +105,8 @@ class AppBottomNav extends StatelessWidget {
                                     : item.icon,
                                 key: ValueKey<bool>(selected),
                                 color: selected
-                                    ? c.navOnNavy
-                                    : c.navOnNavyMuted,
+                                    ? c.navActive
+                                    : c.navInactive,
                                 size: 23,
                               ),
                             ),
@@ -118,10 +118,10 @@ class AppBottomNav extends StatelessWidget {
                                   width: 8,
                                   height: 8,
                                   decoration: BoxDecoration(
-                                    color: c.danger,
+                                    color: c.accent,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: c.navy,
+                                      color: c.navSurface,
                                       width: 1.5,
                                     ),
                                   ),
@@ -140,8 +140,8 @@ class AppBottomNav extends StatelessWidget {
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             color: selected
-                                ? c.navOnNavy
-                                : c.navOnNavyMuted,
+                                ? c.navActive
+                                : c.navInactive,
                           ),
                         ),
                       ],

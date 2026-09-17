@@ -149,7 +149,7 @@ class AppointmentCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.cardTitle
-                              .copyWith(color: c.textPrimary, fontSize: 15.5),
+                              .copyWith(color: c.textPrimary),
                         ),
                         if (subtitle != null) ...[
                           const SizedBox(height: 3),
@@ -200,13 +200,13 @@ class AppointmentCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: sColor,
+                          color: sColor.withValues(alpha: 0.16),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           statusIcon,
-                          size: 10,
-                          color: Colors.white,
+                          size: 11,
+                          color: sColor,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -237,12 +237,14 @@ class AppointmentCard extends StatelessWidget {
                 Row(
                   children: [
                     if (dateLabel != null)
-                      _MetaItem(
-                        icon: dateIcon,
-                        label: "Date",
-                        value: dateLabel!,
-                        color: c.textPrimary,
-                        secondary: c.textSecondary,
+                      Flexible(
+                        child: _MetaItem(
+                          icon: dateIcon,
+                          label: "Date",
+                          value: dateLabel!,
+                          color: c.textPrimary,
+                          secondary: c.textSecondary,
+                        ),
                       ),
                     if (dateLabel != null && timeLabel != null)
                       Container(
@@ -252,12 +254,14 @@ class AppointmentCard extends StatelessWidget {
                         color: c.hairline,
                       ),
                     if (timeLabel != null)
-                      _MetaItem(
-                        icon: timeIcon,
-                        label: "Heure",
-                        value: timeLabel!,
-                        color: c.textPrimary,
-                        secondary: c.textSecondary,
+                      Flexible(
+                        child: _MetaItem(
+                          icon: timeIcon,
+                          label: "Heure",
+                          value: timeLabel!,
+                          color: c.textPrimary,
+                          secondary: c.textSecondary,
+                        ),
                       ),
                     if (extraMeta.isNotEmpty) ...[
                       const SizedBox(width: 12),
@@ -298,23 +302,31 @@ class _MetaItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 30,
-          height: 30,
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: c.primarySoft,
-            borderRadius: BorderRadius.circular(10),
+            color: c.fill,
+            borderRadius: BorderRadius.circular(9),
           ),
-          child: Icon(icon, size: 15, color: c.primary),
+          child: Icon(icon, size: 14, color: c.textSecondary),
         ),
         const SizedBox(width: 8),
         Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: AppTextStyles.label.copyWith(color: secondary)),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.label.copyWith(color: secondary),
+            ),
             const SizedBox(height: 1),
             Text(
               value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: AppTextStyles.amountSmall.copyWith(
                 color: color,
                 fontSize: 12.5,
@@ -356,18 +368,17 @@ class _CardAvatar extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: hasInitials ? c.accentGradient : null,
-          color: hasInitials ? null : c.primarySoft,
+          color: hasInitials ? c.primarySoft : c.fill,
         ),
         child: hasInitials
             ? Text(
                 initials!.trim().substring(0, 1).toUpperCase(),
                 style: AppTextStyles.cardTitle.copyWith(
-                  color: Colors.white,
-                  fontSize: 17,
+                  color: c.primary,
+                  fontSize: 16,
                 ),
               )
-            : Icon(icon, size: 22, color: c.primary),
+            : Icon(icon, size: 21, color: c.textSecondary),
       );
     }
 
