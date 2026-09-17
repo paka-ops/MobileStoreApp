@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/screens/EmployerFormPage.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
+import 'package:mobile_store_app/widgets/design_system.dart';
 
 class WelcomePreLoginScreen extends StatefulWidget {
   @override
@@ -32,7 +34,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                       decoration: BoxDecoration(
                         color: colors.card,
                         shape: BoxShape.circle,
-                        border: Border.all(color: colors.border),
+                        boxShadow: colors.cardShadow,
                       ),
                       child: ClipOval(
                         child: Image.asset(
@@ -50,18 +52,15 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                       children: [
                         Text(
                           "BouTiKa",
-                          style: TextStyle(
+                          style: AppTextStyles.greeting.copyWith(
                             color: colors.primary,
-                            fontWeight: FontWeight.w800,
                             fontSize: 17,
-                            letterSpacing: 0.2,
                           ),
                         ),
                         Text(
                           "ma boutique autrement",
-                          style: TextStyle(
+                          style: AppTextStyles.label.copyWith(
                             color: colors.textSecondary,
-                            fontSize: 11.5,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -93,23 +92,20 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.primarySoft,
-                  border: Border.all(
-                    color: colors.primary.withValues(alpha: 0.20),
-                    width: 1.5,
-                  ),
+                  gradient: colors.accentGradient,
                   boxShadow: [
                     BoxShadow(
-                      color: colors.primary.withValues(alpha: 0.14),
-                      blurRadius: 40,
+                      color: colors.gradientColors.first
+                          .withValues(alpha: 0.30),
+                      blurRadius: 34,
                       offset: const Offset(0, 16),
                     ),
                   ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.storefront_rounded,
                   size: 66,
-                  color: colors.primary,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 36),
@@ -117,20 +113,14 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               Text(
                 "Bienvenue",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                  color: colors.textPrimary,
-                ),
+                style: AppTextStyles.h1.copyWith(color: colors.textPrimary),
               ),
               const SizedBox(height: 10),
               Text(
                 "Gérez votre stock, suivez vos ventes et\npilotez votre boutique en toute simplicité.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.body.copyWith(
                   color: colors.textSecondary,
-                  fontSize: 14,
                   height: 1.55,
                 ),
               ),
@@ -166,17 +156,15 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               const Spacer(),
 
               // --- ZONE D'ACTION : boutons en bas pour l'ergonomie ---
-              AppButton.primary(
+              PrimaryButton(
                 label: "Se connecter",
                 icon: Icons.login_rounded,
-                height: 54,
                 onPressed: () => Navigator.pushNamed(context, "/login"),
               ),
               const SizedBox(height: 12),
-              AppButton.secondary(
+              PrimaryButton.outline(
                 label: "Créer un compte",
                 icon: Icons.person_add_alt_rounded,
-                height: 54,
                 onPressed: () {
                   Navigator.push(
                     context,

@@ -1,3 +1,54 @@
+# 🎨 Passe 2 — Design system « Teal / Navy » (13 composants + écrans cœur)
+
+Refonte visuelle selon le design system fourni (style santé type « DocSpot »)
+appliqué au métier de BouTiKa. **Aucune logique métier modifiée.**
+
+### Tokens ré-écrits
+- `lib/core/theme/app_colors.dart` — palette teal `#0D9488` / émeraude
+  `#10B981`, navy `#0F172A` (bouton primaire), fond `#FAFAFA`, pastels
+  d'icônes, note `#FBBF24`, + variantes sombres complètes.
+- `lib/core/theme/app_text_styles.dart` — **Poppins** (`google_fonts`) +
+  styles `greeting`, `name`, `subtitle`, `label`, `cardTitle`, `rating`,
+  `statValue` et helper `AppTextTheme(context)`.
+- `lib/core/theme/app_shadows.dart` — ombre « soft elevation »
+  (noir 5 %, blur 20, y 8) + `floating` / `floatNav` / `glow`.
+- `lib/core/theme/app_decorations.dart` — `softCard`, `floatingCard`,
+  `softIconCircle`, `pastelTile`, `floatingNav`, `AppGradients.teal`.
+- `lib/core/theme/app_theme.dart` — boutons navy en pilule (rayon 28),
+  champs remplis gris clair sans bordure (rayon 16), FAB circulaire,
+  chip/snackbar navy, `tertiary` = note.
+- `lib/core/constants/app_spacing.dart` — `AppRadius.card/button/navPill/search`,
+  `AppSizes.primaryButtonHeight(56)`, `searchBarHeight(52)`,
+  `categoryIcon(48)`, `profileAvatar(100)`, `floatingNav*`.
+
+### 13 composants créés (`lib/widgets/`, export `design_system.dart`)
+`AppGreetingHeader`, `SearchBarWidget`, `CategoryCard`/`CategoryGrid`,
+`GradientInfoCard`/`GradientCardChip`, `FloatingRatingCard`,
+`AppointmentCard`, `FloatingBottomNavBar`/`FloatingNavItem`,
+`ProfileHeaderCard`/`ProfileStat`, `FloatingPriceTag`,
+`CustomTabBar`/`CustomTabItem`, `ServiceListTile`,
+`PrimaryButton`/`RoundActionButton`, `ChatFab`.
+
+### Écrans refondus
+- `store_page.dart` (hub) : header → `AppGreetingHeader`, nav → barre navy
+  flottante, FAB → `ChatFab.labeled` + `RoundActionButton`, KPI →
+  `GradientInfoCard`, inventaire → `CustomTabBar` (grille `CategoryCard` /
+  gestion), catégories et équipe en pastels, onglet « Plus » →
+  `ServiceListTile`.
+- `welcome_screen_before_login.dart`, `login_screen.dart`,
+  `welcome_screen.dart` + `widgets/store_item.dart` : dégradés teal, cartes
+  sans bordure, `PrimaryButton` navy, typographie Poppins.
+- Composants core alignés : `AppButton.primary` (navy), `AppIconButton` et
+  `AppBackButton` (cercles blancs + ombre), `AppBottomNav` (barre navy
+  flottante).
+
+### Corrections de compilation
+Imports manquants ajoutés (pré-existants) : `app_button`, `app_card`,
+`app_dialog`, `app_bottom_nav`, `store_page`, `category_detail_screen`,
+`order_story_screen`, `store_item`.
+
+---
+
 # 📋 CHANGELOG — Refonte UI/UX Premium
 
 Historique complet de la refonte, écran par écran, commit par commit.

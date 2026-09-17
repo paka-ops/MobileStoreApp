@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/navigation/app_header.dart';
 import 'package:mobile_store_app/models/Store.dart';
 import 'package:mobile_store_app/screens/welcome_screen.dart';
@@ -8,6 +8,7 @@ import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/widgets/design_system.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -30,15 +31,20 @@ class LoginScreen extends StatelessWidget {
                   width: 66,
                   height: 66,
                   decoration: BoxDecoration(
-                    color: colors.primarySoft,
+                    gradient: colors.accentGradient,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colors.primary.withValues(alpha: 0.2),
-                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.gradientColors.first
+                            .withValues(alpha: 0.28),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.storefront_rounded,
-                    color: colors.primary,
+                    color: Colors.white,
                     size: 30,
                   ),
                 ),
@@ -50,20 +56,14 @@ class LoginScreen extends StatelessWidget {
                 Text(
                   "Connexion",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                    color: colors.textPrimary,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: colors.textPrimary),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   "Entrez vos identifiants pour accéder à votre boutique",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTextStyles.body.copyWith(
                     color: colors.textSecondary,
-                    fontSize: 13.5,
                     height: 1.5,
                   ),
                 ),
@@ -132,10 +132,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           const SizedBox(height: 28),
-          AppButton.primary(
+          PrimaryButton(
             label: "Se connecter",
             icon: Icons.login_rounded,
-            height: 52,
             isLoading: _isLoading,
             onPressed: _handleLogin,
           ),

@@ -85,11 +85,12 @@ Voir **CHANGELOG_UI.md** pour le détail par écran et par commit.
 
 ## 5. Limitations connues
 
-- **Police Inter** : `AppTextStyles.fontFamily` déclare `'Inter'`, mais les
-  fichiers TTF ne sont **pas embarqués** dans le projet (aucun accès réseau
-  pendant la refonte pour les télécharger). Flutter retombe proprement sur la
-  police système — le design reste cohérent. Pour activer Inter : déposer les
-  TTF dans `assets/fonts/` et déclarer la famille dans `pubspec.yaml`.
+- **Police Poppins (nouvelle passe « Teal / Navy »)** : la typographie passe
+  d'Inter à **Poppins** via le paquet `google_fonts` (résolution + mise en
+  cache au premier rendu ; repli automatique sur la police système hors ligne).
+  Lancer `flutter pub get` après récupération de la branche.
+  ➜ Voir **DESIGN_SYSTEM.md** pour le design system complet (palette teal/navy,
+  13 composants, écrans refondus).
 - **Captures d'écran before/after** : le SDK Flutter/Dart n'est pas disponible
   dans l'environnement de travail (aucune compilation ni `flutter test`
   possible). Les captures avant/après n'ont donc pas pu être produites ; la
