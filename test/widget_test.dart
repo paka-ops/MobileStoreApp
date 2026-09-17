@@ -1,30 +1,36 @@
-// This is a basic Flutter widget test.
+// Test de fumée (smoke test) — BouTiKa
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Vérifie que l'application se construit avec le design system premium
+// (thème light + dark via buildAppTheme) et affiche l'écran d'accueil
+// pré-login comme route initiale.
+//
+// NB : les écrans métier dépendent de services réseau (API) : ils ne
+// peuvent pas être testés ici sans mock. Ce test couvre la coque de
+// l'application (MaterialApp + thème + routes).
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mobile_store_app/main.dart';
+import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets(
+    "MyApp affiche l'écran d'accueil pré-login avec le thème premium",
+    (WidgetTester tester) async {
+      // Construit l'application et déclenche une frame.
+      await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      // Quelques frames pour laisser les animations de démarrage se jouer.
+      // (pumpAndSettle ne termine jamais s'il reste une animation en boucle.)
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      // La coque MaterialApp est bien présente.
+      expect(find.byType(MaterialApp), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      // La route initiale est l'écran d'accueil pré-login.
+      expect(find.byType(WelcomePreLoginScreen), findsOneWidget);
+    },
+  );
 }

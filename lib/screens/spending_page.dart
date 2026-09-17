@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
+import 'package:mobile_store_app/core/widgets/cards/app_card.dart';
+import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
+import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/models/spending.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show appDarkMode, DashColors;
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class ExpensesScreen extends StatefulWidget {
@@ -23,7 +28,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   DateTime? endDate;
 
   static const Color _accent = Color(0xFFC08552);
-  static const Color _danger = Color(0xFFC96B6B);
+  static const Color _danger = Color(0xFFDE4A52);
 
   @override
   void initState() {
@@ -90,8 +95,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             title: Text(
               "Historique des Dépenses",
               style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                fontSize: 16.5,
+                letterSpacing: -0.2,
                 color: colors.textPrimary,
               ),
             ),
@@ -113,6 +119,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               onRefresh: () =>
                   _fetchExpenses(startDate: startDate, endDate: endDate),
               color: colors.primary,
+              backgroundColor: colors.card,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -142,13 +149,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   Widget _buildSummaryCard(DashColors colors) {
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -157,7 +159,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _accent.withOpacity(0.10),
+                  color: _accent.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -172,8 +174,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   "Résumé des dépenses",
                   style: TextStyle(
                     color: colors.textPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     fontSize: 15.5,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -216,7 +219,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       decoration: BoxDecoration(
         color: colors.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: colors.border),
       ),
       child: Column(
@@ -238,6 +241,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               color: valueColor,
               fontSize: 17,
               fontWeight: FontWeight.w800,
+              letterSpacing: -0.2,
             ),
           ),
         ],
@@ -248,44 +252,57 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget _buildFilterSection(DashColors colors) {
     final hasFilter = startDate != null || endDate != null;
 
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.filter_alt_outlined, color: colors.primary, size: 18),
+              Icon(Icons.filter_alt_outlined,
+                  color: colors.primary, size: 18),
               const SizedBox(width: 8),
-              Text(
-                "Filtrer par période",
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14.5,
+              Expanded(
+                child: Text(
+                  "Filtrer par période",
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14.5,
+                  ),
                 ),
               ),
-              const Spacer(),
               if (hasFilter)
-                TextButton.icon(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     setState(() {
                       startDate = null;
                       endDate = null;
                     });
                     _applyFilters();
                   },
-                  icon: const Icon(Icons.close_rounded, size: 16, color: _danger),
-                  label: const Text(
-                    "Réinitialiser",
-                    style: TextStyle(
-                      color: _danger,
-                      fontWeight: FontWeight.w600,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: colors.dangerSoft,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.close_rounded,
+                            size: 13, color: _danger),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Réinitialiser",
+                          style: TextStyle(
+                            color: _danger,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -295,20 +312,30 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildDatePickerChip(
-                  colors: colors,
+                child: FilterDateChip(
                   label: "Date début",
                   date: startDate,
-                  isStart: true,
+                  onTap: () => _pickDate(isStart: true),
+                  onClear: () {
+                    setState(() {
+                      startDate = null;
+                    });
+                    _applyFilters();
+                  },
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildDatePickerChip(
-                  colors: colors,
+                child: FilterDateChip(
                   label: "Date fin",
                   date: endDate,
-                  isStart: false,
+                  onTap: () => _pickDate(isStart: false),
+                  onClear: () {
+                    setState(() {
+                      endDate = null;
+                    });
+                    _applyFilters();
+                  },
                 ),
               ),
             ],
@@ -318,97 +345,36 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildDatePickerChip({
-    required DashColors colors,
-    required String label,
-    required DateTime? date,
-    required bool isStart,
-  }) {
-    final hasDate = date != null;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime(2022),
-          lastDate: DateTime(2100),
-          builder: (context, child) => Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: Theme.of(context).colorScheme.copyWith(
-                primary: colors.primary,
-                onPrimary: Colors.white,
-                surface: colors.card,
-                onSurface: colors.textPrimary,
-              ),
-            ),
-            child: child!,
-          ),
-        );
-
-        if (picked != null) {
-          setState(() {
-            if (isStart) {
-              startDate = picked;
-            } else {
-              endDate = picked;
-            }
-          });
-          _applyFilters();
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 14),
-        decoration: BoxDecoration(
-          color: hasDate ? colors.primarySoft : colors.background,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: hasDate ? colors.primary.withOpacity(0.3) : colors.border,
-            width: 1.2,
+  Future<void> _pickDate({required bool isStart}) async {
+    final colors = DashColors(context);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime(2100),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: colors.primary,
+            onPrimary: Colors.white,
+            surface: colors.card,
+            onSurface: colors.textPrimary,
           ),
         ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_month_rounded,
-              size: 18,
-              color: hasDate ? colors.primary : colors.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                hasDate ? DateFormat('dd/MM/yy').format(date!) : label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: hasDate ? colors.primary : colors.textSecondary,
-                ),
-              ),
-            ),
-            if (hasDate)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isStart) {
-                      startDate = null;
-                    } else {
-                      endDate = null;
-                    }
-                  });
-                  _applyFilters();
-                },
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 14,
-                  color: colors.primary,
-                ),
-              ),
-          ],
-        ),
+        child: child!,
       ),
     );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          startDate = picked;
+        } else {
+          endDate = picked;
+        }
+      });
+      _applyFilters();
+    }
   }
 
   Widget _buildExpenseCard(Spending spending, DashColors colors) {
@@ -422,15 +388,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: colors.border),
+        boxShadow: colors.cardShadow,
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(11),
             decoration: BoxDecoration(
-              color: _accent.withOpacity(0.10),
+              color: _accent.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
@@ -472,7 +439,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             decoration: BoxDecoration(
-              color: _danger.withOpacity(0.10),
+              color: _danger.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -491,44 +458,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   Widget _buildEmptyState(DashColors colors) {
     return Padding(
-      padding: const EdgeInsets.only(top: 80),
-      child: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                color: colors.primarySoft,
-                shape: BoxShape.circle,
-                border: Border.all(color: colors.border),
-              ),
-              child: Icon(
-                Icons.receipt_long_outlined,
-                size: 52,
-                color: colors.primary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Aucune dépense trouvée",
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Aucune dépense ne correspond à la période sélectionnée.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-          ],
+      padding: const EdgeInsets.only(top: 40),
+      child: SizedBox(
+        height: 420,
+        child: EmptyState(
+          icon: Icons.receipt_long_outlined,
+          title: "Aucune dépense trouvée",
+          message:
+          "Aucune dépense ne correspond à la période sélectionnée.",
+          actionLabel: "Actualiser",
+          onAction: () =>
+              _fetchExpenses(startDate: startDate, endDate: endDate),
         ),
       ),
     );
