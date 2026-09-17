@@ -31,7 +31,7 @@ import '../widgets/store_page/functions/get_low_stock_product.dart';
 import 'login_screen.dart';
 
 // ---------------------------------------------------------------------------
-// Modèle ligne de vente
+// Modèle ligne de vente — logique métier inchangée
 // ---------------------------------------------------------------------------
 class OrderLine {
   Product? product;
@@ -48,7 +48,7 @@ class OrderLine {
 }
 
 // ---------------------------------------------------------------------------
-// Couleurs sémantiques fixes (ne changent pas avec le thème)
+// Couleurs sémantiques fixes — mises à jour vers palette sobre premium
 // ---------------------------------------------------------------------------
 class _Fixed {
   static const accent  = Color(0xFFC08552);
@@ -64,7 +64,7 @@ class _NavItemData {
 }
 
 // ---------------------------------------------------------------------------
-// Widget principal
+// Widget principal — logique métier strictement préservée
 // ---------------------------------------------------------------------------
 class StoreDetailScreen extends StatefulWidget {
   final Store store;
@@ -83,37 +83,34 @@ class StoreDetailScreen extends StatefulWidget {
 }
 
 class _StoreDetailScreen extends State<StoreDetailScreen> {
-  List<Employee> employees        = [];
-  List<Category> categories       = [];
-  List<Product>  allStoreProducts = [];
-  List<Product>  lowStockProducts = [];
+  List<Employee> employees = [];
+  List<Category> categories = [];
+  List<Product> allStoreProducts = [];
+  List<Product> lowStockProducts = [];
 
-  bool isCreatingOrder    = false;
-  bool isValidatingSale   = false;
-  bool isSavingCategory   = false;
-  bool isSavingEmployee   = false;
+  bool isCreatingOrder = false;
+  bool isValidatingSale = false;
+  bool isSavingCategory = false;
+  bool isSavingEmployee = false;
   bool isDeletingEmployee = false;
-  bool isCancelingSale    = false;
+  bool isCancelingSale = false;
 
   int _currentIndex = 0;
-
-  // Vrai tant que les appels API initiaux ne sont pas terminés :
-  // la page affiche alors l'écran d'attente « BouTika ».
   bool _isLoading = true;
 
-  final _firstnameController    = TextEditingController();
-  final _secondnameController   = TextEditingController();
-  final _usernameController     = TextEditingController();
-  final _phoneController        = TextEditingController();
-  final _passwordController     = TextEditingController();
+  final _firstnameController = TextEditingController();
+  final _secondnameController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _categoryNameController = TextEditingController();
   final _categoryDescController = TextEditingController();
   final _expensePriceController = TextEditingController();
-  final _expenseDescController  = TextEditingController();
+  final _expenseDescController = TextEditingController();
 
-  final _expenseFormKey  = GlobalKey<FormState>();
+  final _expenseFormKey = GlobalKey<FormState>();
   final _categoryFormKey = GlobalKey<FormState>();
-  final _formKey         = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   List<Store> displayStore = [];
 
@@ -140,33 +137,27 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // -------------------------------------------------------------------------
-  // Chargement des données
+  // Chargement des données — inchangé
   // -------------------------------------------------------------------------
   Future<void> _fetchAllData() async {
     try {
       await _loadEmployeesAndCategories();
       await _loadAllProductsForSale();
     } finally {
-      // Les appels API sont terminés (succès ou échec) : on quitte
-      // l'écran d'attente « BouTika ».
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadEmployeesAndCategories() async {
-    final list = await EmployeeService()
-        .getEmployeeOfStore(widget.store.id, context);
-    final cats = await CategoryService()
-        .getCategoryByStoreId(widget.store.id, context);
+    final list = await EmployeeService().getEmployeeOfStore(widget.store.id, context);
+    final cats = await CategoryService().getCategoryByStoreId(widget.store.id, context);
     if (mounted) setState(() { employees = list; categories = cats; });
   }
 
-  Future<void> getEmployeeByStoreId(String storeId) =>
-      _loadEmployeesAndCategories();
+  Future<void> getEmployeeByStoreId(String storeId) => _loadEmployeesAndCategories();
 
   Future<void> _loadAllProductsForSale() async {
-    final products =
-    await ProductService().getAllProductByStoreId(widget.store.id);
+    final products = await ProductService().getAllProductByStoreId(widget.store.id);
     if (mounted) {
       setState(() {
         allStoreProducts = products;
@@ -176,7 +167,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // BUILD PRINCIPAL
+  // BUILD PRINCIPAL — sobre, hiérarchie lumineuse maîtrisée
   // =========================================================================
   @override
   Widget build(BuildContext context) {
@@ -184,9 +175,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       valueListenable: appDarkMode,
       builder: (context, isDark, __) {
         final colors = DashColors(context);
+        final ext = colors.ext;
 
-        // Écran d'attente « BouTika » tant que les appels API
-        // de chargement des données ne sont pas terminés.
         if (_isLoading) {
           return Scaffold(
             backgroundColor: colors.background,
@@ -199,12 +189,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         }
 
         return Scaffold(
-          backgroundColor: colors.background,
+          backgroundColor: ext.background,
           body: SafeArea(
             bottom: false,
             child: Column(
               children: [
                 _buildTopBar(context, colors),
+                Container(height: 1, color: ext.border.withOpacity(0.6)),
                 Expanded(
                   child: IndexedStack(
                     index: _currentIndex,
@@ -219,9 +210,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               ],
             ),
           ),
-          floatingActionButton: _currentIndex == 0
-              ? _buildSaleAndExpenseFab(context, colors)
-              : null,
+          floatingActionButton: _currentIndex == 0 ? _buildSaleAndExpenseFab(context, colors) : null,
           bottomNavigationBar: _buildBottomNav(context, colors),
         );
       },
@@ -229,11 +218,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // TOP BAR
+  // TOP BAR — minimal premium, plus de pill orange agressif
   // =========================================================================
   Widget _buildTopBar(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         children: [
           // Avatar boutique
@@ -319,8 +309,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         size: 14,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(6)),
+                    child: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: ext.mutedForeground),
+                  ),
+                ],
               ),
             ),
           ),
@@ -334,7 +330,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             tooltip: "Thème",
             onTap: () => appDarkMode.value = !appDarkMode.value,
           ),
-
           const SizedBox(width: 8),
 
           AppIconButton(
@@ -344,12 +339,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             badgeColor: colors.accent,
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => LowStockProductDetailsScreen(
-                  products: lowStockProducts,
-                  userType: widget.userType,
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => LowStockProductDetailsScreen(products: lowStockProducts, userType: widget.userType)),
             ),
           ),
         ],
@@ -444,9 +434,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // BOTTOM NAV
+  // BOTTOM NAV — minimal, bordure subtile, pas d'ombre agressive
   // =========================================================================
   Widget _buildBottomNav(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     final items = [
       AppBottomNavItem(
           icon: Icons.home_outlined,
@@ -485,6 +476,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     required Widget child,
     EdgeInsetsGeometry? margin,
   }) {
+    final ext = colors.ext;
     return Container(
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
@@ -532,6 +524,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // ONGLET 0 — ACCUEIL
   // =========================================================================
   Widget _buildDashboardTab(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return RefreshIndicator(
       onRefresh: _fetchAllData,
       color: colors.primary,
@@ -540,6 +533,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildEmployeeSection(context, colors),
             Padding(
@@ -565,18 +559,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // ONGLET 1 — VENTES
   // =========================================================================
   Widget _buildSalesTab(BuildContext context) {
-    return OrderStoryScreen(
-      storeId: widget.store.id,
-      userType: widget.userType,
-      categories: categories,
-      embedded: true,
-    );
+    return OrderStoryScreen(storeId: widget.store.id, userType: widget.userType, categories: categories, embedded: true);
   }
 
   // =========================================================================
-  // ONGLET 2 — STOCK
+  // ONGLET 2 — STOCK — hub sobre
   // =========================================================================
   Widget _buildStockTab(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -626,9 +616,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // ONGLET 3 — PLUS
+  // ONGLET 3 — PLUS — profil et actions sobres
   // =========================================================================
   Widget _buildMoreTab(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       children: [
@@ -660,12 +651,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     ),
                     const SizedBox(height: 5),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 9, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: colors.primarySoft,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                      decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(20), border: Border.all(color: ext.border)),
                       child: Text(
                         widget.userType == 'employee'
                             ? "EMPLOYÉ"
@@ -747,18 +734,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       color: colors.textSecondary),
                   onTap: () {
                     final sub = widget.store.subscription!;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SubscriptionScreen(
-                          storeName: widget.store.name,
-                          planType: sub.plan!,
-                          duration: sub.duration!,
-                          startDate: sub.startDate!,
-                          expiryDate: sub.expirationDate!,
-                        ),
-                      ),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => SubscriptionScreen(storeName: widget.store.name, planType: sub.plan!, duration: sub.duration!, startDate: sub.startDate!, expiryDate: sub.expirationDate!)));
                   },
                 ),
               ],
@@ -795,16 +771,48 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             onTap: () => _handleLogout(context, colors),
           ),
         ),
+        const SizedBox(height: 24),
+        Center(child: Text("BouTika • v1.0.0", style: TextStyle(fontSize: 11, color: ext.mutedForeground.withOpacity(0.6), letterSpacing: 0.2))),
       ],
     );
   }
 
+  Widget _buildMoreActionTile({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required DashColors colors,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final ext = colors.ext;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      leading: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: isDestructive ? ext.dangerSoft : ext.surfaceMuted,
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+          border: Border.all(color: isDestructive ? ext.danger.withOpacity(0.15) : ext.border),
+        ),
+        child: Icon(icon, color: isDestructive ? ext.danger : ext.mutedForeground, size: 18),
+      ),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: isDestructive ? ext.danger : ext.foreground)),
+      subtitle: subtitle != null ? Text(subtitle, style: TextStyle(fontSize: 12, color: ext.mutedForeground)) : null,
+      trailing: Icon(Icons.chevron_right_rounded, color: ext.mutedForeground.withOpacity(0.6), size: 20),
+      onTap: onTap,
+    );
+  }
+
   // =========================================================================
-  // FAB
+  // FAB — deux actions hiérarchisées, plus de couleurs agressives
   // =========================================================================
   Widget _buildSaleAndExpenseFab(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         FloatingActionButton.extended(
           heroTag: "btnExpense",
@@ -836,13 +844,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // SECTION EMPLOYÉS
+  // SECTION EMPLOYÉS — avatars épurés
   // =========================================================================
   Widget _buildEmployeeSection(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     return _sectionCard(
       title: "Équipe de vente",
-      subtitle: "${employees.length} membre(s)",
-      icon: Icons.groups_rounded,
+      subtitle: "${employees.length} membre(s) actif(s)",
+      icon: Icons.groups_outlined,
       colors: colors,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -850,10 +859,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           children: [
             if (employees.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16, horizontal: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                child: Row(
                   children: [
                     Icon(Icons.person_add_alt_1_outlined,
                         color: colors.textSecondary
@@ -867,17 +874,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           fontSize: 13,
                           fontWeight: FontWeight.w500),
                     ),
+                    const SizedBox(width: 12),
+                    Text("Aucun employé pour le moment", style: TextStyle(color: ext.mutedForeground, fontSize: 13, fontWeight: FontWeight.w500)),
                   ],
                 ),
               )
             else
-              ...employees.map(
-                      (emp) => _buildClickableAvatar(context, emp, colors)),
+              ...employees.map((emp) => _buildClickableAvatar(context, emp, colors)),
             if (widget.userType == "employer")
               GestureDetector(
                 onTap: () => _showAddEmployeeForm(context, colors),
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.only(right: 8, left: 4),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -912,15 +920,17 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  Widget _buildClickableAvatar(
-      BuildContext context, Employee emp, DashColors colors) {
+  Widget _buildClickableAvatar(BuildContext context, Employee emp, DashColors colors) {
+    final ext = colors.ext;
     return GestureDetector(
       onLongPress: () {
-        if (widget.userType == "employer")
-          _showEmployeeOptions(context, emp, colors);
+        if (widget.userType == "employer") _showEmployeeOptions(context, emp, colors);
+      },
+      onTap: () {
+        if (widget.userType == "employer") _showEmployeeOptions(context, emp, colors);
       },
       child: Padding(
-        padding: const EdgeInsets.only(right: 18),
+        padding: const EdgeInsets.only(right: 16),
         child: SizedBox(
           width: 64,
           child: Column(
@@ -943,6 +953,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: 12),
               ),
+              const SizedBox(height: 6),
+              Text(emp.username ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TextStyle(color: ext.foreground, fontSize: 11.5, fontWeight: FontWeight.w500)),
             ],
           ),
         ),
@@ -953,8 +965,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // LISTE DES CATÉGORIES
   // =========================================================================
-  Widget _buildCategoryList(
-      BuildContext context, List<Category> cats, DashColors colors) {
+  Widget _buildCategoryList(BuildContext context, List<Category> cats, DashColors colors) {
+    final ext = colors.ext;
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -998,32 +1010,23 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  Widget _buildExpandableCategory(
-      BuildContext context, Category category, DashColors colors) {
+  Widget _buildExpandableCategory(BuildContext context, Category category, DashColors colors) {
     return _CategoryCard(
       category: category,
       userType: widget.userType,
       colors: colors,
       onEdit: () => _showAddCategoryForm(context, category, colors),
       onManage: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EmployerCategoryDetailScreen(
-              category: category,
-              userType: widget.userType,
-            ),
-          ),
-        ).then((_) => _fetchAllData());
+        Navigator.push(context, MaterialPageRoute(builder: (_) => EmployerCategoryDetailScreen(category: category, userType: widget.userType))).then((_) => _fetchAllData());
       },
     );
   }
 
   // =========================================================================
-  // OPTIONS EMPLOYÉ
+  // OPTIONS EMPLOYÉ — bottom sheet sobre
   // =========================================================================
-  void _showEmployeeOptions(
-      BuildContext context, Employee emp, DashColors colors) {
+  void _showEmployeeOptions(BuildContext context, Employee emp, DashColors colors) {
+    final ext = colors.ext;
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.card,
@@ -1074,8 +1077,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  void _confirmDeleteEmployee(
-      BuildContext context, Employee emp, DashColors colors) {
+  void _confirmDeleteEmployee(BuildContext context, Employee emp, DashColors colors) {
+    final ext = colors.ext;
     showDialog(
       context: context,
       builder: (ctx) =>
@@ -1173,10 +1176,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // LOGIQUE DE VENTE
+  // LOGIQUE DE VENTE — inchangée, UI refondue
   // =========================================================================
-  void _showStartSaleDialog(
-      BuildContext context, DashColors colors) async {
+  void _showStartSaleDialog(BuildContext context, DashColors colors) async {
+    final ext = colors.ext;
     final orderService = OrderService();
     Order? createdOrder;
 
@@ -1224,8 +1227,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     }
   }
 
-  void _showSaleForm(
-      BuildContext context, String orderId, DashColors colors) {
+  void _showSaleForm(BuildContext context, String orderId, DashColors colors) {
+    final ext = colors.ext;
     final formKey = GlobalKey<FormState>();
     final saleLines = [OrderLine()];
 
@@ -1357,47 +1360,51 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                       },
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    flex: 2,
-                                    child: TextFormField(
-                                      initialValue: "1",
-                                      keyboardType: TextInputType.number,
-                                      decoration: const InputDecoration(
-                                          labelText: "Qté",
-                                          isDense: true),
-                                      onChanged: (val) {
-                                        setPopupState(() {
-                                          line.quantity =
-                                              double.tryParse(val) ?? 0;
-                                          formKey.currentState?.validate();
-                                        });
-                                      },
-                                      validator: (val) {
-                                        final qty =
-                                        num.tryParse(val ?? '');
-                                        if (qty == null || qty <= 0)
-                                          return "Min 1";
-                                        if (line.maxStock != null &&
-                                            qty > line.maxStock!)
-                                          return "Stock insuffisant (${line.maxStock})";
-                                        return null;
-                                      },
-                                    ),
+                                  items: allStoreProducts,
+                                  itemAsString: (p) => p.name,
+                                  dropdownDecoratorProps: DropDownDecoratorProps(
+                                    dropdownSearchDecoration: InputDecoration(labelText: "Produit", isDense: true, filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
                                   ),
-                                ],
+                                  onChanged: (Product? product) {
+                                    setPopupState(() {
+                                      line.product = product;
+                                      line.salingPrice = product?.stock?.sellingPrice ?? 0;
+                                      line.maxStock = (product?.stock?.baseStock ?? 0.0) - (product?.stock?.totalSell ?? 0.0);
+                                      formKey.currentState?.validate();
+                                    });
+                                  },
+                                  validator: (item) {
+                                    if (item == null) return 'Requis';
+                                    for (int i = 0; i < index; i++) {
+                                      if (saleLines[i].product?.id == item.id) return "Déjà ajouté";
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
-                            );
-                          }),
-                          TextButton.icon(
-                            onPressed: () => setPopupState(
-                                    () => saleLines.add(OrderLine())),
-                            icon: Icon(Icons.add_circle_outline,
-                                color: colors.primary, size: 18),
-                            label: Text(
-                              "Ajouter un produit",
-                              style: TextStyle(color: colors.primary),
-                            ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                flex: 2,
+                                child: TextFormField(
+                                  initialValue: "1",
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(color: ext.foreground, fontSize: 14),
+                                  decoration: InputDecoration(labelText: "Qté", isDense: true, filled: true, fillColor: ext.surfaceMuted, border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide(color: ext.border))),
+                                  onChanged: (val) {
+                                    setPopupState(() {
+                                      line.quantity = double.tryParse(val) ?? 0;
+                                      formKey.currentState?.validate();
+                                    });
+                                  },
+                                  validator: (val) {
+                                    final qty = num.tryParse(val ?? '');
+                                    if (qty == null || qty <= 0) return "Min 1";
+                                    if (line.maxStock != null && qty > line.maxStock!) return "Stock ${line.maxStock!.toStringAsFixed(0)}";
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 6),
                           Container(
@@ -1488,9 +1495,22 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(color: ext.surfaceMuted, borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: ext.border)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("TOTAL", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: ext.mutedForeground)),
+                            Text("${calculateTotal().toStringAsFixed(0)} F", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: ext.foreground, letterSpacing: -0.2)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -1499,13 +1519,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     );
   }
 
-  void _showFinalConfirmationDialog(
-      BuildContext context,
-      String orderId,
-      List<OrderLine> saleLines,
-      double total,
-      DashColors colors,
-      ) {
+  void _showFinalConfirmationDialog(BuildContext context, String orderId, List<OrderLine> saleLines, double total, DashColors colors) {
+    final ext = colors.ext;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1618,17 +1633,36 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     ),
                   ],
                 ),
-              ],
-            );
-          }),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () { setConfirmationStat(() => isValidatingSale = false); Navigator.pop(dialogContext); }, child: Text("Non", style: TextStyle(color: ext.mutedForeground))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: ext.success, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)), elevation: 0),
+              onPressed: isValidatingSale ? null : () async {
+                final requestData = saleLines.map((line) => {"orderId": orderId, "productId": line.product!.id, "quantity": line.quantity}).toList();
+                setConfirmationStat(() => isValidatingSale = true);
+                try {
+                  final order = await OrderService().makeOrder(orderId, requestData, context);
+                  if (mounted) setConfirmationStat(() => isValidatingSale = false);
+                  Navigator.pop(dialogContext);
+                  if (order != null) { showSuccessMessage("Vente enregistrée !", context); _loadAllProductsForSale(); } else { showErrorMessage("Erreur lors de la validation.", context); }
+                } catch (e) { print(e); showExceptionMessage(context); }
+              },
+              child: isValidatingSale ? const BouTikaLoader.compact() : const Text("Oui, valider", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        );
+      }),
     );
   }
 
   // =========================================================================
-  // FORMULAIRE CATÉGORIE
+  // FORMULAIRE CATÉGORIE — sobre
   // =========================================================================
-  void _showAddCategoryForm(
-      BuildContext context, Category? category, DashColors colors) {
+  void _showAddCategoryForm(BuildContext context, Category? category, DashColors colors) {
+    final ext = colors.ext;
     if (category != null) {
       _categoryNameController.text = category.name;
       _categoryDescController.text = category.description ?? "";
@@ -1708,7 +1742,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
               actions: [
                 Row(
@@ -1794,10 +1828,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // FORMULAIRE EMPLOYÉ
+  // FORMULAIRE EMPLOYÉ — sobre
   // =========================================================================
-  void _showAddEmployeeForm(BuildContext context, DashColors colors,
-      {Employee? employee}) {
+  void _showAddEmployeeForm(BuildContext context, DashColors colors, {Employee? employee}) {
+    final ext = colors.ext;
     _firstnameController.clear();
     _secondnameController.clear();
     _usernameController.clear();
@@ -1960,9 +1994,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // DÉCONNEXION
+  // DÉCONNEXION — sobre
   // =========================================================================
   void _handleLogout(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -2039,9 +2074,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // FORMULAIRE DÉPENSE
+  // FORMULAIRE DÉPENSE — sobre
   // =========================================================================
   void _showExpenseDialog(BuildContext context, DashColors colors) {
+    final ext = colors.ext;
     bool isSavingExpense = false;
 
     showDialog(
@@ -2114,7 +2150,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
               actions: [
                 Row(
@@ -2187,7 +2223,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 }
 
 // ===========================================================================
-// CATEGORY CARD
+// CATEGORY CARD — premium minimal, hiérarchie lumineuse
 // ===========================================================================
 class _CategoryCard extends StatefulWidget {
   final Category category;
@@ -2196,13 +2232,7 @@ class _CategoryCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onManage;
 
-  const _CategoryCard({
-    required this.category,
-    required this.userType,
-    required this.colors,
-    required this.onEdit,
-    required this.onManage,
-  });
+  const _CategoryCard({required this.category, required this.userType, required this.colors, required this.onEdit, required this.onManage});
 
   @override
   State<_CategoryCard> createState() => _CategoryCardState();
@@ -2213,11 +2243,11 @@ class _CategoryCardState extends State<_CategoryCard> {
 
   @override
   Widget build(BuildContext context) {
-    final colors   = widget.colors;
+    final ext = widget.colors.ext;
     final category = widget.category;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
+      duration: AppDurations.normal,
       curve: Curves.easeOut,
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -2235,7 +2265,6 @@ class _CategoryCardState extends State<_CategoryCard> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           InkWell(
             borderRadius: BorderRadius.circular(AppRadius.xl),
             onTap: () => setState(() => _expanded = !_expanded),
@@ -2259,7 +2288,6 @@ class _CategoryCardState extends State<_CategoryCard> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -2274,19 +2302,14 @@ class _CategoryCardState extends State<_CategoryCard> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text("Gérer le stock et les prix",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: colors.textSecondary,
-                                fontSize: 12)),
+                        Text("Gérer le stock et les prix", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ext.mutedForeground, fontSize: 12)),
                       ],
                     ),
                   ),
                   const SizedBox(width: 8),
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 220),
+                    duration: AppDurations.normal,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -2305,22 +2328,17 @@ class _CategoryCardState extends State<_CategoryCard> {
               ),
             ),
           ),
-
-          // Contenu extensible
           AnimatedCrossFade(
-            duration: const Duration(milliseconds: 220),
+            duration: AppDurations.normal,
             sizeCurve: Curves.easeOut,
-            crossFadeState: _expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             firstChild: const SizedBox(width: double.infinity),
             secondChild: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(height: 1, color: colors.border),
+                  Container(height: 1, color: ext.border),
                   const SizedBox(height: 14),
                   OverlineLabel(text: "Description"),
                   const SizedBox(height: 8),
@@ -2336,27 +2354,9 @@ class _CategoryCardState extends State<_CategoryCard> {
                   Row(
                     children: [
                       if (widget.userType == "employer")
-                        Expanded(
-                          child: _CategoryActionButton(
-                            icon: Icons.edit_outlined,
-                            label: "Modifier",
-                            filled: false,
-                            colors: colors,
-                            onTap: widget.onEdit,
-                          ),
-                        ),
-                      if (widget.userType == "employer")
-                        const SizedBox(width: 10),
-                      Expanded(
-                        flex: 2,
-                        child: _CategoryActionButton(
-                          icon: Icons.inventory_2_outlined,
-                          label: "Gérer les produits",
-                          filled: true,
-                          colors: colors,
-                          onTap: widget.onManage,
-                        ),
-                      ),
+                        Expanded(child: _CategoryActionButton(icon: Icons.edit_outlined, label: "Modifier", filled: false, colors: widget.colors, onTap: widget.onEdit)),
+                      if (widget.userType == "employer") const SizedBox(width: 10),
+                      Expanded(flex: 2, child: _CategoryActionButton(icon: Icons.inventory_2_outlined, label: "Gérer les produits", filled: true, colors: widget.colors, onTap: widget.onManage)),
                     ],
                   ),
                 ],
@@ -2370,7 +2370,7 @@ class _CategoryCardState extends State<_CategoryCard> {
 }
 
 // ===========================================================================
-// BOUTON D'ACTION CATÉGORIE
+// BOUTON D'ACTION CATÉGORIE — sobre
 // ===========================================================================
 class _CategoryActionButton extends StatelessWidget {
   final IconData icon;
@@ -2379,16 +2379,11 @@ class _CategoryActionButton extends StatelessWidget {
   final DashColors colors;
   final VoidCallback onTap;
 
-  const _CategoryActionButton({
-    required this.icon,
-    required this.label,
-    required this.filled,
-    required this.colors,
-    required this.onTap,
-  });
+  const _CategoryActionButton({required this.icon, required this.label, required this.filled, required this.colors, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final ext = colors.ext;
     return Material(
       color: filled ? colors.primary : Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadius.md),
