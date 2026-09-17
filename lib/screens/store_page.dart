@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_store_app/core/constants/app_radius.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/core/widgets/dialogs/app_dialog.dart';
