@@ -418,12 +418,18 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Text(
-                "${stockRestant.toStringAsFixed(2)} / ${stockTotal.toStringAsFixed(2)} unité(s)",
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  "${stockRestant.toStringAsFixed(2)} / ${stockTotal.toStringAsFixed(2)} unité(s)",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

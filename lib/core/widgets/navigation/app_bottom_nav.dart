@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/app_durations.dart';
+import '../../constants/app_spacing.dart';
 import '../../theme/app_colors.dart';
 
 /// ============================================================================
@@ -45,15 +46,23 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = DashColors(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: c.card,
-        boxShadow: c.subtleShadow,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.floatingNavMarginH,
+          0,
+          AppSizes.floatingNavMarginH,
+          AppSizes.floatingNavMarginB,
+        ),
+        child: Container(
+          height: AppSizes.floatingNavHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: c.navSurface,
+            borderRadius: BorderRadius.circular(AppRadius.navPill),
+            boxShadow: c.floatingShadow,
+          ),
           child: Row(
             children: List.generate(items.length, (index) {
               final bool selected = currentIndex == index;
@@ -69,12 +78,13 @@ class AppBottomNav extends StatelessWidget {
                     duration: AppDurations.normal,
                     curve: AppCurves.standard,
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-                    padding: const EdgeInsets.symmetric(vertical: 7),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 7, horizontal: 14),
                     decoration: BoxDecoration(
                       color: selected
-                          ? c.primarySoft
+                          ? c.navPill
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -95,8 +105,8 @@ class AppBottomNav extends StatelessWidget {
                                     : item.icon,
                                 key: ValueKey<bool>(selected),
                                 color: selected
-                                    ? c.primary
-                                    : c.textSecondary,
+                                    ? c.navActive
+                                    : c.navInactive,
                                 size: 23,
                               ),
                             ),
@@ -108,10 +118,10 @@ class AppBottomNav extends StatelessWidget {
                                   width: 8,
                                   height: 8,
                                   decoration: BoxDecoration(
-                                    color: c.danger,
+                                    color: c.accent,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: c.card,
+                                      color: c.navSurface,
                                       width: 1.5,
                                     ),
                                   ),
@@ -130,8 +140,8 @@ class AppBottomNav extends StatelessWidget {
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             color: selected
-                                ? c.primary
-                                : c.textSecondary,
+                                ? c.navActive
+                                : c.navInactive,
                           ),
                         ),
                       ],

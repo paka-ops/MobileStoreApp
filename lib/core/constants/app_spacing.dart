@@ -71,14 +71,30 @@ class AppRadius {
   /// 26 px — sheets, modals
   static const double xxl = 26;
 
+  /// 24 px — grandes cartes du design system (rayon 20–24)
+  static const double card = 24;
+
+  /// 28 px — bouton primaire en pilule
+  static const double button = 28;
+
+  /// 30 px — barres flottantes (bottom nav)
+  static const double navPill = 30;
+
+  /// 16 px — champs de recherche du design system
+  static const double search = 16;
+
   /// Pilule complète
   static const double pill = 999;
 
   /// BorderRadius prêts à l'emploi
   static final BorderRadius rSm = BorderRadius.circular(sm);
   static final BorderRadius rMd = BorderRadius.circular(md);
+  static final BorderRadius rSearch = BorderRadius.circular(search);
   static final BorderRadius rLg = BorderRadius.circular(lg);
   static final BorderRadius rXl = BorderRadius.circular(xl);
+  static final BorderRadius rButton = BorderRadius.circular(button);
+  static final BorderRadius rNav = BorderRadius.circular(navPill);
+  static final BorderRadius rPill = BorderRadius.circular(pill);
   static final BorderRadius rSheet = BorderRadius.vertical(
     top: Radius.circular(xxl),
   );
@@ -101,6 +117,32 @@ class AppSizes {
   static const double appBarHeight = 64;
   static const double bottomNavHeight = 68;
   static const double listItemMinHeight = 64;
+
+  // ---- Design system : dimensions signature ----
+  /// Hauteur du bouton primaire en pilule (Book Appointment)
+  static const double primaryButtonHeight = 56;
+
+  /// Hauteur de la barre de recherche arrondie
+  static const double searchBarHeight = 52;
+
+  /// Diamètre du cercle pastel d'une CategoryCard
+  static const double categoryIcon = 48;
+
+  /// Diamètre de l'avatar du ProfileHeaderCard
+  static const double profileAvatar = 100;
+
+  /// Hauteur de la barre de navigation flottante
+  static const double floatingNavHeight = 64;
+
+  /// Marge horizontale de la barre de navigation flottante
+  static const double floatingNavMarginH = 24;
+
+  /// Marge basse de la barre de navigation flottante
+  static const double floatingNavMarginB = 16;
+
+  /// Padding horizontal des headers (spec : 20 px)
+  static const double screenPadding = 20;
+
   static const double sheetHandleWidth = 40;
   static const double sheetHandleHeight = 4;
 
@@ -113,6 +155,9 @@ class AppSizes {
   static const double avatarSm = 40;
   static const double avatarMd = 48;
   static const double avatarLg = 64;
+
+  /// Avatar large des fiches profil (ProfileHeaderCard)
+  static const double avatarXl = profileAvatar;
 
   // ---- Icônes ----
   static const double iconXs = 14;

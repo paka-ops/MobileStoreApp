@@ -5,6 +5,7 @@ import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
+import 'package:mobile_store_app/core/widgets/navigation/app_header.dart';
 import 'package:mobile_store_app/core/widgets/cards/app_card.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/product.dart';
@@ -989,12 +990,16 @@ class _ProductCardState extends State<_ProductCard> {
                         const SizedBox(height: 5),
                         Row(
                           children: [
-                            Text(
-                              "${product.stock!.sellingPrice} F",
-                              style: TextStyle(
-                                color: c.primary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
+                            Flexible(
+                              child: Text(
+                                "${product.stock!.sellingPrice} F",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: c.textPrimary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -1126,14 +1131,19 @@ class _ProductCardState extends State<_ProductCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "${stock.toStringAsFixed(2)} restant",
-              style: TextStyle(
-                color: c.textPrimary,
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
+            Flexible(
+              child: Text(
+                "${stock.toStringAsFixed(2)} restant",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: c.textPrimary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               "${(ratio * 100).toStringAsFixed(0)}%",
               style: TextStyle(

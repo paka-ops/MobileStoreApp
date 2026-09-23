@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/screens/EmployerFormPage.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
+import 'package:mobile_store_app/widgets/design_system.dart';
 
 class WelcomePreLoginScreen extends StatefulWidget {
   @override
@@ -18,7 +20,14 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
     return Scaffold(
       backgroundColor: colors.background,
       body: SafeArea(
-        child: Padding(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            // Anti-overflow : sur un petit écran (ou avec une grande police
+            // système), la page défile au lieu de déborder.
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
@@ -32,7 +41,7 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                       decoration: BoxDecoration(
                         color: colors.card,
                         shape: BoxShape.circle,
-                        border: Border.all(color: colors.border),
+                        boxShadow: colors.cardShadow,
                       ),
                       child: ClipOval(
                         child: Image.asset(
@@ -50,18 +59,13 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
                       children: [
                         Text(
                           "BouTiKa",
-                          style: TextStyle(
-                            color: colors.primary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 17,
-                            letterSpacing: 0.2,
-                          ),
+                          style: AppTextStyles.brand
+                              .copyWith(color: colors.textPrimary),
                         ),
                         Text(
                           "ma boutique autrement",
-                          style: TextStyle(
+                          style: AppTextStyles.label.copyWith(
                             color: colors.textSecondary,
-                            fontSize: 11.5,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -89,26 +93,16 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
 
               // --- ZONE CENTRALE : illustration + promesse ---
               Container(
-                width: 150,
-                height: 150,
+                width: 148,
+                height: 148,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: colors.primarySoft,
-                  border: Border.all(
-                    color: colors.primary.withValues(alpha: 0.20),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.primary.withValues(alpha: 0.14),
-                      blurRadius: 40,
-                      offset: const Offset(0, 16),
-                    ),
-                  ],
+                  boxShadow: colors.cardShadow,
                 ),
                 child: Icon(
                   Icons.storefront_rounded,
-                  size: 66,
+                  size: 60,
                   color: colors.primary,
                 ),
               ),
@@ -117,20 +111,14 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               Text(
                 "Bienvenue",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                  color: colors.textPrimary,
-                ),
+                style: AppTextStyles.h1.copyWith(color: colors.textPrimary),
               ),
               const SizedBox(height: 10),
               Text(
                 "Gérez votre stock, suivez vos ventes et\npilotez votre boutique en toute simplicité.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.body.copyWith(
                   color: colors.textSecondary,
-                  fontSize: 14,
                   height: 1.55,
                 ),
               ),
@@ -166,17 +154,15 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               const Spacer(),
 
               // --- ZONE D'ACTION : boutons en bas pour l'ergonomie ---
-              AppButton.primary(
+              PrimaryButton(
                 label: "Se connecter",
                 icon: Icons.login_rounded,
-                height: 54,
                 onPressed: () => Navigator.pushNamed(context, "/login"),
               ),
               const SizedBox(height: 12),
-              AppButton.secondary(
+              PrimaryButton.outline(
                 label: "Créer un compte",
                 icon: Icons.person_add_alt_rounded,
-                height: 54,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -187,6 +173,10 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
               ),
               const SizedBox(height: 24),
             ],
+          ),
+                ),
+              ),
+            ),
           ),
         ),
       ),

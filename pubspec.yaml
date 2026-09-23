@@ -33,6 +33,10 @@ dependencies:
   http: ^1.1.0
   dropdown_search: ^5.0.6
   intl: ^0.18.1
+  # Typographie du design system (Poppins).
+  # ⚠️ Le package télécharge la police au premier rendu (mise en cache ensuite) :
+  #    en cas d'absence de réseau, Flutter retombe sur la police système.
+  google_fonts: ^6.2.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

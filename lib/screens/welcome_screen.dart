@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
+import 'package:mobile_store_app/widgets/design_system.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/screens/dashboard_screens.dart';
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
 import '../widgets/store_item.dart';
@@ -79,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 decoration: BoxDecoration(
                   color: colors.card,
                   shape: BoxShape.circle,
-                  border: Border.all(color: colors.border),
+                  boxShadow: colors.cardShadow,
                 ),
                 child: ClipOval(
                   child: Image.asset(
@@ -98,19 +101,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     Text(
                       "BouTiKa",
-                      style: TextStyle(
-                        color: colors.primary,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 17,
-                        letterSpacing: 0.2,
-                      ),
+                      style: AppTextStyles.brand
+                          .copyWith(color: colors.textPrimary),
                     ),
                     Text(
                       "Mes Boutiques",
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: AppTextStyles.label.copyWith(
                         color: colors.textSecondary,
-                        fontSize: 11.5,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -195,10 +193,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       ),
       decoration: BoxDecoration(
         color: colors.primarySoft,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colors.primary.withValues(alpha: 0.14),
-        ),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -302,11 +297,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       height: 54,
       child: FloatingActionButton.extended(
         onPressed: () => _showAddStoreForm(context, colors),
-        backgroundColor: colors.primary,
-        foregroundColor: colors.onPrimary,
-        elevation: 2,
+        backgroundColor: colors.buttonPrimary,
+        foregroundColor: colors.buttonOnPrimary,
+        elevation: 4,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.circular(AppRadius.button)),
         icon: const Icon(Icons.add_rounded, size: 22),
         label: const Text(
           "Nouvelle boutique",
@@ -483,28 +478,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 150,
-              height: 150,
+              width: 148,
+              height: 148,
               decoration: BoxDecoration(
-                color: colors.primarySoft,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: colors.primary.withValues(alpha: 0.18),
-                  width: 1.5,
-                ),
+                color: colors.primarySoft,
+                boxShadow: colors.cardShadow,
               ),
               child: Icon(Icons.storefront_rounded,
-                  size: 66, color: colors.primary),
+                  size: 60, color: colors.primary),
             ),
             const SizedBox(height: 34),
             Text(
               "Aucune boutique trouvée",
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-                color: colors.textPrimary,
-              ),
+              style: AppTextStyles.h3.copyWith(color: colors.textPrimary),
             ),
             const SizedBox(height: 10),
             Text(
@@ -513,19 +500,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   " à piloter votre stock en temps réel."
                   : "Vous n'êtes rattaché à aucune boutique pour le moment.",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTextStyles.body.copyWith(
                 color: colors.textSecondary,
-                fontSize: 13.5,
                 height: 1.55,
               ),
             ),
             if (widget.userType == "employer") ...[
               const SizedBox(height: 28),
-              AppButton.primary(
+              PrimaryButton(
                 label: "Créer une boutique",
                 icon: Icons.add_rounded,
                 expand: false,
-                height: 52,
                 onPressed: () {
                   final colors = DashColors(context);
                   _showAddStoreForm(context, colors);

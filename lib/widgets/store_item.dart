@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/screens/store_page.dart' hide AppColors;
@@ -13,6 +14,24 @@ import '../models/Store.dart';
 class _Fixed {
   static const danger     = Color(0xFFDE4A52);
   static const dangerSoft = Color(0xFFFDEDEE);
+}
+
+/// Pastel déterministe par boutique (présentation uniquement).
+Color _pastelFor(String name, DashColors colors) {
+  int sum = 0;
+  for (final int unit in name.codeUnits) {
+    sum += unit;
+  }
+  return colors.pastelAt(sum);
+}
+
+/// Teinte d'icône contrastée dérivée du pastel.
+Color _pastelIcon(Color pastel) {
+  final HSLColor hsl = HSLColor.fromColor(pastel);
+  return hsl
+      .withLightness((hsl.lightness - 0.30).clamp(0.0, 1.0))
+      .withSaturation((hsl.saturation + 0.12).clamp(0.0, 1.0))
+      .toColor();
 }
 
 class StoreItem extends StatefulWidget {
@@ -95,11 +114,11 @@ class _StoreItemState extends State<StoreItem> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: colors.primarySoft,
+                      color: colors.fill,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.edit_rounded,
-                        color: colors.primary, size: 22),
+                        color: colors.textPrimary, size: 21),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -357,20 +376,10 @@ class _StoreItemState extends State<StoreItem> {
               curve: Curves.easeOut,
               decoration: BoxDecoration(
                 color: colors.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: _showActions
-                      ? colors.primary.withValues(alpha: 0.55)
-                      : colors.border,
-                  width: _showActions ? 1.4 : 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+                boxShadow: _showActions
+                    ? colors.floatingShadow
+                    : colors.cardShadow,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -378,22 +387,19 @@ class _StoreItemState extends State<StoreItem> {
                   // --- HEADER ---
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20)),
-                    ),
+                    decoration: const BoxDecoration(),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          width: AppSizes.categoryIcon,
+                          height: AppSizes.categoryIcon,
                           decoration: BoxDecoration(
-                            color: colors.card,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: colors.border),
+                            color: _pastelFor(_store.name, colors),
+                            shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.storefront_rounded,
-                              color: colors.primary, size: 22),
+                              color: _pastelIcon(_pastelFor(_store.name, colors)),
+                              size: 22),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -516,17 +522,16 @@ class _StoreItemState extends State<StoreItem> {
                       decoration: BoxDecoration(
                         color: colors.background,
                         borderRadius:
-                        BorderRadius.circular(16),
-                        border: Border.all(color: colors.border),
+                        BorderRadius.circular(AppRadius.lg),
                       ),
                       child: Row(
                         children: [
                           _buildActionButton(
                             icon: Icons.edit_rounded,
                             label: "Modifier",
-                            color: colors.primary,
-                            backgroundColor: colors.primarySoft,
-                            labelColor: colors.primary,
+                            color: colors.fill,
+                            backgroundColor: colors.fill,
+                            labelColor: colors.textPrimary,
                             onTap: () {
                               setState(
                                       () => _showActions = false);
@@ -583,9 +588,8 @@ class _StoreItemState extends State<StoreItem> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colors.border),
+        color: colors.fill,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
