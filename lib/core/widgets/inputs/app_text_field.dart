@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 import '../../constants/app_spacing.dart';
 import '../../theme/app_colors.dart';
@@ -76,7 +77,7 @@ class AppTextField extends StatelessWidget {
           fontWeight: FontWeight.w600,
           fontSize: 13.5,
         ),
-        hintStyle: TextStyle(color: c.textSecondary, fontSize: 13.5),
+        hintStyle: TextStyle(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5),
         filled: true,
         fillColor: c.fill,
         prefixIcon: icon != null

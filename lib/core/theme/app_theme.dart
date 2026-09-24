@@ -194,7 +194,9 @@ ThemeData buildAppTheme(bool dark) {
     style: TextButton.styleFrom(
       foregroundColor: primary,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
       textStyle: AppTextStyles.button.copyWith(color: primary),
     ),
   );
@@ -207,8 +209,10 @@ ThemeData buildAppTheme(bool dark) {
     brightness: isDark ? Brightness.dark : Brightness.light,
     colorScheme: scheme,
     fontFamily: AppTextStyles.fontFamily,
+    fontFamilyFallback: AppTextStyles.fontFamilyFallback,
     textTheme: textTheme,
-    scaffoldBackgroundColor: background,
+    // Transparent : le dégradé lavande (AppBackground) passe au travers.
+    scaffoldBackgroundColor: Colors.transparent,
     canvasColor: background,
     cardColor: card,
     dividerColor: border,
@@ -217,7 +221,8 @@ ThemeData buildAppTheme(bool dark) {
     splashColor: ink.withValues(alpha: 0.05),
 
     appBarTheme: AppBarTheme(
-      backgroundColor: background,
+      // Transparente : l'en-tête se fond dans le dégradé lavande.
+      backgroundColor: Colors.transparent,
       foregroundColor: textPrimary,
       elevation: 0,
       scrolledUnderElevation: 0,
@@ -236,10 +241,9 @@ ThemeData buildAppTheme(bool dark) {
         backgroundColor: ink,
         foregroundColor: onInk,
         disabledBackgroundColor:
-            isDark ? AppColors.darkCardElevated : const Color(0xFFD6DAE3),
-        disabledForegroundColor: isDark
-            ? AppColors.darkTextSecondary
-            : const Color(0xFF9AA1AD),
+            isDark ? AppColors.darkCardElevated : AppColors.fillStrong,
+        disabledForegroundColor:
+            isDark ? AppColors.darkTextTertiary : AppColors.textLight,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
@@ -341,9 +345,11 @@ ThemeData buildAppTheme(bool dark) {
     chipTheme: ChipThemeData(
       backgroundColor: fill,
       labelStyle: AppTextStyles.chip.copyWith(color: textPrimary),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      side: BorderSide(color: Colors.transparent),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      side: const BorderSide(color: Colors.transparent),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
     ),
 
     snackBarTheme: SnackBarThemeData(
@@ -354,9 +360,9 @@ ThemeData buildAppTheme(bool dark) {
         fontWeight: FontWeight.w500,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
-      elevation: 4,
+      elevation: 0,
     ),
 
     progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -380,11 +386,11 @@ ThemeData buildAppTheme(bool dark) {
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) return onPrimary;
-        return isDark ? AppColors.darkTextSecondary : Colors.white;
+        return isDark ? AppColors.darkTextPrimary : AppColors.card;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) return primary;
-        return isDark ? AppColors.darkBorder : const Color(0xFFD8DCE2);
+        return isDark ? AppColors.darkBorder : AppColors.fillStrong;
       }),
     ),
 
@@ -394,7 +400,9 @@ ThemeData buildAppTheme(bool dark) {
         return Colors.transparent;
       }),
       side: BorderSide(color: border, width: 1.5),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+      ),
     ),
 
     datePickerTheme: DatePickerThemeData(

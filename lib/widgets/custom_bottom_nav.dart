@@ -8,7 +8,7 @@ import '../core/theme/app_text_styles.dart';
 /// ============================================================================
 /// FLOATING BOTTOM NAV BAR — barre de navigation flottante du design system.
 ///
-///   • Container flottant, BorderRadius.circular(30), surface CLAIRE
+///   • Container flottant, AppRadius.navPill, surface CLAIRE
 ///   • Margin horizontal 24 px, bottom 16 px
 ///   • Icônes grises ; l'active passe en encre sur une pilule gris clair
 ///   • Ombre très diffuse (effet flottant sans lourdeur)
@@ -169,7 +169,7 @@ class FloatingBottomNavBar extends StatelessWidget {
                                   minHeight: 16,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: c.accent,
+                                  color: c.badgeRed,
                                   borderRadius:
                                       BorderRadius.circular(AppRadius.pill),
                                   border: Border.all(

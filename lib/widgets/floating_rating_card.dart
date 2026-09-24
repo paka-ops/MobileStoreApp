@@ -8,7 +8,7 @@ import '../core/widgets/common/primitives.dart';
 /// ============================================================================
 /// FLOATING RATING CARD — petite carte blanche flottante avec note.
 ///
-///   • Card blanche, BorderRadius.circular(16), ombre flottante
+///   • Card blanche, AppRadius.lg, ombre flottante
 ///   • Avatar circulaire + badge rating (étoile jaune + note)
 ///
 ///   FloatingRatingCard(

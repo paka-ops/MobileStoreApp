@@ -140,7 +140,7 @@ class ChatFab extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 constraints: const BoxConstraints(minWidth: 19, minHeight: 19),
                 decoration: BoxDecoration(
-                  color: c.danger,
+                  color: c.badgeRed,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   border: Border.all(color: Colors.white, width: 1.6),
                 ),

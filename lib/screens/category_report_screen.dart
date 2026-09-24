@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
@@ -26,19 +27,16 @@ class CategoryReportScreen extends StatelessWidget {
     _filterOrderProductsByCategory(orders, categories);
 
     return Scaffold(
-      backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
           "Analyses par Catégorie",
           style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 16.5,
-              letterSpacing: -0.2,
-              color: colors.textPrimary),
+              AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary)),
         ),
-        backgroundColor: colors.background,
+        backgroundColor: Colors.transparent,
         foregroundColor: colors.textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
       ),
       body: SafeArea(
@@ -47,7 +45,7 @@ class CategoryReportScreen extends StatelessWidget {
                 child: Text(
                   "Aucune catégorie à analyser",
                   style: TextStyle(
-                      color: colors.textSecondary, fontSize: 14),
+                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14)),
                 ),
               )
             : ListView.builder(
@@ -105,7 +103,7 @@ class CategoryReportScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppRadius.sm,
                   ),
                   child:
                       Icon(Icons.category_rounded, color: color, size: 20),
@@ -151,7 +149,7 @@ class CategoryReportScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: (revenue / sales).clamp(0, 1).toDouble(),
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.fill,
                   valueColor:
                       AlwaysStoppedAnimation<Color>(color),
                   minHeight: 6,

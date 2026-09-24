@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode;
+import 'package:mobile_store_app/core/theme/app_colors.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 
 // ---------------------------------------------------------------------------
 // BouTikaLoader — chargeur standard de toute l'application
@@ -100,11 +101,11 @@ class _BouTikaLoaderState extends State<BouTikaLoader>
         // discrète — sauf si des couleurs personnalisées sont fournies
         // (variante compacte sur bouton coloré, par exemple).
         final base = widget.baseColor ??
-            (isDark ? const Color(0xFF44454C) : const Color(0xFFB6BAC3));
+            (isDark ? AppColors.darkTextTertiary : AppColors.textLight);
         final glow = widget.glowColor ??
-            (isDark ? const Color(0xFF6E5A43) : const Color(0xFFC99C73));
+            (isDark ? AppColors.darkPrimary : AppColors.primarySoft);
         final core = widget.coreColor ??
-            (isDark ? const Color(0xFFCBA97E) : const Color(0xFFB0713C));
+            (isDark ? AppColors.darkAccentPink : AppColors.accentPurple);
 
         final word = AnimatedBuilder(
           animation: _sweepController,
@@ -132,7 +133,7 @@ class _BouTikaLoaderState extends State<BouTikaLoader>
               },
               child: Text(
                 'BouTika',
-                style: TextStyle(
+                style: AppTextStyles.brand.copyWith(
                   fontSize: widget.fontSize,
                   fontWeight: FontWeight.w700,
                   letterSpacing: widget.letterSpacing,
@@ -154,11 +155,10 @@ class _BouTikaLoaderState extends State<BouTikaLoader>
               widget.message!,
               textAlign: TextAlign.center,
               style: widget.messageStyle ??
-                  TextStyle(
-                    fontSize: 13,
+                  AppTextStyles.bodySecondary.copyWith(
                     color: isDark
-                        ? const Color(0xFF8A8D95)
-                        : const Color(0xFF85888F),
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
             ),
           ],

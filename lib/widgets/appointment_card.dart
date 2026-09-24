@@ -9,7 +9,7 @@ import '../core/widgets/common/primitives.dart';
 /// APPOINTMENT CARD — carte de rendez-vous du design system.
 ///
 /// Structure exacte de la spec :
-///   • Card blanche, BorderRadius.circular(20), ombre douce
+///   • Card blanche, AppRadius.xl, ombre douce
 ///   • Row : Avatar + Nom / Spécialité + icône menu (3 points)
 ///   • Badge « Confirmé » avec check icon
 ///   • Divider fin
@@ -307,7 +307,7 @@ class _MetaItem extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: c.fill,
-            borderRadius: BorderRadius.circular(9),
+            borderRadius: AppRadius.sm,
           ),
           child: Icon(icon, size: 14, color: c.textSecondary),
         ),

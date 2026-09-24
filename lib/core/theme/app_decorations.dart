@@ -14,7 +14,7 @@ class AppDecorations {
   AppDecorations._();
 
   /// Carte du design system : surface + ombre douce, sans bordure visible.
-  static BoxDecoration card(DashColors c, {double radius = AppRadius.xl}) =>
+  static BoxDecoration card(DashColors c, {double radius = AppRadius.lg}) =>
       BoxDecoration(
         color: c.card,
         borderRadius: BorderRadius.circular(radius),
@@ -23,7 +23,7 @@ class AppDecorations {
 
   /// Carte « flat » du design system : surface + ombre, zéro bordure.
   /// À privilégier pour les nouvelles cartes (CategoryCard, AppointmentCard…).
-  static BoxDecoration softCard(DashColors c, {double radius = AppRadius.xl}) =>
+  static BoxDecoration softCard(DashColors c, {double radius = AppRadius.lg}) =>
       BoxDecoration(
         color: c.card,
         borderRadius: BorderRadius.circular(radius),
@@ -41,7 +41,7 @@ class AppDecorations {
 
   /// Carte « outline » : bordure visible, pas d'ombre.
   static BoxDecoration cardOutlined(DashColors c,
-      {double radius = AppRadius.xl, Color? borderColor}) =>
+      {double radius = AppRadius.lg, Color? borderColor}) =>
       BoxDecoration(
         color: c.card,
         borderRadius: BorderRadius.circular(radius),
@@ -51,7 +51,7 @@ class AppDecorations {
   /// Carte « filled » : fond gris clair, pas d'ombre, pas de bordure.
   /// (champs de recherche, zones neutres)
   static BoxDecoration cardFilled(DashColors c,
-          {double radius = AppRadius.lg, Color? fill}) =>
+          {double radius = AppRadius.md, Color? fill}) =>
       BoxDecoration(
         color: fill ?? c.fill,
         borderRadius: BorderRadius.circular(radius),
@@ -71,8 +71,9 @@ class AppDecorations {
   static BoxDecoration softIconCircle({required Color softColor}) =>
       BoxDecoration(color: softColor, shape: BoxShape.circle);
 
-  /// Tuile pastel d'une grille de catégories (rayon 18, fond pastel).
-  static BoxDecoration pastelTile({required Color softColor, double radius = 18}) =>
+  /// Tuile pastel d'une grille de catégories (rayon 16, fond pastel).
+  static BoxDecoration pastelTile(
+          {required Color softColor, double radius = AppRadius.lg}) =>
       BoxDecoration(
         color: softColor,
         borderRadius: BorderRadius.circular(radius),
@@ -99,7 +100,7 @@ class AppDecorations {
 
   /// Carte « wash » : dégradé très pâle (teinte → blanc), texte encre.
   /// C'est la carte d'information premium : la couleur n'est qu'une trace.
-  static BoxDecoration washCard(DashColors c, {Color? tint, double radius = AppRadius.xl}) =>
+  static BoxDecoration washCard(DashColors c, {Color? tint, double radius = AppRadius.lg}) =>
       BoxDecoration(
         gradient: c.wash(tint: tint),
         borderRadius: BorderRadius.circular(radius),
@@ -107,7 +108,7 @@ class AppDecorations {
       );
 
   /// Carte encre (surface forte, texte blanc) — usage rare et volontaire.
-  static BoxDecoration inkCard(DashColors c, {double radius = AppRadius.xl}) =>
+  static BoxDecoration inkCard(DashColors c, {double radius = AppRadius.lg}) =>
       BoxDecoration(
         gradient: c.inkWash,
         borderRadius: BorderRadius.circular(radius),
@@ -121,11 +122,14 @@ class AppDecorations {
 class AppGradients {
   AppGradients._();
 
-  /// Dégradé de marque (teal profond → teal), diagonal.
+  /// Dégradé de marque (violet → rose), diagonal.
   /// ⚠️ Réservé au logo et aux héro : jamais une grande surface saturée.
   static LinearGradient accent(DashColors c) => c.accentGradient;
 
-  /// Alias explicite : dégradé teal du design system.
+  /// Alias explicite : dégradé de marque (violet → rose).
+  static LinearGradient brand(DashColors c) => c.accentGradient;
+
+  /// Alias historique conservé.
   static LinearGradient teal(DashColors c) => c.accentGradient;
 
   /// Dégradé primaire (cartes héro, boutons spéciaux)
@@ -144,14 +148,13 @@ class AppGradients {
   /// Wash très pâle d'une teinte (cartes d'info, tuiles teintées).
   static LinearGradient wash(DashColors c, {Color? tint}) => c.wash(tint: tint);
 
-  /// Voile d'écran : wash très pâle en haut → fond neutre (effet premium).
-  static LinearGradient heroWash(DashColors c) => LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          c.backgroundWash,
-          c.background,
-        ],
-        stops: const [0.0, 0.45],
-      );
+  /// Voile d'écran : dégradé de fond du design system (lavande → blanc cassé).
+  /// Utilisé comme toile de fond par tous les écrans.
+  static LinearGradient heroWash(DashColors c) => c.backgroundGradient;
+
+  /// Alias explicite : dégradé de fond de page.
+  static LinearGradient page(DashColors c) => c.backgroundGradient;
+
+  /// Dégradé d'écran long (lavande en tête, puis fond général).
+  static LinearGradient screen(DashColors c) => c.screenGradient;
 }

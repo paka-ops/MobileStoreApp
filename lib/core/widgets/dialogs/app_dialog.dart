@@ -74,10 +74,7 @@ class AppDialog {
               title,
               textAlign: TextAlign.center,
               style: AppTextStyles.h3.copyWith(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-                color: c.textPrimary,
+                AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
               ),
             ),
           );
@@ -91,9 +88,7 @@ class AppDialog {
                 message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: c.textSecondary,
-                  fontSize: 13.5,
-                  height: 1.5,
+                  AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, height: 1.5),
                 ),
               ),
             );
@@ -191,7 +186,7 @@ class AppSheet {
                     height: AppSizes.sheetHandleHeight,
                     decoration: BoxDecoration(
                       color: c.border,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: AppRadius.sm,
                     ),
                   ),
                   if (title != null)

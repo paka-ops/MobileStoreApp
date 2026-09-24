@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/models/employer.dart';
 import 'package:mobile_store_app/screens/login_screen.dart';
@@ -44,21 +46,21 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   InputDecoration _inputStyle(String label, IconData icon, DashColors colors) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+      labelStyle: TextStyle(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14)),
       prefixIcon: Icon(icon, color: colors.primary, size: 20),
       filled: true,
       fillColor: colors.card,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.sm,
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.sm,
         borderSide: BorderSide(color: colors.border, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.sm,
         borderSide: BorderSide(color: colors.primary, width: 1.5),
       ),
     );
@@ -69,9 +71,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
     final colors = DashColors(context);
     
     return Scaffold(
-      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: colors.background,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary, size: 20),
@@ -116,7 +116,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           decoration: BoxDecoration(
             color: colors.primarySoft,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.sm,
           ),
           child: Center(
             child: Text(
@@ -136,7 +136,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
         ),
         Text(
           "Complétez les étapes pour commencer",
-          style: TextStyle(color: colors.textSecondary, fontSize: 13),
+          style: TextStyle(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary)),
         ),
       ],
     );

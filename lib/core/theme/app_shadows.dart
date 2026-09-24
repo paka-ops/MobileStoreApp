@@ -10,21 +10,39 @@ import 'package:flutter/material.dart';
 class AppShadows {
   AppShadows._();
 
-  /// Ombre de carte — 4 % noir, blur 20, y 8.
+  /// Ombre de carte — 5 % noir, blur 10, y 4 (spécification).
   static const List<BoxShadow> card = [
     BoxShadow(
-      color: Color(0x0A000000), // noir 4 %
-      blurRadius: 20,
-      offset: Offset(0, 8),
+      color: Color(0x0D000000), // noir 5 %
+      blurRadius: 10,
+      offset: Offset(0, 4),
     ),
   ];
 
-  /// Ombre pour éléments flottants (FAB, barres, tags) — 8 %, blur 26, y 12.
+  /// Ombre très légère — 3 % noir, blur 6, y 2 (pilules actives, petits éléments).
+  static const List<BoxShadow> soft = [
+    BoxShadow(
+      color: Color(0x08000000), // noir 3 %
+      blurRadius: 6,
+      offset: Offset(0, 2),
+    ),
+  ];
+
+  /// Ombre du segment actif d'une barre de pills — 6 %, blur 8, y 2.
+  static const List<BoxShadow> activePill = [
+    BoxShadow(
+      color: Color(0x0F000000), // noir 6 %
+      blurRadius: 8,
+      offset: Offset(0, 2),
+    ),
+  ];
+
+  /// Ombre pour éléments flottants (FAB, barres, tags) — 8 %, blur 20, y 8.
   static const List<BoxShadow> floating = [
     BoxShadow(
       color: Color(0x14000000), // noir 8 %
-      blurRadius: 26,
-      offset: Offset(0, 12),
+      blurRadius: 20,
+      offset: Offset(0, 8),
     ),
   ];
 
@@ -32,16 +50,16 @@ class AppShadows {
   static const List<BoxShadow> floatNav = [
     BoxShadow(
       color: Color(0x14000000), // noir 8 %
-      blurRadius: 28,
-      offset: Offset(0, 12),
+      blurRadius: 20,
+      offset: Offset(0, 8),
     ),
   ];
 
-  /// Ombre de dialog / modal — 12 %, blur 32, y 12.
+  /// Ombre de dialog / modal — 12 %, blur 28, y 12.
   static const List<BoxShadow> modal = [
     BoxShadow(
       color: Color(0x1F000000),
-      blurRadius: 32,
+      blurRadius: 28,
       offset: Offset(0, 12),
     ),
   ];

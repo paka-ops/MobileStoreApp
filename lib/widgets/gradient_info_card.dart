@@ -73,7 +73,7 @@ class GradientInfoCard extends StatelessWidget {
     this.inkVariant = false,
     this.showChevron = false,
     this.iconInPill = true,
-    this.radius = AppRadius.xl,
+    this.radius = AppRadius.lg,
     this.padding = const EdgeInsets.all(16),
     this.gradient,
   });
@@ -86,7 +86,7 @@ class GradientInfoCard extends StatelessWidget {
     this.icon = Icons.calendar_month_outlined,
     this.onTap,
     this.trailing,
-    this.radius = AppRadius.xl,
+    this.radius = AppRadius.lg,
   })  : label = label,
         value = value,
         caption = null,

@@ -53,38 +53,38 @@ class AppRadius {
   /// 8 px — petits éléments (badges, mini vignettes)
   static const double xs = 8;
 
-  /// 10 px — chips, petites boîtes
-  static const double sm = 10;
+  /// 12 px — chips, petites boîtes, pastilles carrées
+  static const double sm = 12;
 
-  /// 12 px — boutons, inputs
+  /// 12 px — boutons, inputs, petites cartes
   static const double md = 12;
 
-  /// 14 px — boutons larges, champs principaux
-  static const double mlg = 14;
+  /// 16 px — champs principaux, cartes standard
+  static const double mlg = 16;
 
-  /// 16 px — cartes standard
+  /// 16 px — cartes standard (radiusMedium)
   static const double lg = 16;
 
-  /// 20 px — cartes premium
+  /// 20 px — cartes premium (radiusLarge)
   static const double xl = 20;
 
-  /// 26 px — sheets, modals
+  /// 26 px — sheets, modals (coins supérieurs)
   static const double xxl = 26;
 
-  /// 24 px — grandes cartes du design system (rayon 20–24)
-  static const double card = 24;
+  /// 16 px — cartes du design system (radiusMedium)
+  static const double card = 16;
 
-  /// 28 px — bouton primaire en pilule
-  static const double button = 28;
+  /// 100 px — boutons en pilule complète (radio = hauteur / 2)
+  static const double button = 100;
 
-  /// 30 px — barres flottantes (bottom nav)
-  static const double navPill = 30;
+  /// 20 px — barres flottantes (bottom nav, radiusLarge)
+  static const double navPill = 20;
 
   /// 16 px — champs de recherche du design system
   static const double search = 16;
 
-  /// Pilule complète
-  static const double pill = 999;
+  /// Pilule complète (radiusPill de la spécification)
+  static const double pill = 100;
 
   /// BorderRadius prêts à l'emploi
   static final BorderRadius rSm = BorderRadius.circular(sm);
@@ -113,17 +113,17 @@ class AppSizes {
   // ---- Hauteurs de composants ----
   static const double buttonHeight = 52;
   static const double buttonHeightCompact = 44;
-  static const double inputHeight = 56;
+  static const double inputHeight = 52;
   static const double appBarHeight = 64;
-  static const double bottomNavHeight = 68;
+  static const double bottomNavHeight = 64;
   static const double listItemMinHeight = 64;
 
   // ---- Design system : dimensions signature ----
-  /// Hauteur du bouton primaire en pilule (Book Appointment)
-  static const double primaryButtonHeight = 56;
+  /// Hauteur du bouton primaire en pilule (CTA)
+  static const double primaryButtonHeight = 52;
 
   /// Hauteur de la barre de recherche arrondie
-  static const double searchBarHeight = 52;
+  static const double searchBarHeight = 48;
 
   /// Diamètre du cercle pastel d'une CategoryCard
   static const double categoryIcon = 48;

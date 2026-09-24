@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/constants/app_spacing.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show DashColors;
 
@@ -18,7 +20,7 @@ class SubscriptionHeader extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: c.primarySoft,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.sm,
               ),
               child: Icon(Icons.verified_rounded,
                   color: c.primary, size: 20),
@@ -41,9 +43,7 @@ class SubscriptionHeader extends StatelessWidget {
         Text(
           "Consultez l'état de votre abonnement et contactez le support pour le renouveler.",
           style: TextStyle(
-            color: c.textSecondary,
-            fontSize: 13.5,
-            height: 1.5,
+            AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, height: 1.5),
           ),
         ),
       ],

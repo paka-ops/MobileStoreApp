@@ -79,7 +79,7 @@ class CategoryCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: c.card,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: c.cardShadow,
         ),
         child: LayoutBuilder(
@@ -158,7 +158,8 @@ class CategoryCard extends StatelessWidget {
                       constraints:
                           const BoxConstraints(minWidth: 20, minHeight: 18),
                       decoration: BoxDecoration(
-                        color: c.fill,
+                        // Pastille circulaire rouge de la spécification.
+                        color: c.badgeRed,
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                       alignment: Alignment.center,
@@ -167,7 +168,7 @@ class CategoryCard extends StatelessWidget {
                         style: AppTextStyles.label.copyWith(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          color: c.textSecondary,
+                          color: Colors.white,
                         ),
                       ),
                     ),

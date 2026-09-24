@@ -45,7 +45,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         final colors = DashColors(context);
 
         return Scaffold(
-          backgroundColor: colors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -324,7 +323,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return AlertDialog(
           backgroundColor: colors.card,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xl,
             side: BorderSide(color: colors.border),
           ),
           titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -336,7 +335,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: colors.primarySoft,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.sm,
                 ),
                 child: Icon(Icons.add_business_rounded,
                     color: colors.primary, size: 22),
@@ -348,10 +347,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: 17.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
+                    AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
                   ),
                 ),
               ),

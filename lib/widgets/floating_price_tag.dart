@@ -8,7 +8,7 @@ import '../core/widgets/common/primitives.dart';
 /// ============================================================================
 /// FLOATING PRICE TAG — étiquette de prix flottante du design system.
 ///
-///   • Card blanche flottante, BorderRadius.circular(16), ombre
+///   • Card blanche flottante, AppRadius.lg, ombre
 ///   • Positionnée en absolu/Stack sur le côté de l'écran
 ///
 ///   Stack(
@@ -108,7 +108,7 @@ class FloatingPriceTag extends StatelessWidget {
                         color: accent
                             ? Colors.white.withValues(alpha: 0.14)
                             : c.fill,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: AppRadius.sm,
                       ),
                       child: Icon(
                         icon,

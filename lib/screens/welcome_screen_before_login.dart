@@ -18,7 +18,6 @@ class _WelcomeState extends State<WelcomePreLoginScreen> {
     final colors = DashColors(context);
 
     return Scaffold(
-      backgroundColor: colors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(

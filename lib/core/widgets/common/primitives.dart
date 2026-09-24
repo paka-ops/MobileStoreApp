@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_text_styles.dart';
+import '../../../core/constants/app_spacing.dart';
 
 import '../../constants/app_durations.dart';
 import '../../theme/app_colors.dart';
@@ -86,7 +88,7 @@ class AppBadge extends StatelessWidget {
       child: Text(
         count > 99 ? '99+' : '$count',
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: AppTextStyles.label.copyWith(
           color: textColor,
           fontSize: 10,
           height: 1,
@@ -122,7 +124,7 @@ class SoftChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: softColor,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: AppRadius.sm,
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Row(
@@ -175,7 +177,7 @@ class StatusPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
         color: softColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadius.pill,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -233,10 +235,7 @@ class SectionHeader extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 17.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
+                style: AppTextStyles.sectionTitle.copyWith(
                   color: c.textPrimary,
                 ),
               ),
@@ -246,9 +245,7 @@ class SectionHeader extends StatelessWidget {
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
+                  style: AppTextStyles.label.copyWith(
                     color: c.textSecondary,
                   ),
                 ),
@@ -278,10 +275,7 @@ class OverlineLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text.toUpperCase(),
-      style: TextStyle(
-        fontSize: 11,
-        height: 1.2,
-        fontWeight: FontWeight.w700,
+      style: AppTextStyles.overline.copyWith(
         letterSpacing: 1.2,
         color: color ?? DashColors(context).textSecondary,
       ),

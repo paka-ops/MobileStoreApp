@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
@@ -87,7 +88,6 @@ class _LowStockProductDetailsScreenState
     ));
 
     return Scaffold(
-      backgroundColor: c.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -243,7 +243,7 @@ class _LowStockProductDetailsScreenState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.xl,
               side: BorderSide(color: c.border),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -255,7 +255,7 @@ class _LowStockProductDetailsScreenState
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: c.successSoft,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.sm,
                   ),
                   child: Icon(Icons.add_box_rounded,
                       color: c.success, size: 22),
@@ -267,10 +267,7 @@ class _LowStockProductDetailsScreenState
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: c.textPrimary,
-                      fontSize: 17.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
+                      AppTextStyles.heading.copyWith(fontSize: 17.5, color: c.textPrimary),
                     ),
                   ),
                 ),
@@ -404,10 +401,7 @@ class _LowStockProductDetailsScreenState
                   p.name,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                    color: c.textPrimary,
+                    AppTextStyles.heading.copyWith(fontSize: 18, color: c.textPrimary),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -470,9 +464,7 @@ class _LowStockProductDetailsScreenState
         children: [
           Text(label,
               style: TextStyle(
-                  color: c.textSecondary,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500)),
+                  AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, fontWeight: FontWeight.w500))),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -482,9 +474,7 @@ class _LowStockProductDetailsScreenState
             child: Text(
               value,
               style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 13.5,
-                color: valueColor ?? c.textPrimary,
+                AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w700, fontSize: 13.5, color: valueColor ?? c.textPrimary),
               ),
             ),
           ),
@@ -619,7 +609,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: statusSoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadius.sm,
                       border: Border.all(
                           color: statusColor.withValues(alpha: 0.2)),
                     ),
@@ -636,10 +626,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            letterSpacing: -0.1,
-                            color: c.textPrimary,
+                            AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, color: c.textPrimary),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -651,9 +638,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: c.textPrimary,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
+                                  AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
                               ),
                             ),
@@ -719,9 +704,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
+                            AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),

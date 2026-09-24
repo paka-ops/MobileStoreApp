@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/constants/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_store_app/utils/app_colors.dart' show DashColors, appDarkMode;
 import 'package:mobile_store_app/utils/message.dart' show showSuccessMessage;
@@ -131,7 +133,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: c.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -216,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             height: 42,
             decoration: BoxDecoration(
               color: c.primarySoft,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadius.sm,
               border: Border.all(color: c.border),
             ),
             child: Icon(Icons.dashboard_rounded, color: c.primary, size: 24),
@@ -238,9 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   "Vue d'ensemble de vos boutiques",
                   style: TextStyle(
-                    color: c.textSecondary,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
+                    AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 12.5),
                   ),
                 ),
               ],
@@ -258,7 +257,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 42,
               decoration: BoxDecoration(
                 color: c.cardElevated,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.sm,
                 border: Border.all(color: c.border),
               ),
               child: Icon(
@@ -285,7 +284,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: c.card,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.sm,
             border: Border.all(color: c.border),
           ),
           child: Icon(icon, size: 20, color: c.textPrimary),
@@ -323,7 +322,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: c.card,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadius.lg,
           border: Border.all(color: c.border),
         ),
         child: Row(
@@ -443,7 +442,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xl,
         border: Border.all(color: c.border),
       ),
       child: Column(
@@ -479,9 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 8),
                         Text(_weekDays[i],
                             style: TextStyle(
-                                color: c.textSecondary,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600)),
+                                AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11, fontWeight: FontWeight.w600))),
                       ],
                     ),
                   ),
@@ -528,9 +525,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       const SizedBox(width: 6),
       Text(l,
           style: TextStyle(
-              color: c.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600)),
+              AppTextStyles.label.copyWith(color: c.textSecondary, fontWeight: FontWeight.w600))),
     ],
   );
 
@@ -555,7 +550,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xl,
         border: Border.all(color: c.border),
       ),
       child: Column(
@@ -593,9 +588,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              color: c.textPrimary,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13.5)),
+                              AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700).5)),
                     ),
                     Text(_fmt(s.chiffreAffaires),
                         style: TextStyle(
@@ -638,7 +631,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: c.primarySoft,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: AppRadius.sm,
           ),
           child: Text(sub,
               style: TextStyle(
@@ -684,7 +677,7 @@ class _GlobalKpiCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xl,
         border: Border.all(color: c.border),
       ),
       child: Column(
@@ -694,7 +687,7 @@ class _GlobalKpiCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  color: softColor, borderRadius: BorderRadius.circular(12)),
+                  color: softColor, borderRadius: AppRadius.sm),
               child: Icon(icon, color: color, size: 20),
             ),
             const Spacer(),
@@ -778,15 +771,9 @@ class _StoreCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: c.card,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: c.border, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            boxShadow: c.cardShadow,
           ),
           child: Column(
             children: [
@@ -857,9 +844,7 @@ class _StoreCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: c.textSecondary,
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w500,
+                          AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11.5),
                         ),
                       ),
                     ),
@@ -938,7 +923,7 @@ class _StoreCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
       decoration: BoxDecoration(
         color: soft,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadius.lg,
         border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Row(
@@ -947,7 +932,7 @@ class _StoreCard extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: c.card,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: AppRadius.sm,
               border: Border.all(color: color.withValues(alpha: 0.2)),
             ),
             child: Icon(icon, color: color, size: 16),
@@ -990,9 +975,7 @@ class _StoreCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                    color: c.textSecondary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600)),
+                    AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600))),
           ),
           const SizedBox(width: 8),
           Container(
@@ -1075,9 +1058,7 @@ class _StoreCard extends StatelessWidget {
           Text(
             "Conversion: ${store.tauxConversion.toStringAsFixed(1)}%",
             style: TextStyle(
-                color: c.textSecondary,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600),
+                AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600)),
           ),
           const Spacer(),
           Text("Voir détails",

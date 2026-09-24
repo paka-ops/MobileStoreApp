@@ -7,7 +7,7 @@ import '../core/theme/app_text_styles.dart';
 /// ============================================================================
 /// SEARCH BAR WIDGET — barre de recherche du design system.
 ///
-///   • Container arrondi BorderRadius.circular(16)
+///   • Container arrondi AppRadius.lg
 ///   • Fond gris clair (#F3F4F6), AUCUNE bordure
 ///   • Icône recherche + hint gris
 ///   • Hauteur ~52 px
@@ -149,8 +149,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.body.copyWith(
-                            color: c.textSecondary,
-                            fontSize: 14,
+                            AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14),
                           ),
                         ),
                       )
@@ -178,8 +177,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           contentPadding: EdgeInsets.zero,
                           hintText: widget.hint,
                           hintStyle: AppTextStyles.body.copyWith(
-                            color: c.textSecondary,
-                            fontSize: 14,
+                            AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14),
                           ),
                         ),
                       ),

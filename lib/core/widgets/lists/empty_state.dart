@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 import '../../constants/app_spacing.dart';
 import '../../theme/app_colors.dart';
@@ -166,7 +167,7 @@ class ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: c.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, height: 1.5)),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),
