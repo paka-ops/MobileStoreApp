@@ -45,7 +45,7 @@ class CustomTabBar extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final Color? activeColor;
 
-  const CustomTabBar({
+   CustomTabBar({
     super.key,
     required List<String> tabs,
     required this.currentIndex,

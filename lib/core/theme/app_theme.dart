@@ -298,7 +298,7 @@ ThemeData buildAppTheme(bool dark) {
       surfaceTintColor: Colors.transparent,
       modalBackgroundColor: card,
       modalBarrierColor: Colors.black.withValues(alpha: isDark ? 0.6 : 0.45),
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.rSheet),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.rSheet),
       showDragHandle: false,
       elevation: isDark ? 12 : 8,
     ),

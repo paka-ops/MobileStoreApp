@@ -1044,7 +1044,7 @@ class _OrderCardState extends State<_OrderCard> {
                           ),
                         ),
                         Text(
-                          "$totalAmount F",
+                          "${totalAmount.toStringAsFixed(2)} F",
                           style: TextStyle(
                             color: c.primary,
                             fontWeight: FontWeight.w800,

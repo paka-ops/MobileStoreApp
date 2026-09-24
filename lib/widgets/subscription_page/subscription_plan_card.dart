@@ -13,26 +13,26 @@ class SubscriptionPlanCard extends StatelessWidget {
 
   Color _statusColor(DashColors c) {
     final bool isExpired =
-        subscription.expirationDate.isBefore(DateTime.now());
+        subscription.expirationDate!.isBefore(DateTime.now());
     return isExpired ? c.danger : c.success;
   }
 
   Color _statusSoftColor(DashColors c) {
     final bool isExpired =
-        subscription.expirationDate.isBefore(DateTime.now());
+        subscription.expirationDate!.isBefore(DateTime.now());
     return isExpired ? c.dangerSoft : c.successSoft;
   }
 
   String _statusLabel() {
     final bool isExpired =
-        subscription.expirationDate.isBefore(DateTime.now());
+        subscription.expirationDate!.isBefore(DateTime.now());
     return isExpired ? "Expiré" : "Actif";
   }
 
   @override
   Widget build(BuildContext context) {
     final c = DashColors(context);
-    final int daysLeft = subscription.expirationDate
+    final int daysLeft = subscription.expirationDate!
         .difference(DateTime.now())
         .inDays;
     final Color statusColor = _statusColor(c);
@@ -116,7 +116,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   softColor: c.infoSoft,
                   label: "Date de début",
                   value: DateFormat('dd/MM/yyyy')
-                      .format(subscription.startDate),
+                      .format(subscription.startDate!),
                 ),
                 _buildRow(
                   c,
@@ -125,7 +125,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   softColor: c.warningSoft,
                   label: "Date d'expiration",
                   value: DateFormat('dd/MM/yyyy')
-                      .format(subscription.expirationDate),
+                      .format(subscription.expirationDate!),
                 ),
                 _buildRow(
                   c,

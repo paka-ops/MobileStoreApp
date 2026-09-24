@@ -493,11 +493,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   Widget _buildKpiRow(BuildContext context, DashColors colors) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      // IntrinsicHeight + stretch : les deux tuiles gardent la même hauteur,
-      // quel que soit le contenu (aucun désalignement, aucun overflow).
-      child: IntrinsicHeight(
+      child: SizedBox(
+        height: 140, // Donnez une hauteur fixe
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: GradientInfoCard(
@@ -730,12 +728,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SubscriptionScreen(
-                          storeName: widget.store.name,
-                          planType: sub.plan!,
-                          duration: sub.duration!,
-                          startDate: sub.startDate!,
-                          expiryDate: sub.expirationDate!,
+                        builder: (_) => SubscriptionScreenPage(
+                          subscription: sub,
                         ),
                       ),
                     );
