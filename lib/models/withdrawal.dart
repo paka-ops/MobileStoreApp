@@ -2,8 +2,8 @@ class Withdrawal {
   String? id;
   double amount;
   String message;
-  DateTime date;
-  Withdrawal({this.id, required this.amount , required this.message,required this.date});
+  DateTime? date;
+  Withdrawal({this.id, required this.amount , required this.message,this.date});
   factory Withdrawal.fromJson(Map<String,dynamic> json)=>
       Withdrawal(
         id: json["id"],
@@ -13,8 +13,7 @@ class Withdrawal {
       );
   Map<String,dynamic> toJson()=>{
     "amount" : amount,
-    "message" : message,
-    "date" : date.toIso8601String()
+    "message" : message
   };
 
   /// Le serveur peut renvoyer le montant en nombre ou en chaîne.

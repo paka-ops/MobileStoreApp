@@ -6,7 +6,7 @@ import 'package:mobile_store_app/models/withdrawal.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 class WithdrawalService{
-  String baseUrl = UserService.baseUrl;
+  String baseUrl = "${UserService.baseUrl}/v1";
   String? token = UserService.token;
   Future<List<Withdrawal>?> getWithdrawals({required storeId,required DateTime startDate, required DateTime endDate, required BuildContext context}) async {
     try {
@@ -45,16 +45,15 @@ class WithdrawalService{
   Future<Withdrawal?> create({required String storeId,required Withdrawal withdrawal,required BuildContext context})async{
     try{
       var result = await http.post(Uri.parse("$baseUrl/withdrawal?storeId=$storeId"),
+        body: jsonEncode(withdrawal.toJson()),
           headers: {
             "Authorization" : "Bearer $token",
             "content-type" : "application/json"
-          },
-          body: jsonEncode({
-            ...withdrawal.toJson(),
-            "storeId": storeId,
-          })
+          }
+
       ).timeout(Duration(seconds: 10));
       if(result.statusCode == 201 || result.statusCode == 200 ){
+        showSuccessMessage("retrait ajouté avec success", context);
         return _readWithdrawal(result.body, withdrawal);
       }else if(result.statusCode == 401){
         showSubscriptionExpiredMessage(context);

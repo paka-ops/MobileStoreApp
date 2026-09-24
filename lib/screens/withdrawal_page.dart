@@ -57,7 +57,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
   /// Période envoyée à l'API (les valeurs par défaut sont la date du jour).
   DateTime startDate = _today();
-  DateTime endDate = _today();
+  DateTime endDate = _today().add(const Duration(days: 1)) ;
 
   static DateTime _today() => _startOfDay(DateTime.now());
 
@@ -85,7 +85,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       );
 
       final List<Withdrawal> list = result ?? <Withdrawal>[];
-      list.sort((a, b) => b.date.compareTo(a.date));
+      list.sort((a, b) => b.date!.compareTo(a.date!));
 
       if (mounted) {
         setState(() => withdrawals = list);
@@ -406,7 +406,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   // -------------------------------------------------------------------------
   Widget _buildWithdrawalCard(Withdrawal withdrawal, DashColors colors) {
     final String dateText =
-        DateFormat('dd MMM yyyy • HH:mm').format(withdrawal.date);
+        DateFormat('dd MMM yyyy • HH:mm').format(withdrawal.date!);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -734,8 +734,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
     final Withdrawal withdrawal = Withdrawal(
       id: widget.withdrawal?.id,
       amount: amount,
-      message: _messageController.text.trim(),
-      date: _date,
+      message: _messageController.text.trim()
     );
 
     setState(() => isSaving = true);
@@ -848,20 +847,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
                     : null,
               ),
               const SizedBox(height: 14),
-              Text(
-                "DATE DU RETRAIT",
-                style: TextStyle(
-                  color: colors.textSecondary,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.1,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _DateField(
-                date: _date,
-                onTap: _pickDate,
-              ),
+
             ],
           ),
         ),
