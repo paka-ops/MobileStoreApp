@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/models/order.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart'
+    show AppColors, DashColors;
 
 class GeneralReportScreen extends StatelessWidget {
   final String storeId;
@@ -40,15 +42,16 @@ class GeneralReportScreen extends StatelessWidget {
     Map<String, num> result = _computeResult(orders);
 
     return Scaffold(
-      backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
             "Rapport Général",
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16.5, letterSpacing: -0.2, color: colors.textPrimary)
+            style: AppTextStyles.heading.copyWith(
+                fontSize: 17, color: colors.textPrimary)
         ),
-        backgroundColor: colors.background,
+        backgroundColor: Colors.transparent,
         foregroundColor: colors.textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
       ),
       body: SafeArea(
@@ -72,7 +75,7 @@ class GeneralReportScreen extends StatelessWidget {
                   Expanded(child: _buildKPICard(colors, "Panier Moyen", "${result['panierMoyen']!.toStringAsFixed(2)} F", Icons.trending_up_rounded, colors.accent)),
                   const SizedBox(width: 12),
                   if (userType == "employer")
-                    Expanded(child: _buildKPICard(colors, "Bénéfices", "${result['revenue']} CFA", Icons.account_balance_wallet_rounded, const Color(0xFF8A7CB8))),
+                    Expanded(child: _buildKPICard(colors, "Bénéfices", "${result['revenue']} CFA", Icons.account_balance_wallet_rounded, AppColors.accentPurple)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -109,7 +112,7 @@ class GeneralReportScreen extends StatelessWidget {
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(icon, color: color, size: 18),
           ),
@@ -118,21 +121,12 @@ class GeneralReportScreen extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 16.5,
-              letterSpacing: -0.2,
-              color: colors.textPrimary,
-            ),
+            style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -162,7 +156,7 @@ class GeneralReportScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               "Graphique de performance",
-              style: TextStyle(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+              style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Text(

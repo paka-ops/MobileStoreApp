@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 import 'package:mobile_store_app/main.dart';
 
 class GlobalErrorInterceptor extends Interceptor {
@@ -15,7 +16,7 @@ class GlobalErrorInterceptor extends Interceptor {
           content: Text("Une erreur est survenue lors de la liaison avec le serveur. "
               "Assurez-vous d'être connecté à Internet ou contactez votre "
               "administrateur si le problème persiste."),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.badgeRed,
         ),
       );
     }

@@ -18,7 +18,6 @@ class LoginScreen extends StatelessWidget {
     final colors = DashColors(context);
 
     return Scaffold(
-      backgroundColor: colors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

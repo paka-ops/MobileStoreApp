@@ -44,6 +44,9 @@ class GradientInfoCard extends StatelessWidget {
   /// Teinte du wash (pastel). Ignorée si [inkVariant] est vrai.
   final Color? tint;
 
+  /// Couleur de l'icône de la pastille (encre par défaut).
+  final Color? iconColor;
+
   /// Carte encre (surface sombre, texte blanc) — usage rare et volontaire.
   final bool inkVariant;
 
@@ -70,10 +73,11 @@ class GradientInfoCard extends StatelessWidget {
     this.onTap,
     this.footer,
     this.tint,
+    this.iconColor,
     this.inkVariant = false,
     this.showChevron = false,
     this.iconInPill = true,
-    this.radius = AppRadius.xl,
+    this.radius = AppRadius.lg,
     this.padding = const EdgeInsets.all(16),
     this.gradient,
   });
@@ -86,13 +90,14 @@ class GradientInfoCard extends StatelessWidget {
     this.icon = Icons.calendar_month_outlined,
     this.onTap,
     this.trailing,
-    this.radius = AppRadius.xl,
+    this.radius = AppRadius.lg,
   })  : label = label,
         value = value,
         caption = null,
         child = null,
         footer = null,
         tint = null,
+        iconColor = null,
         inkVariant = false,
         showChevron = false,
         iconInPill = true,
@@ -109,7 +114,8 @@ class GradientInfoCard extends StatelessWidget {
     final Color labelColor = inkVariant
         ? Colors.white.withValues(alpha: 0.72)
         : c.textSecondary;
-    final Color iconFg = inkVariant ? Colors.white : c.textPrimary;
+    final Color iconFg =
+        inkVariant ? Colors.white : (iconColor ?? c.textPrimary);
     final Color iconBg = inkVariant
         ? Colors.white.withValues(alpha: 0.12)
         : c.card;

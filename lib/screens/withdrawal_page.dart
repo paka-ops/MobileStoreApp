@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
@@ -121,20 +122,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
         final colors = DashColors(context);
 
         return Scaffold(
-          backgroundColor: colors.background,
           appBar: AppBar(
             title: Text(
               "Historique des retraits",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16.5,
-                letterSpacing: -0.2,
+              style: AppTextStyles.heading.copyWith(
+                fontSize: 17,
                 color: colors.textPrimary,
               ),
             ),
-            backgroundColor: colors.background,
+            backgroundColor: Colors.transparent,
             foregroundColor: colors.textPrimary,
             elevation: 0,
+            scrolledUnderElevation: 0,
             centerTitle: true,
             actions: [
               IconButton(
@@ -191,7 +190,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: colors.primarySoft,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
                   Icons.savings_outlined,
@@ -297,11 +296,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               Expanded(
                 child: Text(
                   "Filtrer par période",
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14.5,
-                  ),
+                  style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                 ),
               ),
               if (!_isTodayFilter)
@@ -312,7 +307,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -426,7 +421,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                 padding: const EdgeInsets.all(11),
                 decoration: BoxDecoration(
                   color: colors.primarySoft,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: Icon(
                   Icons.savings_outlined,
@@ -445,20 +440,12 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                           : "Sans motif",
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.5,
-                      ),
+                      style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       dateText,
-                      style: TextStyle(
-                        color: colors.textSecondary,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5),
                     ),
                   ],
                 ),
@@ -469,7 +456,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
                   color: colors.dangerSoft,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   "- ${withdrawal.amount.toStringAsFixed(0)} F",
@@ -536,7 +523,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           side: BorderSide(color: colors.border),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -556,23 +543,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             const SizedBox(height: 18),
             Text(
               "Supprimer le retrait",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-                color: colors.textPrimary,
-              ),
+              style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
             ),
             const SizedBox(height: 10),
             Text(
               "Voulez-vous vraiment supprimer le retrait de "
               "${withdrawal.amount.toStringAsFixed(0)} F ? Cette action est irréversible.",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13.5,
-                height: 1.5,
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
             ),
           ],
         ),
@@ -774,7 +752,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
     return AlertDialog(
       backgroundColor: colors.card,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         side: BorderSide(color: colors.border),
       ),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -786,7 +764,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: colors.primarySoft,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(
               Icons.savings_outlined,

@@ -20,8 +20,10 @@ import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/core/theme/app_dimensions.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
-    show appDarkMode, DashColors;
+    show appDarkMode, AppColors, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/widgets/design_system.dart';
 import '../models/Store.dart';
@@ -54,9 +56,9 @@ class OrderLine {
 // Couleurs sémantiques fixes (ne changent pas avec le thème)
 // ---------------------------------------------------------------------------
 class _Fixed {
-  static const accent  = Color(0xFFC08552);
-  static const danger  = Color(0xFFDE4A52);
-  static const success = Color(0xFF2F9E68);
+  static const accent  = AppColors.accentPink;
+  static const danger  = AppColors.badgeRed;
+  static const success = AppColors.accentGreen;
 }
 
 class _NavItemData {
@@ -194,10 +196,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Écran d'attente « BouTika » tant que les appels API
         // de chargement des données ne sont pas terminés.
         if (_isLoading) {
-          return Scaffold(
-            backgroundColor: colors.background,
+          // Le dégradé lavande vient d'AppBackground (main.dart).
+          return const Scaffold(
             body: Center(
-              child: const BouTikaLoader(
+              child: BouTikaLoader(
                 message: "Préparation de votre boutique…",
               ),
             ),
@@ -205,7 +207,6 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         }
 
         return Scaffold(
-          backgroundColor: colors.background,
           body: SafeArea(
             bottom: false,
             child: Column(
@@ -284,26 +285,25 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             children: [
               ListTile(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(Spacing.sm),
                   decoration: BoxDecoration(
                     color: colors.primarySoft,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Icon(Icons.check_circle_rounded,
                       color: colors.primary, size: 20),
                 ),
                 title: Text(
                   widget.store.name,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: colors.textPrimary),
+                  style: AppTextStyles.cardTitle
+                      .copyWith(color: colors.textPrimary),
                 ),
                 subtitle: Text(
                   "Boutique active",
-                  style: TextStyle(color: colors.textSecondary),
+                  style: AppTextStyles.bodySecondary,
                 ),
               ),
               if (displayStore.isNotEmpty)
@@ -314,20 +314,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     color: colors.border),
               ...displayStore.map((newStore) => ListTile(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(Spacing.sm),
                   decoration: BoxDecoration(
-                    color: colors.cardElevated,
-                    borderRadius: BorderRadius.circular(10),
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Icon(Icons.storefront_outlined,
                       color: colors.textSecondary, size: 20),
                 ),
                 title: Text(newStore.name,
-                    style:
-                    TextStyle(color: colors.textPrimary)),
+                    style: AppTextStyles.productTitle
+                        .copyWith(color: colors.textPrimary)),
                 trailing: Icon(Icons.chevron_right_rounded,
                     color: colors.textSecondary),
                 onTap: () {
@@ -401,15 +401,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        boxShadow: colors.cardShadow,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: colors.softShadow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.md,
+              Spacing.md,
+              Spacing.md,
+              0,
+            ),
             child: SectionHeader(
               title: title,
               subtitle: subtitle,
@@ -419,7 +424,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       height: 44,
                       decoration: BoxDecoration(
                         color: colors.primarySoft,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Icon(icon, color: colors.primary, size: 21),
                     )
@@ -427,7 +432,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(Spacing.md),
             child: child,
           ),
         ],
@@ -514,7 +519,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 label: "Alertes",
                 value: "${lowStockProducts.length}",
                 caption: "sous le seuil",
-                tint: colors.pastelAt(0),
+                tint: colors.pastelAt(3),
+                iconColor: colors.starYellow,
                 showChevron: true,
                 onTap: () => Navigator.push(
                   context,
@@ -621,7 +627,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       children: [
         // Carte profil
         AppCard(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingAllM,
+          radius: AppRadius.lg,
+          shadow: colors.softShadow,
           borderColor: Colors.transparent,
           child: Row(
             children: [
@@ -640,11 +648,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       "${UserService.username}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          letterSpacing: -0.2,
-                          color: colors.textPrimary),
+                      style: AppTextStyles.sectionTitle
+                          .copyWith(color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
                     Container(
@@ -652,16 +657,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           horizontal: 9, vertical: 3),
                       decoration: BoxDecoration(
                         color: colors.fill,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                       ),
                       child: Text(
                         widget.userType == 'employee'
                             ? "EMPLOYÉ"
                             : "PROPRIÉTAIRE",
-                        style: TextStyle(
+                        style: AppTextStyles.chip.copyWith(
                           color: colors.textSecondary,
                           fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -677,6 +681,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Actions
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
+          radius: AppRadius.lg,
+          shadow: colors.softShadow,
           borderColor: Colors.transparent,
           child: Column(
             children: [
@@ -760,6 +766,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Déconnexion
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
+          radius: AppRadius.lg,
+          shadow: colors.softShadow,
           borderColor: Colors.transparent,
           child: ServiceListTile(
             icon: Icons.logout_rounded,
@@ -842,10 +850,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     const SizedBox(height: 8),
                     Text(
                       "Aucun employé pour le moment",
-                      style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500),
+                      style: AppTextStyles.bodySecondary
+                          .copyWith(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -865,18 +871,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: colors.fill,
+                          // Bouton circulaire d'action : encre + icône claire.
+                          color: colors.ink,
                           shape: BoxShape.circle,
+                          boxShadow: colors.softShadow,
                         ),
                         child: Icon(Icons.add_rounded,
-                            color: colors.textPrimary, size: 21),
+                            color: colors.onInk, size: 21),
                       ),
                       const SizedBox(height: 5),
                       Text("Ajouter",
-                          style: TextStyle(
-                              color: colors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12)),
+                          style: AppTextStyles.chip
+                              .copyWith(color: colors.textSecondary)),
                     ],
                   ),
                 ),
@@ -917,10 +923,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12),
+                style: AppTextStyles.chip
+                    .copyWith(color: colors.textPrimary),
               ),
             ],
           ),
@@ -948,22 +952,24 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: GestureDetector(
             onTap: () => _showAddCategoryForm(context, null, colors),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              height: 44,
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.md,
+              ),
               decoration: BoxDecoration(
-                color: colors.fill,
-                borderRadius: BorderRadius.circular(AppRadius.card),
+                // Bouton d'action « + » : pilule encre, icône et texte clairs.
+                color: colors.ink,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                boxShadow: colors.softShadow,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_rounded,
-                      color: colors.textPrimary, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(Icons.add_rounded, color: colors.onInk, size: 20),
+                  const SizedBox(width: Spacing.sm),
                   Text("Ajouter une catégorie",
-                      style: TextStyle(
-                          color: colors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13.5)),
+                      style: AppTextStyles.cardTitle.copyWith(
+                          fontSize: 13.5, color: colors.onInk)),
                 ],
               ),
             ),
@@ -975,7 +981,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
   Widget _buildExpandableCategory(
       BuildContext context, Category category, DashColors colors) {
-    return _CategoryCard(
+    return _StoreCategoryCard(
       category: category,
       userType: widget.userType,
       colors: colors,
@@ -995,7 +1001,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       barrierColor: colors.barrier,
       shape: const RoundedRectangleBorder(
           borderRadius:
-          BorderRadius.vertical(top: Radius.circular(26))),
+          BorderRadius.vertical(top: Radius.circular(AppRadius.xxl))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1006,27 +1012,26 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               height: 4,
               decoration: BoxDecoration(
                 color: colors.border,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
             ),
             const SizedBox(height: 10),
             ListTile(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               leading: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(Spacing.sm),
                 decoration: BoxDecoration(
                   color: colors.dangerSoft,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(Icons.delete_outline_rounded,
                     color: colors.danger, size: 20),
               ),
               title: Text("Supprimer l'employé",
-                  style: TextStyle(
-                      color: colors.danger,
-                      fontWeight: FontWeight.w600)),
+                  style: AppTextStyles.cardTitle
+                      .copyWith(color: colors.danger)),
               onTap: () {
                 Navigator.pop(ctx);
                 _confirmDeleteEmployee(context, emp, colors);
@@ -1048,7 +1053,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding:
@@ -1059,7 +1064,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: AppDimensions.paddingAllM,
                     decoration: BoxDecoration(
                       color: colors.dangerSoft,
                       shape: BoxShape.circle,
@@ -1070,10 +1075,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   const SizedBox(height: 18),
                   Text(
                     "Confirmation",
-                    style: TextStyle(
+                    style: AppTextStyles.heading.copyWith(
                       fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -1081,11 +1084,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Voulez-vous vraiment supprimer ${emp.username} ?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: colors.textSecondary,
-                      fontSize: 13.5,
-                      height: 1.5,
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -1209,7 +1208,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return Dialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               child: ConstrainedBox(
@@ -1218,7 +1217,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   maxHeight: MediaQuery.sizeOf(context).height * 0.8,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: AppDimensions.paddingAllL,
                   child: Form(
                     key: formKey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1234,7 +1233,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                 decoration: BoxDecoration(
                                   color: colors.primarySoft,
                                   borderRadius:
-                                  BorderRadius.circular(12),
+                                  BorderRadius.circular(AppRadius.sm),
                                 ),
                                 child: Icon(
                                     Icons.shopping_cart_checkout_rounded,
@@ -1245,17 +1244,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               Expanded(
                                 child: Text(
                                   "Choix des produits",
-                                  style: TextStyle(
+                                  style: AppTextStyles.heading.copyWith(
                                     fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.2,
                                     color: colors.textPrimary,
                                   ),
                                 ),
                               ),
                               Text("Ordre n°${orderId.substring(0, 8)}",
-                                  style: TextStyle(
-                                      fontSize: 11.5,
+                                  style: AppTextStyles.caption.copyWith(
                                       color: colors.textSecondary)),
                             ],
                           ),
@@ -1361,7 +1357,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                 color: colors.primary, size: 18),
                             label: Text(
                               "Ajouter un produit",
-                              style: TextStyle(color: colors.primary),
+                              style: AppTextStyles.button
+                                  .copyWith(color: colors.primary),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -1372,7 +1369,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             decoration: BoxDecoration(
                               color: colors.primarySoft,
                               borderRadius:
-                              BorderRadius.circular(AppRadius.md),
+                              BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Row(
                               mainAxisAlignment:
@@ -1380,17 +1377,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               children: [
                                 Text(
                                   "TOTAL",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
+                                  style: AppTextStyles.overline.copyWith(
                                     letterSpacing: 1.1,
                                     color: colors.textSecondary,
                                   ),
                                 ),
                                 Text(
                                   "${calculateTotal().toStringAsFixed(0)} F",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
+                                  style: AppTextStyles.price.copyWith(
                                     fontSize: 17,
                                     color: colors.primary,
                                   ),
@@ -1479,7 +1473,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding:
@@ -1490,7 +1484,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: AppDimensions.paddingAllM,
                     decoration: BoxDecoration(
                       color: colors.successSoft,
                       shape: BoxShape.circle,
@@ -1501,10 +1495,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   const SizedBox(height: 18),
                   Text(
                     "Confirmer la Vente",
-                    style: TextStyle(
+                    style: AppTextStyles.heading.copyWith(
                       fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -1512,11 +1504,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Valider la vente de ${total.toStringAsFixed(0)} F ?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: colors.textSecondary,
-                      fontSize: 13.5,
-                      height: 1.5,
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -1610,7 +1598,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1622,7 +1610,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.category_rounded,
                         color: colors.primary, size: 22),
@@ -1635,11 +1623,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           : "Modifier Catégorie",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: AppTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -1776,7 +1762,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1788,7 +1774,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.person_add_alt_rounded,
                         color: colors.primary, size: 22),
@@ -1801,11 +1787,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           : "Modifier ${employee.username}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: AppTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -1933,7 +1917,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           side: BorderSide(color: colors.border),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1942,7 +1926,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingAllM,
               decoration: BoxDecoration(
                 color: colors.dangerSoft,
                 shape: BoxShape.circle,
@@ -1953,10 +1937,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             const SizedBox(height: 18),
             Text(
               "Déconnexion",
-              style: TextStyle(
+              style: AppTextStyles.heading.copyWith(
                 fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
                 color: colors.textPrimary,
               ),
             ),
@@ -1964,9 +1946,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             Text(
               "Voulez-vous vraiment quitter BouTiKa ?",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13.5,
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5,
               ),
             ),
           ],
@@ -2017,7 +1997,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -2029,7 +2009,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.accentSoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.remove_circle_outline,
                         color: colors.accent, size: 20),
@@ -2040,11 +2020,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       "Nouvelle Dépense",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: AppTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -2175,14 +2153,14 @@ Color _pastelIcon(Color pastel) {
 // ===========================================================================
 // CATEGORY CARD
 // ===========================================================================
-class _CategoryCard extends StatefulWidget {
+class _StoreCategoryCard extends StatefulWidget {
   final Category category;
   final String userType;
   final DashColors colors;
   final VoidCallback onEdit;
   final VoidCallback onManage;
 
-  const _CategoryCard({
+  const _StoreCategoryCard({
     required this.category,
     required this.userType,
     required this.colors,
@@ -2191,10 +2169,10 @@ class _CategoryCard extends StatefulWidget {
   });
 
   @override
-  State<_CategoryCard> createState() => _CategoryCardState();
+  State<_StoreCategoryCard> createState() => _StoreCategoryCardState();
 }
 
-class _CategoryCardState extends State<_CategoryCard> {
+class _StoreCategoryCardState extends State<_StoreCategoryCard> {
   bool _expanded = false;
 
   @override
@@ -2208,7 +2186,7 @@ class _CategoryCardState extends State<_CategoryCard> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: _expanded ? colors.floatingShadow : colors.cardShadow,
       ),
       child: Column(
@@ -2217,7 +2195,7 @@ class _CategoryCardState extends State<_CategoryCard> {
         children: [
           // Header
           InkWell(
-            borderRadius: BorderRadius.circular(AppRadius.xl),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -2245,10 +2223,9 @@ class _CategoryCardState extends State<_CategoryCard> {
                           category.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: AppTextStyles.productTitle.copyWith(
                             fontWeight: FontWeight.w700,
                             fontSize: 14.5,
-                            letterSpacing: -0.1,
                             color: colors.textPrimary,
                           ),
                         ),
@@ -2256,9 +2233,8 @@ class _CategoryCardState extends State<_CategoryCard> {
                         Text("Gérer le stock et les prix",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: colors.textSecondary,
-                                fontSize: 12)),
+                            style: AppTextStyles.bodySecondary
+                                .copyWith(fontSize: 12)),
                       ],
                     ),
                   ),
@@ -2305,17 +2281,16 @@ class _CategoryCardState extends State<_CategoryCard> {
                   Text(
                     category.description ??
                         "Aucune description fournie.",
-                    style: TextStyle(
+                    style: AppTextStyles.bodySecondary.copyWith(
                         color: colors.textPrimary,
-                        height: 1.45,
-                        fontSize: 13),
+                        height: 1.45),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       if (widget.userType == "employer")
                         Expanded(
-                          child: _CategoryActionButton(
+                          child: _StoreCategoryActionButton(
                             icon: Icons.edit_outlined,
                             label: "Modifier",
                             filled: false,
@@ -2327,7 +2302,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                         const SizedBox(width: 10),
                       Expanded(
                         flex: 2,
-                        child: _CategoryActionButton(
+                        child: _StoreCategoryActionButton(
                           icon: Icons.inventory_2_outlined,
                           label: "Gérer les produits",
                           filled: true,
@@ -2350,14 +2325,14 @@ class _CategoryCardState extends State<_CategoryCard> {
 // ===========================================================================
 // BOUTON D'ACTION CATÉGORIE
 // ===========================================================================
-class _CategoryActionButton extends StatelessWidget {
+class _StoreCategoryActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool filled;
   final DashColors colors;
   final VoidCallback onTap;
 
-  const _CategoryActionButton({
+  const _StoreCategoryActionButton({
     required this.icon,
     required this.label,
     required this.filled,
@@ -2369,15 +2344,15 @@ class _CategoryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: filled ? colors.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(AppRadius.sm),
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(
               vertical: 11, horizontal: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.md),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
             border: filled
                 ? null
                 : Border.all(color: colors.border, width: 1.2),
@@ -2394,9 +2369,8 @@ class _CategoryActionButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: AppTextStyles.button.copyWith(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
                     color: filled
                         ? colors.onPrimary
                         : colors.textPrimary,

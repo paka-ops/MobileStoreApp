@@ -15,7 +15,6 @@ class SubscriptionScreenPage extends StatelessWidget {
     final colors = DashColors(context);
 
     return Scaffold(
-      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),

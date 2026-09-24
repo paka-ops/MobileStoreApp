@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
@@ -8,7 +9,7 @@ import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/models/spending.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
-    show appDarkMode, DashColors;
+    show appDarkMode, AppColors, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
@@ -30,8 +31,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   DateTime startDate = _today();
   DateTime endDate = _today();
 
-  static const Color _accent = Color(0xFFC08552);
-  static const Color _danger = Color(0xFFDE4A52);
+  static const Color _accent = AppColors.accentPink;
+  static const Color _danger = AppColors.badgeRed;
 
   static DateTime _today() => _startOfDay(DateTime.now());
 
@@ -104,20 +105,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         final colors = DashColors(context);
 
         return Scaffold(
-          backgroundColor: colors.background,
           appBar: AppBar(
             title: Text(
               "Historique des Dépenses",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16.5,
-                letterSpacing: -0.2,
+              style: AppTextStyles.heading.copyWith(
+                fontSize: 17,
                 color: colors.textPrimary,
               ),
             ),
-            backgroundColor: colors.background,
+            backgroundColor: Colors.transparent,
             foregroundColor: colors.textPrimary,
             elevation: 0,
+            scrolledUnderElevation: 0,
             centerTitle: true,
             actions: [
               IconButton(
@@ -172,7 +171,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: _accent.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: const Icon(
                   Icons.account_balance_wallet_outlined,
@@ -275,11 +274,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               Expanded(
                 child: Text(
                   "Filtrer par période",
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14.5,
-                  ),
+                  style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                 ),
               ),
               if (!_isTodayFilter)
@@ -290,7 +285,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -403,7 +398,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 padding: const EdgeInsets.all(11),
                 decoration: BoxDecoration(
                   color: _accent.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: const Icon(
                   Icons.money_off_rounded,
@@ -422,20 +417,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           : "Sans description",
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.5,
-                      ),
+                      style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       dateText,
-                      style: TextStyle(
-                        color: colors.textSecondary,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5),
                     ),
                   ],
                 ),
@@ -446,7 +433,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
                   color: _danger.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   "- ${amount.toStringAsFixed(0)} F",
@@ -528,7 +515,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           side: BorderSide(color: colors.border),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -548,23 +535,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             const SizedBox(height: 18),
             Text(
               "Supprimer la dépense",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-                color: colors.textPrimary,
-              ),
+              style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
             ),
             const SizedBox(height: 10),
             Text(
               "Voulez-vous vraiment supprimer cette dépense de "
               "${(spending.price ?? 0).toStringAsFixed(0)} F ? Cette action est irréversible.",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13.5,
-                height: 1.5,
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
             ),
           ],
         ),
@@ -642,7 +620,7 @@ class _ExpenseEditDialog extends StatefulWidget {
 }
 
 class _ExpenseEditDialogState extends State<_ExpenseEditDialog> {
-  static const Color _accent = Color(0xFFC08552);
+  static const Color _accent = AppColors.accentPink;
 
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _amountController;
@@ -705,7 +683,7 @@ class _ExpenseEditDialogState extends State<_ExpenseEditDialog> {
     return AlertDialog(
       backgroundColor: colors.card,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         side: BorderSide(color: colors.border),
       ),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -717,7 +695,7 @@ class _ExpenseEditDialogState extends State<_ExpenseEditDialog> {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: _accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: const Icon(Icons.edit_rounded, color: _accent, size: 20),
           ),

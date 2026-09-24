@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/theme/app_colors.dart';
 
 import '../core/constants/app_spacing.dart';
 
@@ -14,9 +15,9 @@ import '../core/constants/app_spacing.dart';
 
 /// Couleurs des messages (fixes, indépendantes du thème).
 class _MessageColors {
-  static const Color error = Color(0xFFDE4A52);
-  static const Color success = Color(0xFF2F9E68);
-  static const Color warning = Color(0xFFDE911D);
+  static const Color error = AppColors.badgeRed;
+  static const Color success = AppColors.accentGreen;
+  static const Color warning = AppColors.warning;
 }
 
 void showModernSnackBar({

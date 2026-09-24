@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 
 // ============================================================================
-// APP COLORS — Palette « Calm Premium » (agencement inspiré des apps haut de
-// gamme) : base NEUTRE CHAUDE + encre quasi-noire + accents minuscules.
+// APP COLORS — palette unique de l'application (design system « Lavande »).
 //
-// Principe anti-fatigue oculaire :
-//  • La couleur ne porte JAMAIS de grandes surfaces : fonds neutres, cartes
-//    blanches, textes encre/gris.
-//  • L'accent n'apparaît que par petites touches (pastille, point, icône).
-//  • Les dégradés sont des « washes » très pâles (≈ 4 % de teinte), jamais
-//    des aplats saturés.
-//  • Saturation maximale volontairement basse : aucune couleur « fluo ».
+// Identité visuelle :
+//   • Fond dégradé LAVANDE très clair (#E8E4F3 → #F5F5F7)
+//   • Surfaces blanches, texte encre (#1A1A1A), gris iOS (#8E8E93)
+//   • Accents PINK (#E91E8C) et PURPLE (#9C27B0) utilisés avec parcimonie
+//   • Badges rouges (#FF3B30), étoiles ambre (#FFC107), vert validation (#4CAF50)
+//   • Pills : piste #F2F2F7, texte actif #000000, inactif #AEAEB2
 //
-// Rôles :
-//  • `ink`    → actions (boutons pillules noirs), icônes actives, titres.
-//  • `primary`→ teal profond DÉSATURÉ : états interactifs (focus, progress,
-//               sélection) et marque BouTiKa — utilisé avec parcimonie.
-//  • `accent` → corail doux : alertes, pastilles, points, chiffres clés.
+// Rôles sémantiques (API conservée — aucun écran cassé) :
+//   ink     → actions (boutons pillules noirs), icônes actives, titres
+//   primary → violet (marque, états interactifs : focus, progression)
+//   accent  → rose (alertes douces, points, chiffres clés)
+//   card    → surface blanche ; fill → zone remplie neutre ; border → trait fin
 //
-// ⚠️ Compatibilité : tous les anciens noms (primary, accent, danger, card,
-//    navy, darkPrimary, …) restent disponibles — aucun écran n'est cassé.
+// ⚠️ Tous les anciens noms restent disponibles : primary, accent, danger, card,
+//    navy, darkPrimary, pastels… La valeur change, jamais le nom.
 // ============================================================================
 
 /// État du thème partagé par toute l'application.
@@ -32,149 +30,222 @@ class AppColors {
   AppColors._();
 
   // -------------------------------------------------------------------
-  // NEUTRES — LIGHT (base chaude, très douce)
+  // COULEURS PRINCIPALES (spécification)
   // -------------------------------------------------------------------
 
-  /// Fond général — blanc cassé chaud (jamais blanc pur)
-  static const Color background = Color(0xFFF7F6F3);
+  /// Lavande clair — haut du dégradé de fond
+  static const Color primaryGradientStart = Color(0xFFE8E4F3);
 
-  /// Voile haut d'écran (dégradé très pâle, teinte corail à 4 %)
-  static const Color backgroundWash = Color(0xFFF9F2EE);
+  /// Blanc cassé — bas du dégradé de fond
+  static const Color primaryGradientEnd = Color(0xFFF5F5F7);
 
-  /// Cartes — blanc pur (seule surface « pure », pour le contraste doux)
-  static const Color card = Color(0xFFFFFFFF);
-  static const Color cardElevated = Color(0xFFFFFFFF);
+  /// Fond général de l'écran
+  static const Color backgroundLight = Color(0xFFFAFAFA);
 
-  /// Zones remplies sans bordure (recherche, chips neutres)
-  static const Color fill = Color(0xFFF1F0EC);
-  static const Color fillStrong = Color(0xFFE8E6E1);
+  /// Surface des cartes
+  static const Color cardBackground = Color(0xFFFFFFFF);
 
-  /// Bordures / lignes fines
-  static const Color border = Color(0xFFECEAE5);
-  static const Color hairline = Color(0xFFF2F0EC);
+  /// Dégradé de fond principal de l'application.
+  static const LinearGradient backgroundGradient = LinearGradient(
+    colors: [primaryGradientStart, primaryGradientEnd],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 
-  /// Textes
-  static const Color textDark = Color(0xFF1A1A1F); // encre
-  static const Color textGrey = Color(0xFF8B8B92); // secondaire
-  static const Color textTertiary = Color(0xFFB3B3B9); // labels discrets
+  // -------------------------------------------------------------------
+  // ACCENTS
+  // -------------------------------------------------------------------
+  static const Color accentPink = Color(0xFFE91E8C);
+  static const Color accentPurple = Color(0xFF9C27B0);
+  static const Color badgeRed = Color(0xFFFF3B30);
+  static const Color accentGreen = Color(0xFF4CAF50);
 
-  /// Encre — boutons pillules, icônes actives, surfaces fortes
-  static const Color ink = Color(0xFF17171B);
-  static const Color inkSoft = Color(0xFF2C2C33);
+  // -------------------------------------------------------------------
+  // TEXTES
+  // -------------------------------------------------------------------
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF8E8E93);
+  static const Color textLight = Color(0xFFB0B0B5);
+
+  // -------------------------------------------------------------------
+  // ÉTOILES / RATING
+  // -------------------------------------------------------------------
+  static const Color starYellow = Color(0xFFFFC107);
+
+  // -------------------------------------------------------------------
+  // BOUTONS / PILLS
+  // -------------------------------------------------------------------
+  static const Color pillBackground = Color(0xFFF2F2F7);
+  static const Color pillActiveText = Color(0xFF000000);
+  static const Color pillInactiveText = Color(0xFFAEAEB2);
+
+  // -------------------------------------------------------------------
+  // NEUTRES (surfaces, traits)
+  // -------------------------------------------------------------------
+
+  /// Fond général (alias historique de [backgroundLight]).
+  static const Color background = backgroundLight;
+
+  /// Voile haut d'écran — bas du dégradé lavande.
+  static const Color backgroundWash = primaryGradientEnd;
+
+  /// Cartes — blanc pur.
+  static const Color card = cardBackground;
+  static const Color cardElevated = cardBackground;
+
+  /// Zones remplies sans bordure (recherche, chips neutres).
+  static const Color fill = pillBackground;
+  static const Color fillStrong = Color(0xFFE8E8ED);
+
+  /// Bordures / lignes fines.
+  static const Color border = Color(0xFFE5E5EA);
+  static const Color borderLight = border;
+  static const Color hairline = Color(0xFFEFEFF3);
+  static const Color divider = hairline;
+
+  /// Textes (alias sémantiques).
+  static const Color textDark = textPrimary;
+  static const Color textGrey = textSecondary;
+  static const Color textTertiary = textLight;
+
+  /// Encre — boutons pillules, icônes actives, surfaces fortes.
+  static const Color ink = textPrimary;
+  static const Color inkSoft = Color(0xFF333336);
   static const Color onInk = Color(0xFFFFFFFF);
 
   // -------------------------------------------------------------------
-  // ACCENTS — light (touches discrètes)
+  // MARQUE (primary = violet) & ACCENT (accent = rose)
   // -------------------------------------------------------------------
-
-  /// Teal profond désaturé — couleur de marque, états interactifs
-  static const Color primary = Color(0xFF0F766E);
-  static const Color primarySoft = Color(0xFFE7F2F0);
-
-  /// Contenu posé sur la couleur primaire
+  static const Color primary = accentPurple;
+  static const Color primarySoft = Color(0xFFF4E9F7);
   static const Color onPrimary = Color(0xFFFFFFFF);
 
-  /// Corail doux — alertes, pastilles, points, mise en avant
-  static const Color accent = Color(0xFFE0653F);
-  static const Color accentSoft = Color(0xFFFBEDE7);
-  static const Color accentDeep = Color(0xFFC4512F);
+  static const Color accent = accentPink;
+  static const Color accentSoft = Color(0xFFFDEBF5);
+  static const Color accentDeep = Color(0xFFC2185B);
 
-  /// Étoile de notation (ambre adouci)
-  static const Color rating = Color(0xFFE0A04A);
-  static const Color ratingSoft = Color(0xFFFBF2E3);
+  /// Étoile de notation (ambre).
+  static const Color rating = starYellow;
+  static const Color ratingSoft = Color(0xFFFFF7E0);
 
-  /// Sémantiques (saturations basses)
-  static const Color danger = Color(0xFFCF5A55);
-  static const Color dangerSoft = Color(0xFFFBECEA);
+  // -------------------------------------------------------------------
+  // SÉMANTIQUES
+  // -------------------------------------------------------------------
+  static const Color danger = badgeRed;
+  static const Color dangerSoft = Color(0xFFFFEBEA);
 
-  static const Color success = Color(0xFF33946A);
-  static const Color successSoft = Color(0xFFE8F4EE);
+  static const Color success = accentGreen;
+  static const Color successSoft = Color(0xFFE8F5E9);
 
-  static const Color info = Color(0xFF5278B8);
-  static const Color infoSoft = Color(0xFFEDF2FA);
+  static const Color info = Color(0xFF5E5CE6);
+  static const Color infoSoft = Color(0xFFEAE9FD);
 
-  static const Color warning = Color(0xFFC88324);
-  static const Color warningSoft = Color(0xFFFBF3E6);
+  static const Color warning = Color(0xFFFF9F0A);
+  static const Color warningSoft = Color(0xFFFFF3E0);
 
-  /// Alias de l'encre (compatibilité avec l'ancienne API `navy`)
+  /// Alias de l'encre (compatibilité avec l'ancienne API `navy`).
   static const Color navy = ink;
   static const Color navySoft = inkSoft;
   static const Color onNavy = onInk;
 
   // -------------------------------------------------------------------
-  // PASTELS — fonds d'icônes (désaturés, chauds)
+  // PASTELS — fonds d'icônes (teintes claires de la famille)
   // -------------------------------------------------------------------
-  static const Color pastelPeach = Color(0xFFFBEDE7);
-  static const Color pastelBlue = Color(0xFFEDF2FA);
-  static const Color pastelViolet = Color(0xFFF3F1FB);
-  static const Color pastelMint = Color(0xFFE9F5EF);
-  static const Color pastelSand = Color(0xFFFBF3E6);
-  static const Color pastelRose = Color(0xFFFCEFF0);
-  static const Color pastelGrey = Color(0xFFF3F2EF);
-  static const Color pastelSky = Color(0xFFEAF3F9);
+  static const Color pastelPeach = accentSoft; // rose très clair
+  static const Color pastelBlue = Color(0xFFE8F0FE);
+  static const Color pastelViolet = primarySoft;
+  static const Color pastelMint = successSoft;
+  static const Color pastelSand = ratingSoft;
+  static const Color pastelRose = dangerSoft;
+  static const Color pastelGrey = pillBackground;
+  static const Color pastelSky = Color(0xFFEAF3FB);
+  static const Color pastelLavender = primaryGradientStart;
 
-  /// Anciens noms conservés (mêmes teintes adoucies)
-  static const Color pastelRed = pastelPeach;
+  /// Anciens noms conservés (mêmes teintes de la famille).
+  static const Color pastelRed = pastelRose;
   static const Color pastelOrange = pastelSand;
   static const Color pastelTeal = pastelMint;
   static const Color pastelGreen = pastelMint;
   static const Color pastelAmber = pastelSand;
 
-  /// Ordre de cyclage des grilles de catégories
+  /// Ordre de cyclage des grilles de catégories.
   static const List<Color> pastels = <Color>[
-    pastelPeach,
-    pastelBlue,
     pastelViolet,
+    pastelPeach,
     pastelMint,
     pastelSand,
-    pastelSky,
+    pastelBlue,
+    pastelLavender,
     pastelRose,
     pastelGrey,
   ];
 
   // -------------------------------------------------------------------
-  // DARK — neutre chaud profond
+  // DÉGRADÉS
   // -------------------------------------------------------------------
 
-  static const Color darkBackground = Color(0xFF121215);
-  static const Color darkBackgroundWash = Color(0xFF171315);
-  static const Color darkCard = Color(0xFF1A1A1E);
-  static const Color darkCardElevated = Color(0xFF202026);
-  static const Color darkFill = Color(0xFF202026);
-  static const Color darkFillStrong = Color(0xFF2A2A31);
-  static const Color darkBorder = Color(0xFF2B2B32);
-  static const Color darkHairline = Color(0xFF23232A);
+  /// Dégradé de marque (violet → rose) — logo, CTA de mise en avant.
+  static const LinearGradient brandGradient = LinearGradient(
+    colors: [accentPurple, accentPink],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
-  static const Color darkTextPrimary = Color(0xFFF2F1EE);
+  /// Dégradé encre (pilules et boutons d'action forts).
+  static const LinearGradient inkGradient = LinearGradient(
+    colors: [Color(0xFF232326), Color(0xFF121214)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // -------------------------------------------------------------------
+  // DARK — neutres profonds de la même famille
+  // -------------------------------------------------------------------
+
+  static const Color darkBackground = Color(0xFF121214);
+  static const Color darkBackgroundWash = Color(0xFF1B1826);
+  static const Color darkCard = Color(0xFF1C1C1E);
+  static const Color darkCardElevated = Color(0xFF2C2C2E);
+  static const Color darkFill = Color(0xFF2C2C2E);
+  static const Color darkFillStrong = Color(0xFF3A3A3C);
+  static const Color darkBorder = Color(0xFF38383A);
+  static const Color darkHairline = Color(0xFF2C2C2E);
+  static const Color darkDivider = darkHairline;
+
+  static const Color darkTextPrimary = Color(0xFFF2F2F7);
   static const Color darkTextSecondary = Color(0xFF9A9AA1);
-  static const Color darkTextTertiary = Color(0xFF6E6E76);
+  static const Color darkTextTertiary = Color(0xFF6E6E73);
 
   /// En mode sombre, l'encre s'inverse : pastille claire + texte sombre.
-  static const Color darkInk = Color(0xFFF5F4F1);
-  static const Color darkInkSoft = Color(0xFFDCDBD7);
-  static const Color darkOnInk = Color(0xFF17171B);
+  static const Color darkInk = Color(0xFFF2F2F7);
+  static const Color darkInkSoft = Color(0xFFDCDCDE);
+  static const Color darkOnInk = Color(0xFF1A1A1A);
 
-  static const Color darkPrimary = Color(0xFF5FB3A8);
-  static const Color darkPrimarySoft = Color(0xFF17312E);
-  static const Color darkOnPrimary = Color(0xFF06201D);
+  static const Color darkPrimary = Color(0xFFCE93D8);
+  static const Color darkPrimarySoft = Color(0xFF2E2133);
+  static const Color darkOnPrimary = Color(0xFF1A1A1A);
 
-  static const Color darkAccent = Color(0xFFF08A66);
-  static const Color darkAccentSoft = Color(0xFF3A241C);
-  static const Color darkAccentDeep = Color(0xFFF2A288);
+  static const Color darkAccentPink = Color(0xFFFF6FB5);
+  static const Color darkAccent = darkAccentPink;
+  static const Color darkAccentSoft = Color(0xFF33202B);
+  static const Color darkAccentDeep = Color(0xFFFF8FC5);
 
-  static const Color darkRating = Color(0xFFEFB65C);
-  static const Color darkRatingSoft = Color(0xFF382C18);
-
-  static const Color darkDanger = Color(0xFFE58B85);
+  static const Color darkBadgeRed = Color(0xFFFF6B61);
+  static const Color darkDanger = darkBadgeRed;
   static const Color darkDangerSoft = Color(0xFF3A2320);
 
-  static const Color darkSuccess = Color(0xFF6BC094);
-  static const Color darkSuccessSoft = Color(0xFF17301F);
+  static const Color darkAccentGreen = Color(0xFF81C784);
+  static const Color darkSuccess = darkAccentGreen;
+  static const Color darkSuccessSoft = Color(0xFF1E3221);
 
-  static const Color darkInfo = Color(0xFF8AA9D8);
-  static const Color darkInfoSoft = Color(0xFF1E2836);
+  static const Color darkStarYellow = Color(0xFFFFD54F);
+  static const Color darkRating = darkStarYellow;
+  static const Color darkRatingSoft = Color(0xFF38321C);
 
-  static const Color darkWarning = Color(0xFFDCA85C);
+  static const Color darkInfo = Color(0xFF9FA8FF);
+  static const Color darkInfoSoft = Color(0xFF262A3D);
+
+  static const Color darkWarning = Color(0xFFFFB74D);
   static const Color darkWarningSoft = Color(0xFF332A1A);
 
   static const Color darkNavy = darkInk;
@@ -182,28 +253,29 @@ class AppColors {
   static const Color darkOnNavy = darkOnInk;
 
   // Pastels sombres (teintes profondes, jamais vives)
-  static const Color darkPastelPeach = Color(0xFF2A211D);
+  static const Color darkPastelPeach = darkAccentSoft;
   static const Color darkPastelBlue = Color(0xFF1D2531);
-  static const Color darkPastelViolet = Color(0xFF242138);
-  static const Color darkPastelMint = Color(0xFF1B2A24);
-  static const Color darkPastelSand = Color(0xFF2B2418);
-  static const Color darkPastelRose = Color(0xFF2E2124);
-  static const Color darkPastelGrey = Color(0xFF232327);
+  static const Color darkPastelViolet = darkPrimarySoft;
+  static const Color darkPastelMint = darkSuccessSoft;
+  static const Color darkPastelSand = darkRatingSoft;
+  static const Color darkPastelRose = darkDangerSoft;
+  static const Color darkPastelGrey = darkFill;
   static const Color darkPastelSky = Color(0xFF1D2A31);
+  static const Color darkPastelLavender = Color(0xFF241F33);
 
-  static const Color darkPastelRed = darkPastelPeach;
+  static const Color darkPastelRed = darkPastelRose;
   static const Color darkPastelOrange = darkPastelSand;
   static const Color darkPastelTeal = darkPastelMint;
   static const Color darkPastelGreen = darkPastelMint;
   static const Color darkPastelAmber = darkPastelSand;
 
   static const List<Color> darkPastels = <Color>[
-    darkPastelPeach,
-    darkPastelBlue,
     darkPastelViolet,
+    darkPastelPeach,
     darkPastelMint,
     darkPastelSand,
-    darkPastelSky,
+    darkPastelBlue,
+    darkPastelLavender,
     darkPastelRose,
     darkPastelGrey,
   ];
@@ -238,19 +310,41 @@ class DashColors {
   Color get navySoft => inkSoft;
   Color get onNavy => onInk;
 
-  // ---- Primaire (teal profond désaturé) ------------------------------------
+  // ---- Primaire (violet de marque) -----------------------------------------
   Color get primary => _isDark ? AppColors.darkPrimary : AppColors.primary;
   Color get primarySoft =>
       _isDark ? AppColors.darkPrimarySoft : AppColors.primarySoft;
   Color get onPrimary =>
       _isDark ? AppColors.darkOnPrimary : AppColors.onPrimary;
 
-  // ---- Accent (corail doux) ------------------------------------------------
+  // ---- Accent (rose) -------------------------------------------------------
   Color get accent => _isDark ? AppColors.darkAccent : AppColors.accent;
   Color get accentSoft =>
       _isDark ? AppColors.darkAccentSoft : AppColors.accentSoft;
   Color get accentDeep =>
       _isDark ? AppColors.darkAccentDeep : AppColors.accentDeep;
+
+  /// Accents nommés de la spécification (rose / violet / vert / rouge).
+  Color get accentPink =>
+      _isDark ? AppColors.darkAccentPink : AppColors.accentPink;
+  Color get accentPurple => primary;
+  Color get accentGreen =>
+      _isDark ? AppColors.darkAccentGreen : AppColors.accentGreen;
+  Color get accentPinkSoft =>
+      _isDark ? AppColors.darkAccentSoft : AppColors.accentSoft;
+  Color get accentPurpleSoft => primarySoft;
+  Color get accentGreenSoft =>
+      _isDark ? AppColors.darkSuccessSoft : AppColors.successSoft;
+  Color get accentPinkSoftDeep => accentSoft;
+
+  /// Badge rouge (pastilles de notification / compteurs).
+  Color get badgeRed => _isDark ? AppColors.darkBadgeRed : AppColors.badgeRed;
+  Color get badgeRedSoft => dangerSoft;
+
+  /// Étoile de notation.
+  Color get starYellow =>
+      _isDark ? AppColors.darkStarYellow : AppColors.starYellow;
+  Color get starYellowSoft => ratingSoft;
 
   // ---- Notation ------------------------------------------------------------
   Color get rating => _isDark ? AppColors.darkRating : AppColors.rating;
@@ -277,6 +371,10 @@ class DashColors {
   Color get background =>
       _isDark ? AppColors.darkBackground : AppColors.background;
 
+  /// Alias explicites de la spécification.
+  Color get backgroundLight => background;
+  Color get cardBackground => card;
+
   /// Voile très pâle utilisé en haut d'écran (dégradé doux).
   Color get backgroundWash =>
       _isDark ? AppColors.darkBackgroundWash : AppColors.backgroundWash;
@@ -289,6 +387,14 @@ class DashColors {
       _isDark ? AppColors.darkFillStrong : AppColors.fillStrong;
   Color get border => _isDark ? AppColors.darkBorder : AppColors.border;
   Color get hairline => _isDark ? AppColors.darkHairline : AppColors.hairline;
+  Color get divider => hairline;
+
+  /// Piste et textes des pills (onglets / filtres).
+  Color get pillBackground => fill;
+  Color get pillActiveText =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.pillActiveText;
+  Color get pillInactiveText =>
+      _isDark ? AppColors.darkTextTertiary : AppColors.pillInactiveText;
 
   // ---- Textes --------------------------------------------------------------
   Color get textPrimary =>
@@ -297,6 +403,7 @@ class DashColors {
       _isDark ? AppColors.darkTextSecondary : AppColors.textGrey;
   Color get textTertiary =>
       _isDark ? AppColors.darkTextTertiary : AppColors.textTertiary;
+  Color get textLight => textTertiary;
 
   // ---- Bouton primaire (pilule encre) --------------------------------------
   /// Fond du bouton primaire — noir doux en clair, pastille claire en sombre.
@@ -314,14 +421,12 @@ class DashColors {
   Color get navSurface => card;
 
   /// Pastille de l'onglet actif : gris très clair / voile blanc en sombre.
-  Color get navPill =>
-      _isDark ? Colors.white.withValues(alpha: 0.10) : AppColors.fill;
+  Color get navPill => fill;
 
   /// Icône active (encre) / inactive (gris).
   Color get navActive => ink;
-  Color get navInactive => _isDark
-      ? const Color(0xFF7E7E86)
-      : const Color(0xFF9A9AA1);
+  Color get navInactive =>
+      _isDark ? const Color(0xFF7E7E86) : AppColors.pillInactiveText;
 
   /// Compatibilité (ancienne barre navy)
   Color get navOnNavy => onInk;
@@ -333,11 +438,11 @@ class DashColors {
   Color get navShadowColor =>
       Colors.black.withValues(alpha: _isDark ? 0.45 : 0.07);
 
-  // ---- Dégradés (washes très pâles — jamais d'aplat saturé) ---------------
-  /// Dégradé de marque (teal profond → teal), réservé au logo / héro.
+  // ---- Dégradés -----------------------------------------------------------
+  /// Dégradé de marque (violet → rose), réservé au logo / héro.
   List<Color> get gradientColors => _isDark
-      ? const [Color(0xFF1E5D57), Color(0xFF2E8C82)]
-      : const [Color(0xFF0F766E), Color(0xFF2E8C82)];
+      ? const [Color(0xFF7E57C2), Color(0xFFE91E8C)]
+      : const [Color(0xFF9C27B0), Color(0xFFE91E8C)];
 
   LinearGradient get accentGradient => LinearGradient(
         colors: gradientColors,
@@ -351,7 +456,38 @@ class DashColors {
         end: Alignment.centerRight,
       );
 
-  /// Wash « carte d'info » : teinte pâle → blanc (4–8 % de couleur seulement).
+  /// Dégradé de fond de l'écran : lavande → blanc cassé (clair),
+  /// neutre profond (sombre). Toutes les pages l'utilisent.
+  LinearGradient get backgroundGradient => _isDark
+      ? const LinearGradient(
+          colors: [AppColors.darkBackgroundWash, AppColors.darkBackground],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        )
+      : const LinearGradient(
+          colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        );
+
+  /// Alias court de [backgroundGradient].
+  LinearGradient get gradient => backgroundGradient;
+
+  /// Dégradé d'écran long : lavande en tête puis fond général.
+  LinearGradient get screenGradient => _isDark
+      ? backgroundGradient
+      : const LinearGradient(
+          colors: [
+            AppColors.primaryGradientStart,
+            AppColors.primaryGradientEnd,
+            AppColors.backgroundLight,
+          ],
+          stops: [0.0, 0.45, 1.0],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        );
+
+  /// Wash « carte d'info » : teinte pâle → blanc (la couleur n'est qu'une trace).
   LinearGradient wash({Color? tint}) {
     final Color base = tint ?? accentSoft;
     return LinearGradient(
@@ -365,15 +501,15 @@ class DashColors {
   }
 
   /// Wash encre (carte forte, texte blanc) — usage rare et volontaire.
-  LinearGradient get inkWash => LinearGradient(
-        colors: _isDark
-            ? const [Color(0xFF26262C), Color(0xFF1B1B20)]
-            : const [Color(0xFF23232A), Color(0xFF15151A)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
+  LinearGradient get inkWash => _isDark
+      ? const LinearGradient(
+          colors: [Color(0xFF26262C), Color(0xFF1B1B20)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )
+      : AppColors.inkGradient;
 
-  /// Halo très diffus (illustrations) — 6 % maximum.
+  /// Halo très diffus (illustrations).
   Color get glow => primary.withValues(alpha: _isDark ? 0.10 : 0.06);
 
   // ---- Pastels (fonds d'icônes) --------------------------------------------
@@ -387,57 +523,77 @@ class DashColors {
     return p[i < 0 ? i + p.length : i];
   }
 
-  // ---- Ombres : « soft elevation » (très diffus, jamais marquées) ---------
-  /// Ombre standard des cartes — 4 % noir, blur 20, y 8.
+  // ---- Ombres : « soft elevation » (très diffuses, jamais marquées) --------
+  /// Ombre standard des cartes — 5 % noir, blur 10, y 4.
   List<BoxShadow> get cardShadow => _isDark
       ? [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ]
       : [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ];
 
-  /// Ombre des éléments flottants (nav, FAB, tag) — 8 %, blur 24, y 12.
+  /// Ombre très légère (pilules actives, petits éléments posés) — 3 %, blur 6.
+  List<BoxShadow> get softShadow => _isDark
+      ? [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ]
+      : [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ];
+
+  /// Ombre des éléments flottants (nav, FAB, tag) — 8 %, blur 20, y 8.
   List<BoxShadow> get floatingShadow => _isDark
       ? [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.40),
-            blurRadius: 26,
-            offset: const Offset(0, 12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ]
       : [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 26,
-            offset: const Offset(0, 12),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ];
 
-  /// Ombre légère posée (top bar)
-  List<BoxShadow> get subtleShadow => _isDark
+  /// Ombre du segment actif d'une barre de pills — 6 %, blur 8, y 2.
+  List<BoxShadow> get activePillShadow => _isDark
       ? [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.30),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ]
       : [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ];
+
+  /// Ombre légère posée (top bar)
+  List<BoxShadow> get subtleShadow => softShadow;
 
   // ---- Helpers historiques (compatibilité) --------------------------------
   /// Fond pill greeting (top bar) — désormais neutre et discret
@@ -453,7 +609,7 @@ class DashColors {
   Color get barrier => Colors.black.withValues(alpha: _isDark ? 0.6 : 0.32);
 
   Color get shimmerBase =>
-      _isDark ? const Color(0xFF202026) : const Color(0xFFEFEEEB);
+      _isDark ? const Color(0xFF202026) : const Color(0xFFEFEFF3);
   Color get shimmerHighlight =>
-      _isDark ? const Color(0xFF2A2A31) : const Color(0xFFF8F7F5);
+      _isDark ? const Color(0xFF2A2A31) : const Color(0xFFF8F8FA);
 }

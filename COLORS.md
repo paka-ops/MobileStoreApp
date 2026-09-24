@@ -1,4 +1,4 @@
-# 🌈 Palette de couleurs — BouTiKa
+# 🌈 Palette — BouTiKa (design system « Lavande » v2)
 
 Toutes les couleurs vivent dans `lib/core/theme/app_colors.dart`.
 **Règle d'or** : jamais de `Colors.black` / `Colors.white` en surface ou texte —
@@ -6,67 +6,68 @@ toujours passer par `DashColors` (ou `AppColors` pour du statique).
 
 ```dart
 final c = DashColors(context);   // résout clair/sombre selon le thème courant
-c.primary; c.card; c.textPrimary; c.dangerSoft; …
+c.accentPink; c.accentPurple; c.badgeRed; c.card; c.textPrimary; c.pastelAt(2); …
 ```
 
-## 1. Couleurs de marque
+## 1. Fond, surfaces, traits
 
 | Token | Light | Dark | Usage |
 |---|---|---|---|
-| `primary` | `#3E63DD` | `#8A9EF4` | Boutons, éléments actifs, lien signature |
-| `primarySoft` | `#E9EEFE` | `#212A4E` | Fond teinté derrière le primaire |
-| `onPrimary` | `#FFFFFF` | `#0D1226` | Texte/icône posés sur le primaire |
-| `accent` | `#C08552` | `#D9A876` | Camel chaleureux — dépenses, highlights |
-| `accentSoft` | `#F6ECE3` | `#2B2118` | Fond teinté accent |
+| `primaryGradientStart` | `#E8E4F3` | `#1B1826` | Haut du dégradé de fond (lavande) |
+| `primaryGradientEnd` | `#F5F5F7` | `#121214` | Bas du dégradé |
+| `background` / `backgroundLight` | `#FAFAFA` | `#121214` | Fond général |
+| `card` / `cardBackground` | `#FFFFFF` | `#1C1C1E` | Cartes, sheets, barres |
+| `fill` / `pillBackground` | `#F2F2F7` | `#2C2C2E` | Zones remplies, piste des pills |
+| `fillStrong` | `#E8E8ED` | `#3A3A3C` | Remplissage appuyé, états désactivés |
+| `border` | `#E5E5EA` | `#38383A` | Traits visibles |
+| `hairline` / `divider` | `#EFEFF3` | `#2C2C2E` | Séparateurs doux |
 
-## 2. Couleurs sémantiques
-
-| Token | Light | Dark | Usage |
-|---|---|---|---|
-| `success` | `#2F9E68` | `#52C186` | Validations, stock sain, gains |
-| `successSoft` | `#E8F6EE` | `#16301F` | Fond teinté succès |
-| `danger` | `#DE4A52` | `#F0767D` | Suppression, erreurs, stock critique |
-| `dangerSoft` | `#FDEDEE` | `#331D20` | Fond teinté danger |
-| `warning` | `#DE911D` | `#EDB24E` | Alertes, stock bas |
-| `warningSoft` | `#FDF4E1` | `#2F2611` | Fond teinté alerte |
-| `info` | `#4A8DDC` | `#7FB1EA` | Infos, badges neutres |
-| `infoSoft` | `#EAF2FB` | `#1A2634` | Fond teinté info |
-
-## 3. Surfaces & textes
+## 2. Textes & encre
 
 | Token | Light | Dark | Usage |
 |---|---|---|---|
-| `background` | `#F6F7F9` | `#0E1116` | Fond des écrans (jamais blanc/noir pur) |
-| `card` | `#FFFFFF` | `#161B22` | Cartes, niveau 1 |
-| `cardElevated` | `#FFFFFF` | `#1E242D` | Inputs, zones élevées |
-| `border` | `#E7EAEE` | `#272E39` | Bordures 1px |
-| `textPrimary` | `#22262D` | `#E9ECF2` | Texte principal (anthracite) |
-| `textSecondary` | `#6E7681` | `#8C93A0` | Texte secondaire |
+| `textPrimary` / `textDark` | `#1A1A1A` | `#F2F2F7` | Titres, valeurs, corps |
+| `textSecondary` / `textGrey` | `#8E8E93` | `#9A9AA1` | Sous-titres, métadonnées |
+| `textLight` / `textTertiary` | `#B0B0B5` | `#6E6E73` | Labels discrets, hints |
+| `ink` | `#1A1A1A` | `#F2F2F7` | Boutons pillules, icônes actives |
+| `onInk` | `#FFFFFF` | `#1A1A1A` | Contenu posé sur l'encre |
 
-Tokens utilitaires exposés par `DashColors` : `isDark`, `barrier` (voile de
-dialog), `shimmerBase`/`shimmerHighlight`, `glow` (focus), `hairline`,
-`cardShadow`.
+## 3. Accents & sémantiques
 
-## 4. Couleurs fixées par fonctionnalité (héritage, à ne pas unifier)
+| Token | Light | Dark | Fond associé | Usage |
+|---|---|---|---|---|
+| `accentPink` (`accent`) | `#E91E8C` | `#FF6FB5` | `accentSoft` `#FDEBF5` | Accent principal |
+| `accentPurple` (`primary`) | `#9C27B0` | `#CE93D8` | `primarySoft` `#F4E9F7` | Marque, focus, progression |
+| `badgeRed` (`danger`) | `#FF3B30` | `#FF6B61` | `dangerSoft` `#FFEBEA` | Badges, suppressions |
+| `accentGreen` (`success`) | `#4CAF50` | `#81C784` | `successSoft` `#E8F5E9` | Validations |
+| `starYellow` (`rating`) | `#FFC107` | `#FFD54F` | `ratingSoft` `#FFF7E0` | Étoiles / notes |
+| `warning` | `#FF9F0A` | `#FFB74D` | `warningSoft` `#FFF3E0` | Alertes douces |
+| `info` | `#5E5CE6` | `#9FA8FF` | `infoSoft` `#EAE9FD` | Informations |
 
-Ces couleurs proviennent des écrans d'origine et sont volontairement conservées :
+## 4. Pills & dégradés
 
-- **Dépenses** : `_accent = #C08552`, `_danger = #DE4A52` (statique, les deux modes).
-- **Rapport par catégorie** : cycle de couleurs
-  `#4A7C82 · #C08552 · #6FA687 · #8A7CB8 · #D8A657 · #5C8AAE`.
-- **Rapport général** : bénéfice employer = `#8A7CB8`.
-
-## 5. Seuils de stock (métier — ne pas unifier)
-
-| Écran | Règle | Labels |
+| Token | Valeur | Usage |
 |---|---|---|
-| Alertes stock (`get_low_stock_product`) | inclusion si `stock < 10` | — |
-| Cartes/alertes | `≤ 5` critique (rouge) · `≤ 15` bas (ambre) · sinon sain (vert) | « Critique » / « Bas » / « Normal » ou « Stock critique » / « Stock bas » / « Stock sain » |
-| Gestion catégorie | inclusion alertes si `stock ≤ 10` | — |
+| `pillBackground` | `#F2F2F7` | Piste des onglets / filtres |
+| `pillActiveText` | `#000000` | Segment actif |
+| `pillInactiveText` | `#AEAEB2` | Segments inactifs |
+| `backgroundGradient` | lavande → blanc cassé | Fond de **toutes** les pages |
+| `screenGradient` | lavande → blanc cassé → `#FAFAFA` | Fond d'écran long |
+| `brandGradient` | violet → rose | Logo, CTA de mise en avant |
+| `inkGradient` / `inkWash` | `#232326` → `#121214` | Cartes fortes, FAB |
 
-## 6. Accessibilité
+## 5. Pastels (fonds d'icônes, cyclage `pastelAt(i)`)
 
-- Contrastes vérifiés : texte anthracite sur fond gris clair ≥ 12:1 ;
-  texte sombre `#E9ECF2` sur `#0E1116` ≥ 13:1.
-- États « soft » garantissent un fond teinté peu saturé derrière chaque
-  couleur vive → pas de fatigue visuelle en usage prolongé.
+`pastelViolet #F4E9F7` · `pastelPeach #FDEBF5` · `pastelMint #E8F5E9` ·
+`pastelSand #FFF7E0` · `pastelBlue #E8F0FE` · `pastelLavender #E8E4F3` ·
+`pastelRose #FFEBEA` · `pastelGrey #F2F2F7`
+
+## 6. Ombres (`AppShadows` / `DashColors`)
+
+| Token | Recette | Usage |
+|---|---|---|
+| `cardShadow` | `0x0D000000` · blur 10 · y 4 | Cartes |
+| `softShadow` | `0x08000000` · blur 6 · y 2 | Pills actives, petits éléments |
+| `floatingShadow` | `0x14000000` · blur 20 · y 8 | Nav, FAB, tags |
+| `activePillShadow` | `0x0F000000` · blur 8 · y 2 | Segments actifs |
+| `modalShadow` | `0x1F000000` · blur 28 · y 12 | Dialogs, modales |

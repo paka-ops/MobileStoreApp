@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/screens/store_page.dart' hide AppColors;
 import 'package:mobile_store_app/service/store_service.dart';
 import 'package:mobile_store_app/service/user_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart'
-    show appDarkMode, DashColors;
+import 'package:mobile_store_app/core/theme/app_colors.dart'
+    show appDarkMode, AppColors, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
 import '../models/Store.dart';
 
-// Couleurs fixes indépendantes du thème (danger)
+// Couleurs sémantiques fixes de la palette (danger)
 class _Fixed {
-  static const danger     = Color(0xFFDE4A52);
-  static const dangerSoft = Color(0xFFFDEDEE);
+  static const danger     = AppColors.badgeRed;
+  static const dangerSoft = AppColors.dangerSoft;
 }
 
 /// Pastel déterministe par boutique (présentation uniquement).
@@ -103,7 +104,7 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -115,7 +116,7 @@ class _StoreItemState extends State<StoreItem> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.fill,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.edit_rounded,
                         color: colors.textPrimary, size: 21),
@@ -126,12 +127,7 @@ class _StoreItemState extends State<StoreItem> {
                       "Modifier la boutique",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
+                      style: AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
                     ),
                   ),
                 ],
@@ -258,7 +254,7 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -278,23 +274,14 @@ class _StoreItemState extends State<StoreItem> {
                   const SizedBox(height: 18),
                   Text(
                     "Supprimer la boutique",
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                      color: colors.textPrimary,
-                    ),
+                    style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "Voulez-vous vraiment supprimer '${_store.name}' ?"
                         " Cette action est irréversible.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: colors.textSecondary,
-                      fontSize: 13.5,
-                      height: 1.5,
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -362,7 +349,7 @@ class _StoreItemState extends State<StoreItem> {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             onTap: () {
               if (_showActions) {
                 setState(() => _showActions = false);
@@ -439,7 +426,7 @@ class _StoreItemState extends State<StoreItem> {
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: colors.card,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                             border: Border.all(color: colors.border),
                           ),
                           child: Icon(
@@ -478,11 +465,7 @@ class _StoreItemState extends State<StoreItem> {
                                     : "Adresse non renseignée",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colors.textSecondary,
-                                  fontSize: 13.5,
-                                  height: 1.3,
-                                ),
+                                style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.3),
                               ),
                             ),
                           ],
@@ -598,11 +581,7 @@ class _StoreItemState extends State<StoreItem> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -620,9 +599,9 @@ class _StoreItemState extends State<StoreItem> {
     return Expanded(
       child: Material(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),

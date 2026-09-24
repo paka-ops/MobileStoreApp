@@ -52,11 +52,7 @@ class AppScreenHeader extends StatelessWidget {
                     subtitle!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: c.textSecondary,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 12.5),
                   ),
                 ],
               ],

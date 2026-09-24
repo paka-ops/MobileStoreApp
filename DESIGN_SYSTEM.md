@@ -1,199 +1,169 @@
-# 🎨 BouTiKa — Design System « Calm Premium »
+# 🎨 BouTiKa — Design System « Lavande » (v2)
 
-Refonte **visuelle** de l'application : base neutre chaude, texte encre, et
-la couleur réduite à de **petites touches** — la recette des apps haut de
-gamme, qui ne fatigue pas l'œil sur une journée de travail.
+Système de design **unique** de l'application : fond dégradé lavande, surfaces
+blanches, texte encre, accents **rose** et **violet** utilisés avec parcimonie.
 
-> **Règle d'or respectée : 0 % de logique métier modifiée.**
-> Aucun service, modèle, contrôleur, appel API, identifiant, nom de variable
-> ou destination de navigation n'a changé. Seuls les widgets de présentation
-> (couleurs, formes, espacements, typographie, animations) ont été retravaillés.
+> **Migration complète** : l'ancien design system « Calm Premium » (teal/corail)
+> a été remplacé dans **tout le projet**. Voir `MIGRATION_V2.md` pour le
+> détail, les garanties et les vérifications.
 
 ---
 
-## 1. Les 4 règles de couleur (pourquoi ça ne pique plus les yeux)
+## 1. Palette — `core/theme/app_colors.dart`
 
-| # | Règle | Mise en œuvre |
-|---|---|---|
-| 1 | **La couleur ne porte jamais une grande surface** | Fonds neutres (`#F7F6F3`), cartes blanches, texte encre. Aucun aplat saturé plein écran. |
-| 2 | **L'accent est une trace, pas un bloc** | Corail `#E0653F` uniquement en pastille, point ou chiffre clé (≤ 2 % de l'écran). |
-| 3 | **Les dégradés sont des washes** | Teinte pâle (~5 %) → blanc. Le texte reste encre : jamais de blanc sur couleur saturée. |
-| 4 | **Une seule famille d'action** | Les boutons sont des pilules encre `#17171B` (comme « See all » / « Details »), pas des aplats colorés. |
+### Fond & surfaces
 
-**Résultat** : l'écran se lit en niveaux de gris chauds ; la couleur ne
-revient que là où elle porte une information (alerte, statut, catégorie).
-
----
-
-## 2. Palette
-
-| Rôle | Clair | Sombre |
-|---|---|---|
-| Fond général | `#F7F6F3` (blanc cassé chaud) | `#121215` |
-| Voile haut d'écran | `#F9F2EE` | `#171315` |
-| Cartes | `#FFFFFF` | `#1A1A1E` |
-| Zone remplie (recherche, champs) | `#F1F0EC` | `#202026` |
-| Bordure / hairline | `#ECEAE5` / `#F2F0EC` | `#2B2B32` / `#23232A` |
-| **Encre** (boutons, icônes actives, titres) | `#17171B` | `#F5F4F1` (pastille claire) |
-| Texte principal | `#1A1A1F` | `#F2F1EE` |
-| Texte secondaire | `#8B8B92` | `#9A9AA1` |
-| Texte tertiaire (labels) | `#B3B3B9` | `#6E6E76` |
-| **Accent corail** (alertes, points, highlights) | `#E0653F` | `#F08A66` |
-| **Teal de marque** (interactif, focus, logo) | `#0F766E` | `#5FB3A8` |
-| Succès / « Confirmé » | `#33946A` | `#6BC094` |
-| Note / étoile | `#E0A04A` | `#EFB65C` |
-| Erreur | `#CF5A55` | `#E58B85` |
-| Info / Warning | `#5278B8` / `#C88324` | `#8AA9D8` / `#DCA85C` |
-
-**Pastels d'icônes** (désaturés, cyclage automatique) : peach `#FBEDE7`,
-bleu `#EDF2FA`, violet `#F3F1FB`, menthe `#E9F5EF`, sable `#FBF3E6`,
-ciel `#EAF3F9`, rose `#FCEFF0`, gris `#F3F2EF`.
-
-```dart
-final c = DashColors(context);
-
-c.ink / c.onInk              // pilules d'action (noir doux)
-c.accent / c.accentSoft      // corail : alertes, points, chiffres clés
-c.primary / c.primarySoft    // teal de marque : focus, icônes interactives
-c.textPrimary / textSecondary / textTertiary
-c.card / c.fill / c.hairline
-c.wash(tint: c.pastelAt(2))  // dégradé très pâle teinte → blanc
-c.inkWash                    // surface encre (usage rare, 1 par écran)
-c.cardShadow / c.floatingShadow
-c.navSurface / c.navActive / c.navInactive / c.navPill
-```
-
-> ⚠️ **Mode sombre conservé** : chaque couleur possède sa variante sombre
-> (fonds neutres profonds, encre inversée en pastille claire). La bascule
-> clair/sombre de l'app continue de fonctionner — elle est désormais dans
-> l'onglet **« Plus »** pour alléger l'en-tête.
-
----
-
-## 3. Typographie — Poppins
-
-Police **Poppins** via `google_fonts`. Principe : *petit label gris → grande
-valeur encre*. Graisses bornées à w700 (fini les w800/w900 « criards »).
-
-| Usage | Style | Taille / graisse |
-|---|---|---|
-| Ligne d'accroche grise (« Bonjour, Amanda ») | `AppTextStyles.eyebrow` (= `greeting`) | 13 / w500 |
-| Nom / valeur d'en-tête | `AppTextStyles.name` | 21 / w700 |
-| Grand chiffre (KPI, solde) | `AppTextStyles.metric` | 26 / w700 |
-| Titre de section | `AppTextStyles.sectionTitle` | 17.5 / w700 |
-| Titre de page | `AppTextStyles.h2` | 22 / w700 |
-| Titre de carte / ligne | `AppTextStyles.cardTitle` | 14.5 / w600 |
-| Corps | `AppTextStyles.body` | 14 / w400 |
-| Sous-titre de ligne | `AppTextStyles.tileSubtitle` | 12.5 / w400 |
-| Label « Date / Heure » | `AppTextStyles.label` | 11.5 / w400 |
-| Montant | `AppTextStyles.amount` | 15 / w700 tabulaire |
-| Marque (« BouTiKa ») | `AppTextStyles.brand` | 17 / w700 |
-
-Raccourci thémé : `final t = AppTextTheme(context); t.eyebrow, t.metric…`
-
----
-
-## 4. Composants réutilisables (13)
-
-```dart
-import 'package:mobile_store_app/widgets/design_system.dart';
-```
-
-| # | Composant | Fichier | Style « calm premium » |
+| Jeton | Clair | Sombre | Rôle |
 |---|---|---|---|
-| 1 | `AppGreetingHeader` | `greeting_header.dart` | Ligne grise + nom encre + localisation ; cloche en cercle gris clair avec **point corail** ; avatar carré arrondi |
-| 2 | `SearchBarWidget` | `search_bar_widget.dart` | Fond `#F1F0EC`, rayon 16, h 52, zéro bordure |
-| 3 | `CategoryCard` / `CategoryGrid` | `category_card.dart` | Carte blanche, icône en cercle pastel (taille **adaptative**), grille 3 colonnes |
-| 4 | `GradientInfoCard` | `gradient_info_card.dart` | **Wash pastel → blanc**, texte encre, chevron optionnel (variante `inkVariant` pour une carte forte) |
-| 5 | `FloatingRatingCard` | `floating_rating_card.dart` | Carte flottante, avatar pastel, pastille note sable (largeur bornée) |
-| 6 | `AppointmentCard` | `appointment_card.dart` | Avatar + nom/rôle + menu ; badge « Confirmé » pastel ; divider ; Date \| Heure |
-| 7 | `FloatingBottomNavBar` | `custom_bottom_nav.dart` | Barre flottante **claire**, rayon 30, marges 24/16, icône active encre sur pilule gris clair |
-| 8 | `ProfileHeaderCard` | `profile_header_card.dart` | Avatar 100 px, badge « Top » sable/ambre, stats à dividers fins |
-| 9 | `FloatingPriceTag` | `floating_price_tag.dart` | Étiquette blanche flottante (largeur bornée), variante `.accent` encre |
-| 10 | `CustomTabBar` | `custom_tab_bar.dart` | Onglet actif **encre** + underline fin (plus de teal vif) |
-| 11 | `ServiceListTile` | `service_list_tile.dart` | Icône pastel ronde, titre encre, sous-titre gris, chevron, padding v12 |
-| 12 | `PrimaryButton` / `RoundActionButton` | `primary_button.dart` | Pilule **encre** pleine largeur, h 56, rayon 28 |
-| 13 | `ChatFab` | `chat_fab.dart` | Cercle **encre** (+ variante pilule `.labeled`) |
+| `primaryGradientStart` | `#E8E4F3` | `#1B1826` | Haut du dégradé de fond (lavande) |
+| `primaryGradientEnd` | `#F5F5F7` | `#121214` | Bas du dégradé |
+| `backgroundLight` / `background` | `#FAFAFA` | `#121214` | Fond général |
+| `cardBackground` / `card` | `#FFFFFF` | `#1C1C1E` | Cartes, sheets, barres |
+| `fill` / `pillBackground` | `#F2F2F7` | `#2C2C2E` | Zones remplies, piste des pills |
+| `fillStrong` | `#E8E8ED` | `#3A3A3C` | Remplissage appuyé, désactivé |
+| `border` | `#E5E5EA` | `#38383A` | Traits visibles |
+| `hairline` / `divider` | `#EFEFF3` | `#2C2C2E` | Séparateurs doux |
 
----
+### Textes
 
-## 5. Correctifs « pixel overflow » de cette passe
+| Jeton | Clair | Sombre | Rôle |
+|---|---|---|---|
+| `textPrimary` / `textDark` | `#1A1A1A` | `#F2F2F7` | Titres, valeurs |
+| `textSecondary` / `textGrey` | `#8E8E93` | `#9A9AA1` | Sous-titres, métadonnées |
+| `textLight` / `textTertiary` | `#B0B0B5` | `#6E6E73` | Labels discrets |
+| `ink` | `#1A1A1A` | `#F2F2F7` | Boutons pillules, icônes actives |
+| `onInk` | `#FFFFFF` | `#1A1A1A` | Contenu posé sur l'encre |
 
-Sans SDK Flutter dans l'environnement, ces correctifs viennent d'un audit
-statique des causes classiques (et non d'un `flutter run`). Ce qui a été
-corrigé :
+### Accents & sémantiques
 
-| Cause | Correctif |
-|---|---|
-| **`CategoryCard` à hauteur fixe (118) dans une cellule de grille plus petite** → débordement sur écrans étroits | La tuile n'impose plus de hauteur : `LayoutBuilder` mesure la cellule et adapte la taille de l'icône (32→48) + le nombre de lignes du texte. Ratio de grille ajusté (0.88). |
-| **`FloatingRatingCard` / `FloatingPriceTag` / `ChatFab.labeled`** dans un `Stack`/`Align` → largeur non bornée, texte sans ellipsis | `ConstrainedBox(maxWidth: 300 / 230 / 220)` + textes `Flexible` + ellipsis → plus d'assertion « unbounded flex » ni de débordement. |
-| **`AppointmentCard`** : `Flexible` dans une `Row` non bornée (assertion RenderFlex) | Les blocs Date/Heure sont `Flexible` dans la `Row` **bornée** de la carte ; les textes sont ellipsés. |
-| **En-tête** : nom de boutique + cloche + avatar sur une seule ligne | Hiérarchie revue (3 lignes courtes côté gauche) ; chaque texte est `Flexible` + ellipsis ; bascule de thème déplacée vers « Plus ». |
-| **Écran pré-login** : `Column` + `Spacer` en plein écran → débordement vertical sur petits écrans / grande police | Passage en `SingleChildScrollView` + `ConstrainedBox(minHeight)` + `IntrinsicHeight` : la page défile au lieu de déborder. |
-| **KPI côte à côte** de hauteurs différentes | `IntrinsicHeight` + `CrossAxisAlignment.stretch` : tuiles alignées et bornées. |
-| **Rows « texte dynamique + pastille »** (prix + badge, n° de commande + statut, « X restant » + %) sur 4 écrans | Texte dynamique en `Flexible` + `maxLines: 1` + ellipsis. |
-| **`FilterDateChip` / champs** : bordures + rayon 14 incohérents | Fond gris clair, rayon 16, bordures transparentes (focus teal 1.4). |
-| **7 `withOpacity`** (dépréciés → warnings d'analyse) dans `dashboard_screens.dart` | Migrés en `withValues(alpha:)`. |
+| Jeton | Clair | Sombre | Rôle |
+|---|---|---|---|
+| `accentPink` / `accent` | `#E91E8C` | `#FF6FB5` | Accent principal (rose) |
+| `accentPurple` / `primary` | `#9C27B0` | `#CE93D8` | Marque (violet), états interactifs |
+| `badgeRed` / `danger` | `#FF3B30` | `#FF6B61` | Badges de notification, suppressions |
+| `accentGreen` / `success` | `#4CAF50` | `#81C784` | Validations |
+| `starYellow` / `rating` | `#FFC107` | `#FFD54F` | Étoiles / notes |
+| `warning` | `#FF9F0A` | `#FFB74D` | Alertes |
+| `info` | `#5E5CE6` | `#9FA8FF` | Informations |
 
-**S'il reste un débordement** : Flutter affiche des rayures jaunes/noires et
-une ligne du type `A RenderFlex overflowed by N pixels on the right/bottom`
-dans la console. Envoyez-moi ce message + l'écran concerné, je corrige ciblé.
+Chaque accent possède une variante `…Soft` (`accentSoft`, `primarySoft`,
+`successSoft`, `dangerSoft`, `ratingSoft`, `warningSoft`, `infoSoft`) utilisée
+comme fond de pastille.
 
----
+### Pills (onglets, filtres, chips)
 
-## 6. Ce qui n'a PAS été touché (garantie logique métier)
+| Jeton | Valeur | Rôle |
+|---|---|---|
+| `pillBackground` | `#F2F2F7` | Piste |
+| `pillActiveText` | `#000000` | Segment actif |
+| `pillInactiveText` | `#AEAEB2` | Segments inactifs |
 
-- ✅ `lib/service/**` (API, Dio/http, endpoints) — **aucune modification**
-- ✅ `lib/models/**` — **aucune modification**
-- ✅ Contrôleurs, `TextEditingController`, `GlobalKey<FormState>`, validation
-- ✅ `initState` / `dispose` / `_fetchAllData` / `_handleLogin` / tous les
-  handlers métier : **appelés exactement comme avant**
-- ✅ Destinations de navigation (écrans, arguments passés) — identiques
-- ✅ Noms de classes, méthodes, variables publiques — inchangés
-- ✅ Modes clair **et** sombre — tous deux opérationnels
+### Dégradés
 
-Toutes les lignes de logique supprimées puis ré-introduites ont été
-vérifiées : elles sont **identiques** (ex. `_showStoreSwitcherSheet`,
-`_showStartSaleDialog`, `_showExpenseDialog`, `.then((_) => _fetchAllData())`),
-simplement branchées sur les nouveaux widgets.
+| Jeton | Composition | Usage |
+|---|---|---|
+| `backgroundGradient` | lavande → blanc cassé | **Fond de toutes les pages** (via `AppBackground`) |
+| `screenGradient` | lavande → blanc cassé → `#FAFAFA` | Fond d'écran long (héro) |
+| `brandGradient` | violet → rose | Logo, CTA de mise en avant |
+| `inkGradient` / `inkWash` | `#232326` → `#121214` | Cartes fortes, FAB |
 
-### Corrections d'imports pré-existantes (nécessaires à la compilation)
+### Accès
 
-Le dépôt contenait des références à des classes **sans import** (le code ne
-pouvait pas compiler). Ces imports manquants ont été ajoutés, sans toucher à
-la logique : `app_button.dart` (primitives), `app_card.dart` et
-`app_dialog.dart` (`AppDecorations`), `store_page.dart` (`AppCard`,
-`ActionTile`, `BouTikaLoader`), `category_detail_screen.dart` et
-`order_story_screen.dart` (`AppScreenHeader`), `store_item.dart`
-(`AppSpacing`), `app_bottom_nav.dart` (`AppSpacing`).
-
----
-
-## 7. À faire de ton côté
-
-```bash
-flutter pub get      # obligatoire : le paquet google_fonts a été ajouté
-flutter analyze      # vérification de compilation
-flutter run
+```dart
+final c = DashColors(context);   // résout clair / sombre automatiquement
+c.card, c.fill, c.textPrimary, c.accentPink, c.badgeRed, c.pastelAt(i)…
+AppColors.accentPink             // valeur statique (hors widget tree)
 ```
 
-- **Premier lancement avec réseau** recommandé (téléchargement de Poppins
-  puis mise en cache). Sans réseau, la police système est utilisée : le
-  design reste cohérent (tailles, graisses, espacements).
+---
+
+## 2. Typographie — `core/theme/app_text_styles.dart`
+
+Police : **SF Pro Display** (spécification). SF Pro n'étant pas distribuable,
+le repli est explicite : `Poppins` → `Inter` → `Roboto` → police système
+(sur iOS/macOS, la police système **est** SF Pro).
+Pour l'embarquer : déposer les `.ttf` dans `assets/fonts/` et les déclarer dans
+`pubspec.yaml` sous la famille `SF Pro Display` — aucun code à modifier.
+
+| Style | Taille / graisse | Usage |
+|---|---|---|
+| `heading` | 22 / w700 | Titre d'écran, nom de boutique |
+| `productTitle` | 14 / w500 | Libellé produit / catégorie |
+| `price` | 16 / w700 | Prix, montants |
+| `bodySecondary` | 13 / w400 | Texte secondaire, descriptions |
+| `pillText` | 12 / w500 | Onglets / pills |
+| `display` `h1` `h2` `h3` | 32 / 28 / 22 / 19 | Hiérarchie de base |
+| `bodyLarge` `body` `bodySmall` `caption` | 16 / 14 / 13 / 12 | Corps de texte |
+| `eyebrow` `subtitle` `sectionTitle` `cardTitle` | 13 / 14.5 / 17 / 15 | En-têtes de section |
+| `metric` `amount` `amountSmall` `statValue` | 26 / 15 / 13.5 / 16.5 | Chiffres (chiffres tabulaires) |
+| `label` `chip` `overline` `button` `brand` `rating` | 12 / 12 / 11 / 15 / 17 / 13 | Composants |
+| `custom(...)` `withColor(...)` | — | Raccourcis hors échelle |
 
 ---
 
-## 8. Écrans refondus / restants
+## 3. Dimensions — `core/theme/app_dimensions.dart`
 
-**Refondus** : hub boutique (Accueil · Ventes · Stock · Plus),
-pré-login, connexion, sélection de boutique + `StoreItem`,
-`AppGreetingHeader`, `PrimaryButton`, `AppCard`, `AppTextField`,
-`FilterDateChip`, `AppBottomNav`.
+```dart
+BorderRadius.circular(AppDimensions.radiusSmall)   // 12
+BorderRadius.circular(AppDimensions.radiusMedium)  // 16  ← cartes
+BorderRadius.circular(AppDimensions.radiusLarge)   // 20  ← cartes premium, nav
+BorderRadius.circular(AppDimensions.radiusPill)    // 100 ← pills, boutons
+EdgeInsets.all(AppDimensions.paddingM)             // 16
+```
 
-**Restants (passe suivante)** : `category_detail_screen`,
-`product_details_page`, `order_story_screen`, `low_stock_product`,
-`stock_history_screen`, `spending_page`, `general_report_screen`,
-`category_report_screen`, `EmployerFormPage`, `dashboard_screens`,
-`subscription_screen_page`. Ils héritent **déjà** des nouveaux tokens
-(couleurs, typographie, ombres) ; il reste à y remplacer les widgets maison
-par les composants du design system.
+| Famille | Jetons |
+|---|---|
+| Rayons | `radiusSmall` 12 · `radiusMedium` 16 · `radiusLarge` 20 · `radiusPill` 100 · `radiusSheet` 26 |
+| Espacements | `paddingXS` 4 · `paddingS` 8 · `paddingM` 16 · `paddingL` 24 · `screenPadding` 20 |
+| Ombres | `cardShadow` (5 %, blur 10, y 4) · `softShadow` (3 %, blur 6, y 2) · `floatingShadow` (8 %, blur 20, y 8) · `activePillShadow` (6 %, blur 8, y 2) · `modalShadow` (12 %, blur 28, y 12) |
+
+Source unique : `AppRadius` / `Spacing` / `AppSizes` (`core/constants/app_spacing.dart`)
+et `AppShadows` (`core/theme/app_shadows.dart`) — `AppDimensions` ne fait que
+les exposer sous les noms de la spécification.
+
+---
+
+## 4. Règles d'application
+
+| Élément | Règle |
+|---|---|
+| **Fond d'écran** | Dégradé lavande global (`AppBackground` dans `main.dart`) ; `Scaffold` **transparent**, AppBar transparente |
+| **Cartes** | Blanc, rayon 16, `cardShadow`, padding 16 |
+| **Pills / onglets** | Piste `pillBackground` (h 44), segment actif blanc + ombre + texte noir, inactifs `pillInactiveText` |
+| **Badges de notification** | Pastille circulaire `badgeRed`, `Stack` + `Positioned` en haut à droite, texte blanc 10/w700 |
+| **Boutons d'action circulaires** | `shape: BoxShape.circle` ou rayon `radiusPill`, fond encre `ink`, icône `onInk` |
+| **Boutons pillules** | Hauteur 44–52, rayon `AppRadius.button` (= 100 → pilule), fond encre |
+| **Étoiles / rating** | Icône `starYellow` 14 px + `AppTextStyles.bodySecondary` à côté |
+| **Icônes pastillées** | Cercle 44–48 px, fond `pastelAt(i)` ou `…Soft`, icône teintée assombrie |
+| **Sheets / dialogs** | Rayon 20 (dialog) / 26 (sheet haut), surface `card`, ombre modale |
+
+---
+
+## 5. Thème global — `core/theme/app_theme.dart`
+
+`buildAppTheme(isDark)` configure : `ColorScheme` complet, typographie,
+boutons (pilules), champs, chips (pilules), snackbars, dialogs, sheets,
+navigation, switch/checkbox, date picker, transitions de page.
+
+Points clés de la v2 :
+* `scaffoldBackgroundColor: Colors.transparent` → le dégradé passe derrière ;
+* `appBarTheme.backgroundColor: Colors.transparent` → en-têtes fondus ;
+* `fontFamily` + `fontFamilyFallback` (SF Pro → Poppins → Inter → Roboto) ;
+* tous les rayons passent par `AppRadius`, toutes les couleurs par `AppColors`.
+
+---
+
+## 6. Composants
+
+* **Socle** : `core/widgets/` — `AppButton`, `AppCard`/`StatCard`/`ActionTile`/`InfoTile`,
+  `AppTextField`, `AppDialog`/`AppSheet`, `EmptyState`, `Shimmer`, `AppBottomNav`,
+  `AppHeader`, `PressableScale`/`AppBadge`/`SoftChip`/`StatusPill`/`SectionHeader`/`OverlineLabel`,
+  `AppBackground`.
+* **Design system applicatif** : `widgets/` — `AppGreetingHeader`, `CustomTabBar`,
+  `FloatingBottomNavBar`, `CategoryCard`/`CategoryGrid`, `GradientInfoCard`,
+  `ChatFab`, `PrimaryButton`/`RoundActionButton`, `SearchBarWidget`,
+  `ServiceListTile`, `ProfileHeaderCard`, `AppointmentCard`, `FloatingPriceTag`,
+  `FloatingRatingCard`, `BouTikaLoader`.
+
+Tous conservent leur **API d'origine** (mêmes paramètres, mêmes callbacks) :
+la v2 change l'apparence, jamais les contrats.

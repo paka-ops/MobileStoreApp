@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
@@ -147,7 +148,6 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: c.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -253,11 +253,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
               const SizedBox(height: 14),
               Text(
                 "Chargement des statistiques...",
-                style: TextStyle(
-                  color: c.textSecondary,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -351,7 +347,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                 height: 52,
                 decoration: BoxDecoration(
                   color: c.primarySoft,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(
                     color: c.primary.withValues(alpha: 0.18),
                   ),
@@ -711,7 +707,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                   height: 46,
                   decoration: BoxDecoration(
                     color: c.primarySoft,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(
                       color: c.primary.withValues(alpha: 0.15),
                     ),

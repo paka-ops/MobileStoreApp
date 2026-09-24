@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_text_styles.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
@@ -74,7 +75,6 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
     final c = DashColors(context);
 
     return Scaffold(
-      backgroundColor: c.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -117,7 +117,7 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
         backgroundColor: c.primary,
         foregroundColor: c.onPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
       ),
     );
@@ -304,7 +304,7 @@ class _RestockCardState extends State<_RestockCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: c.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.inventory_2_outlined,
                         color: c.primary, size: 20),
@@ -342,7 +342,7 @@ class _RestockCardState extends State<_RestockCard> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: c.successSoft,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Text(
                       "+${widget.addedQty.toStringAsFixed(2)}",
@@ -417,10 +417,7 @@ class _RestockCardState extends State<_RestockCard> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: c.textSecondary,
-              fontSize: 13,
-            ),
+            style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary),
           ),
           Text(
             value,

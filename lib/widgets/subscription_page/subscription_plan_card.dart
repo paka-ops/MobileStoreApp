@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_text_styles.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
@@ -70,7 +71,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: c.primarySoft,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(
                         color: c.primary.withValues(alpha: 0.2)),
                   ),
@@ -173,7 +174,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: softColor,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Icon(icon, size: 16, color: color),
         ),
@@ -181,11 +182,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              color: c.textSecondary,
-              fontSize: 13.5,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500),
           ),
         ),
         Text(

@@ -144,7 +144,7 @@ class AppGreetingHeader extends StatelessWidget {
                               title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.name
+                              style: AppTextStyles.heading
                                   .copyWith(color: c.textPrimary),
                             ),
                           ),
@@ -248,26 +248,40 @@ class _CircleActionButton extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: c.fill,
+          // Surface blanche + ombre douce : l'en-tête se détache du lavande.
+          color: c.card,
           shape: BoxShape.circle,
+          boxShadow: c.softShadow,
         ),
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
             Icon(icon, size: 20, color: c.textPrimary),
-            // Simple point corail : l'accent ne prend jamais de place.
+            // Pastille CIRCULAIRE rouge, positionnée en haut à droite.
             if (badgeCount > 0)
               Positioned(
-                right: 10,
-                top: 10,
+                right: -1,
+                top: -1,
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 1,
+                  ),
+                  constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                   decoration: BoxDecoration(
-                    color: c.accent,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: c.fill, width: 1.5),
+                    color: c.badgeRed,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    border: Border.all(color: c.card, width: 1.6),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    badgeCount > 99 ? "99+" : "$badgeCount",
+                    style: AppTextStyles.label.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -304,8 +318,9 @@ class _HeaderAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashColors c = DashColors(context);
-    final BorderRadius radius =
-        BorderRadius.circular(rounded ? 15 : 999);
+    final BorderRadius radius = BorderRadius.circular(
+      rounded ? AppRadius.lg : AppRadius.pill,
+    );
     final bool hasInitials = initials != null && initials!.trim().isNotEmpty;
 
     Widget content;
@@ -332,8 +347,9 @@ class _HeaderAvatar extends StatelessWidget {
         height: 44,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: background ?? c.primarySoft,
+          color: background ?? c.card,
           borderRadius: radius,
+          boxShadow: c.softShadow,
         ),
         child: content,
       ),

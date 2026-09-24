@@ -8,9 +8,9 @@ import '../core/theme/app_text_styles.dart';
 /// ============================================================================
 /// CUSTOM TAB BAR — onglets texte du design system.
 ///
-///   • Row de textes (Services, Reviews, Education, Rewards)
-///   • Onglet actif : teal + indicateur (underline) teal dessous
-///   • Onglets inactifs : gris
+///   • Piste grise arrondie (pillBackground), hauteur 44 px
+///   • Segment ACTIF : pastille blanche + ombre douce, texte noir
+///   • Segments INACTIFS : texte gris pillInactiveText
 ///
 ///   CustomTabBar(
 ///     tabs: const ["Services", "Avis", "Formation", "Récompenses"],
@@ -77,13 +77,15 @@ class CustomTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashColors c = DashColors(context);
-    // Onglet actif en ENCRE (sobre) plutôt qu'en couleur vive.
-    final Color active = activeColor ?? c.ink;
+    // Onglet actif : texte NOIR sur pastille blanche (pillActiveText).
+    final Color active = activeColor ?? c.pillActiveText;
 
     final List<CustomTabItem> tabs = items.isNotEmpty
         ? items
         : const <CustomTabItem>[CustomTabItem("Sans titre")];
 
+    // Rendu « pills » : piste grise arrondie, segment actif blanc + ombre,
+    // texte actif noir (pillActiveText), texte inactif gris (pillInactiveText).
     final List<Widget> children = List.generate(tabs.length, (index) {
       final bool selected = index == currentIndex;
       final CustomTabItem tab = tabs[index];
@@ -91,67 +93,60 @@ class CustomTabBar extends StatelessWidget {
       final Widget tabChild = GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => onTap(index),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    tab.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.cardTitle.copyWith(
-                      fontSize: 14.5,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                      color: selected ? active : c.textSecondary,
+        child: AnimatedContainer(
+          duration: AppDurations.normal,
+          curve: AppCurves.standard,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? c.card : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            boxShadow: selected ? c.activePillShadow : null,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tab.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.pillText.copyWith(
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    color: selected ? active : c.pillInactiveText,
+                  ),
+                ),
+                if (tab.badgeCount > 0) ...[
+                  const SizedBox(width: 5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    // Pastille circulaire rouge de la spécification.
+                    decoration: BoxDecoration(
+                      color: c.badgeRed,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                    child: Text(
+                      tab.badgeCount > 99 ? "99+" : "${tab.badgeCount}",
+                      style: AppTextStyles.label.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  if (tab.badgeCount > 0) ...[
-                    const SizedBox(width: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: c.fill,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Text(
-                        tab.badgeCount > 99 ? "99+" : "${tab.badgeCount}",
-                        style: AppTextStyles.label.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: selected ? c.textPrimary : c.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
-              ),
-              const SizedBox(height: 7),
-              // Indicateur (underline) teal animé sous l'onglet actif
-              AnimatedContainer(
-                duration: AppDurations.normal,
-                curve: AppCurves.standard,
-                height: 2.5,
-                width: selected ? 22 : 0,
-                decoration: BoxDecoration(
-                  color: active,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
 
       if (scrollable) {
         return Padding(
-          padding: const EdgeInsets.only(right: 22),
+          padding: const EdgeInsets.only(right: 8),
           child: tabChild,
         );
       }
@@ -163,15 +158,23 @@ class CustomTabBar extends StatelessWidget {
       children: [
         Padding(
           padding: padding,
-          child: scrollable
-              ? SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: children),
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: children,
-                ),
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: c.pillBackground,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: scrollable
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: children),
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,
+                  ),
+          ),
         ),
         if (showBottomLine) Container(height: 1, color: c.hairline),
       ],

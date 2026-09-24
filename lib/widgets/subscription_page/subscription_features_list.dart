@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
@@ -64,7 +65,7 @@ class SubscriptionFeaturesList extends StatelessWidget {
                     padding: const EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       color: f['soft'],
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(f['icon'],
                         color: f['color'], size: 18),
@@ -77,12 +78,8 @@ class SubscriptionFeaturesList extends StatelessWidget {
                       children: [
                         Text(
                           f['title'],
-                          style: TextStyle(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
-                          ),
-                        ),
+                          style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700, fontSize: 13.5,
+                          )),
                         const SizedBox(height: 2),
                         Text(
                           f['desc'],
