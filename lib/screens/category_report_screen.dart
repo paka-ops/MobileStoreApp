@@ -30,8 +30,7 @@ class CategoryReportScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Analyses par Catégorie",
-          style: TextStyle(
-              AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary)),
+          style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
         ),
         backgroundColor: Colors.transparent,
         foregroundColor: colors.textPrimary,
@@ -44,8 +43,7 @@ class CategoryReportScreen extends StatelessWidget {
             ? Center(
                 child: Text(
                   "Aucune catégorie à analyser",
-                  style: TextStyle(
-                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14)),
+                  style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14),
                 ),
               )
             : ListView.builder(
@@ -103,7 +101,7 @@ class CategoryReportScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
-                    borderRadius: AppRadius.sm,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child:
                       Icon(Icons.category_rounded, color: color, size: 20),

@@ -72,12 +72,13 @@ class AppTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        labelStyle: TextStyle(
+        labelStyle: AppTextStyles.label.copyWith(
           color: c.textSecondary,
           fontWeight: FontWeight.w600,
           fontSize: 13.5,
         ),
-        hintStyle: TextStyle(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5),
+        hintStyle: AppTextStyles.bodySecondary
+            .copyWith(color: c.textSecondary, fontSize: 13.5),
         filled: true,
         fillColor: c.fill,
         prefixIcon: icon != null
@@ -91,11 +92,11 @@ class AppTextField extends StatelessWidget {
             const EdgeInsets.symmetric(vertical: 17, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -111,7 +112,7 @@ class AppTextField extends StatelessWidget {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
       ),
     );

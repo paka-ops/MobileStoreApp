@@ -108,7 +108,7 @@ class FloatingPriceTag extends StatelessWidget {
                         color: accent
                             ? Colors.white.withValues(alpha: 0.14)
                             : c.fill,
-                        borderRadius: AppRadius.sm,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Icon(
                         icon,

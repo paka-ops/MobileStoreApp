@@ -65,7 +65,7 @@ class SubscriptionFeaturesList extends StatelessWidget {
                     padding: const EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       color: f['soft'],
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(f['icon'],
                         color: f['color'], size: 18),
@@ -78,10 +78,8 @@ class SubscriptionFeaturesList extends StatelessWidget {
                       children: [
                         Text(
                           f['title'],
-                          style: TextStyle(
-                            AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700).5,
-                          ),
-                        ),
+                          style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700, fontSize: 13.5,
+                          )),
                         const SizedBox(height: 2),
                         Text(
                           f['desc'],

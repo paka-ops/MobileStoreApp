@@ -982,7 +982,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
   Widget _buildExpandableCategory(
       BuildContext context, Category category, DashColors colors) {
-    return _CategoryCard(
+    return _StoreCategoryCard(
       category: category,
       userType: widget.userType,
       colors: colors,
@@ -1086,7 +1086,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     "Voulez-vous vraiment supprimer ${emp.username} ?",
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySecondary.copyWith(
-                      AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5, height: 1.5),
+                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                     ),
                   ),
                 ],
@@ -1508,7 +1508,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     "Valider la vente de ${total.toStringAsFixed(0)} F ?",
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySecondary.copyWith(
-                      AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5, height: 1.5),
+                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                     ),
                   ),
                 ],
@@ -1951,8 +1951,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             Text(
               "Voulez-vous vraiment quitter BouTiKa ?",
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodySecondary.copyWith(
-                AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5,
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5,
               ),
             ),
           ],
@@ -2166,7 +2165,7 @@ class _StoreCategoryCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onManage;
 
-  const _CategoryCard({
+  const _StoreCategoryCard({
     required this.category,
     required this.userType,
     required this.colors,

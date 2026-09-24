@@ -46,21 +46,21 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
   InputDecoration _inputStyle(String label, IconData icon, DashColors colors) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14)),
+      labelStyle: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 14),
       prefixIcon: Icon(icon, color: colors.primary, size: 20),
       filled: true,
       fillColor: colors.card,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
-        borderRadius: AppRadius.sm,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: AppRadius.sm,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         borderSide: BorderSide(color: colors.border, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: AppRadius.sm,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         borderSide: BorderSide(color: colors.primary, width: 1.5),
       ),
     );
@@ -116,7 +116,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           decoration: BoxDecoration(
             color: colors.primarySoft,
-            borderRadius: AppRadius.sm,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Center(
             child: Text(
@@ -136,7 +136,7 @@ class _EmployerFormPageState extends State<EmployerFormPage> {
         ),
         Text(
           "Complétez les étapes pour commencer",
-          style: TextStyle(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary)),
+          style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary),
         ),
       ],
     );

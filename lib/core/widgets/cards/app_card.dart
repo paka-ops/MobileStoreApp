@@ -164,9 +164,7 @@ class StatCard extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
-            ),
+            style: AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -320,10 +318,7 @@ class InfoTile extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
-                    letterSpacing: 0.2,
-                  ),
+                  style: AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: 0.2),
                 ),
                 const SizedBox(height: 2),
                 Text(

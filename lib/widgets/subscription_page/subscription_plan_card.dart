@@ -71,7 +71,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: c.primarySoft,
-                    borderRadius: AppRadius.lg,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(
                         color: c.primary.withValues(alpha: 0.2)),
                   ),
@@ -174,7 +174,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: softColor,
-            borderRadius: AppRadius.sm,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Icon(icon, size: 16, color: color),
         ),
@@ -182,9 +182,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, fontWeight: FontWeight.w500),
-            ),
+            style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500),
           ),
         ),
         Text(

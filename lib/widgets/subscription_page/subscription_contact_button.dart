@@ -17,7 +17,7 @@ class SubscriptionContactButton extends StatelessWidget {
       builder: (dialogContext) => Dialog(
         backgroundColor: c.card,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.xl,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           side: BorderSide(color: c.border),
         ),
         child: Padding(
@@ -48,9 +48,7 @@ class SubscriptionContactButton extends StatelessWidget {
               Text(
                 "Appelez-nous au numéro ci-dessous pour renouveler ou gérer votre abonnement.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, height: 1.5),
-                ),
+                style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, height: 1.5),
               ),
               const SizedBox(height: 16),
               InfoCallout(

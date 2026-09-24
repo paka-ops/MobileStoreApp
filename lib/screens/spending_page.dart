@@ -171,7 +171,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: _accent.withValues(alpha: 0.10),
-                  borderRadius: AppRadius.sm,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: const Icon(
                   Icons.account_balance_wallet_outlined,
@@ -274,9 +274,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               Expanded(
                 child: Text(
                   "Filtrer par période",
-                  style: TextStyle(
-                    AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
-                  ),
+                  style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                 ),
               ),
               if (!_isTodayFilter)
@@ -287,7 +285,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: AppRadius.xl,
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -400,7 +398,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 padding: const EdgeInsets.all(11),
                 decoration: BoxDecoration(
                   color: _accent.withValues(alpha: 0.10),
-                  borderRadius: AppRadius.lg,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: const Icon(
                   Icons.money_off_rounded,
@@ -419,16 +417,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           : "Sans description",
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
-                      ),
+                      style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       dateText,
-                      style: TextStyle(
-                        AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5),
-                      ),
+                      style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5),
                     ),
                   ],
                 ),
@@ -439,7 +433,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
                   color: _danger.withValues(alpha: 0.10),
-                  borderRadius: AppRadius.sm,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Text(
                   "- ${amount.toStringAsFixed(0)} F",
@@ -521,7 +515,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.xl,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           side: BorderSide(color: colors.border),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -541,18 +535,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             const SizedBox(height: 18),
             Text(
               "Supprimer la dépense",
-              style: TextStyle(
-                AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
-              ),
+              style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
             ),
             const SizedBox(height: 10),
             Text(
               "Voulez-vous vraiment supprimer cette dépense de "
               "${(spending.price ?? 0).toStringAsFixed(0)} F ? Cette action est irréversible.",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5, height: 1.5),
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
             ),
           ],
         ),
@@ -693,7 +683,7 @@ class _ExpenseEditDialogState extends State<_ExpenseEditDialog> {
     return AlertDialog(
       backgroundColor: colors.card,
       shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.xl,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         side: BorderSide(color: colors.border),
       ),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -705,7 +695,7 @@ class _ExpenseEditDialogState extends State<_ExpenseEditDialog> {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: _accent.withValues(alpha: 0.10),
-              borderRadius: AppRadius.sm,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: const Icon(Icons.edit_rounded, color: _accent, size: 20),
           ),

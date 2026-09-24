@@ -307,7 +307,7 @@ class _MetaItem extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: c.fill,
-            borderRadius: AppRadius.sm,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Icon(icon, size: 14, color: c.textSecondary),
         ),

@@ -117,7 +117,7 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
         backgroundColor: c.primary,
         foregroundColor: c.onPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.lg,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
       ),
     );
@@ -304,7 +304,7 @@ class _RestockCardState extends State<_RestockCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: c.primarySoft,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.inventory_2_outlined,
                         color: c.primary, size: 20),
@@ -342,7 +342,7 @@ class _RestockCardState extends State<_RestockCard> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: c.successSoft,
-                      borderRadius: AppRadius.xl,
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Text(
                       "+${widget.addedQty.toStringAsFixed(2)}",
@@ -417,9 +417,7 @@ class _RestockCardState extends State<_RestockCard> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              AppTextStyles.bodySecondary.copyWith(color: c.textSecondary),
-            ),
+            style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary),
           ),
           Text(
             value,

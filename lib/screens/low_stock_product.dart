@@ -243,7 +243,7 @@ class _LowStockProductDetailsScreenState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.xl,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               side: BorderSide(color: c.border),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -255,7 +255,7 @@ class _LowStockProductDetailsScreenState
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: c.successSoft,
-                    borderRadius: AppRadius.sm,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Icon(Icons.add_box_rounded,
                       color: c.success, size: 22),
@@ -266,9 +266,7 @@ class _LowStockProductDetailsScreenState
                     "Restocker ${product.name}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      AppTextStyles.heading.copyWith(fontSize: 17.5, color: c.textPrimary),
-                    ),
+                    style: AppTextStyles.heading.copyWith(fontSize: 17.5, color: c.textPrimary),
                   ),
                 ),
               ],
@@ -400,9 +398,7 @@ class _LowStockProductDetailsScreenState
                 Text(
                   p.name,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    AppTextStyles.heading.copyWith(fontSize: 18, color: c.textPrimary),
-                  ),
+                  style: AppTextStyles.heading.copyWith(fontSize: 18, color: c.textPrimary),
                 ),
                 const SizedBox(height: 20),
 
@@ -463,8 +459,7 @@ class _LowStockProductDetailsScreenState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
-                  AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, fontWeight: FontWeight.w500))),
+              style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -473,9 +468,7 @@ class _LowStockProductDetailsScreenState
             ),
             child: Text(
               value,
-              style: TextStyle(
-                AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w700, fontSize: 13.5, color: valueColor ?? c.textPrimary),
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w700, fontSize: 13.5, color: valueColor ?? c.textPrimary),
             ),
           ),
         ],
@@ -609,7 +602,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: statusSoft,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
                           color: statusColor.withValues(alpha: 0.2)),
                     ),
@@ -625,9 +618,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                           widget.product.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, color: c.textPrimary),
-                          ),
+                          style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, color: c.textPrimary),
                         ),
                         const SizedBox(height: 5),
                         Row(
@@ -637,9 +628,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                                 "${widget.product.stock!.sellingPrice} F",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
-                                ),
+                                style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -703,9 +692,7 @@ class _LowStockProductCardState extends State<_LowStockProductCard> {
                           "${stock.toStringAsFixed(2)} restant sur ${maxStock.toStringAsFixed(0)}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
-                          ),
+                          style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
                         ),
                       ),
                       const SizedBox(width: 8),

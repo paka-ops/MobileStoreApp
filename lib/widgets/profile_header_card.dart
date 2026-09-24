@@ -170,8 +170,7 @@ class ProfileHeaderCard extends StatelessWidget {
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.subtitle.copyWith(
-                  AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5,
+                style: AppTextStyles.subtitle.copyWith(color: c.textSecondary, fontSize: 13.5,
                 ),
               ),
             ],

@@ -223,9 +223,7 @@ class _EmployerCategoryDetailsState
             const SizedBox(height: 16),
             Text(
               "Chargement des produits...",
-              style: TextStyle(
-                AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -286,7 +284,7 @@ class _EmployerCategoryDetailsState
       foregroundColor: c.onPrimary,
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.lg,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       icon: Icon(Icons.add_rounded, size: 20, color: c.onPrimary),
       label: Text(
@@ -317,7 +315,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.xl,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               side: BorderSide(color: c.border),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -411,7 +409,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.xl,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               side: BorderSide(color: c.border),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -499,7 +497,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.xl,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               side: BorderSide(color: c.border),
             ),
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -607,7 +605,7 @@ class _EmployerCategoryDetailsState
           return AlertDialog(
             backgroundColor: c.card,
             shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.xl,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               side: BorderSide(color: c.border),
             ),
             contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -627,17 +625,13 @@ class _EmployerCategoryDetailsState
                 const SizedBox(height: 18),
                 Text(
                   "Supprimer le produit",
-                  style: TextStyle(
-                    AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
-                  ),
+                  style: AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   "Voulez-vous vraiment supprimer '${p.name}' ? Cette action est irréversible.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, height: 1.5),
-                  ),
+                  style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, height: 1.5),
                 ),
               ],
             ),
@@ -692,7 +686,7 @@ class _EmployerCategoryDetailsState
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: c.infoSoft,
-                    borderRadius: AppRadius.lg,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                   child: Icon(Icons.inventory_2_outlined,
                       color: c.info, size: 28),
@@ -701,9 +695,7 @@ class _EmployerCategoryDetailsState
                 Text(
                   p.name,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    AppTextStyles.heading.copyWith(fontSize: 18, color: c.textPrimary),
-                  ),
+                  style: AppTextStyles.heading.copyWith(fontSize: 18, color: c.textPrimary),
                 ),
                 const SizedBox(height: 20),
 
@@ -763,8 +755,7 @@ class _EmployerCategoryDetailsState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
-                  AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, fontWeight: FontWeight.w500))),
+              style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -773,9 +764,7 @@ class _EmployerCategoryDetailsState
             ),
             child: Text(
               value,
-              style: TextStyle(
-                AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w700, fontSize: 13.5, color: valueColor ?? c.textPrimary),
-              ),
+              style: AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w700, fontSize: 13.5, color: valueColor ?? c.textPrimary),
             ),
           ),
         ],
@@ -794,7 +783,7 @@ class _EmployerCategoryDetailsState
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: iconSoftColor ?? c.primarySoft,
-            borderRadius: AppRadius.sm,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Icon(icon,
               color: iconColor ?? c.primary, size: 22),
@@ -805,9 +794,7 @@ class _EmployerCategoryDetailsState
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              AppTextStyles.heading.copyWith(fontSize: 17.5, color: c.textPrimary),
-            ),
+            style: AppTextStyles.heading.copyWith(fontSize: 17.5, color: c.textPrimary),
           ),
         ),
       ],
@@ -947,7 +934,7 @@ class _ProductCardState extends State<_ProductCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: statusSoft,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
                           color: statusColor.withValues(alpha: 0.2)),
                     ),
@@ -963,9 +950,7 @@ class _ProductCardState extends State<_ProductCard> {
                           product.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, color: c.textPrimary),
-                          ),
+                          style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, color: c.textPrimary),
                         ),
                         const SizedBox(height: 5),
                         Row(
@@ -975,9 +960,7 @@ class _ProductCardState extends State<_ProductCard> {
                                 "${product.stock!.sellingPrice} F",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
-                                ),
+                                style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -1114,9 +1097,7 @@ class _ProductCardState extends State<_ProductCard> {
                 "${stock.toStringAsFixed(2)} restant",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
-                ),
+                style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
               ),
             ),
             const SizedBox(width: 8),

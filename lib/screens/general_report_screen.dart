@@ -112,7 +112,7 @@ class GeneralReportScreen extends StatelessWidget {
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.10),
-              borderRadius: AppRadius.sm,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(icon, color: color, size: 18),
           ),
@@ -121,16 +121,12 @@ class GeneralReportScreen extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
-            ),
+            style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600),
-            ),
+            style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -160,7 +156,7 @@ class GeneralReportScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               "Graphique de performance",
-              style: TextStyle(AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600)),
+              style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Text(

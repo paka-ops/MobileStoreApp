@@ -20,7 +20,7 @@ class SubscriptionHeader extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: c.primarySoft,
-                borderRadius: AppRadius.sm,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(Icons.verified_rounded,
                   color: c.primary, size: 20),
@@ -42,9 +42,7 @@ class SubscriptionHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           "Consultez l'état de votre abonnement et contactez le support pour le renouveler.",
-          style: TextStyle(
-            AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, height: 1.5),
-          ),
+          style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, height: 1.5),
         ),
       ],
     );

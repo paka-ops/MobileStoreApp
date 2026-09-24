@@ -253,9 +253,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
               const SizedBox(height: 14),
               Text(
                 "Chargement des statistiques...",
-                style: TextStyle(
-                  AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, fontWeight: FontWeight.w500),
-                ),
+                style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -349,7 +347,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                 height: 52,
                 decoration: BoxDecoration(
                   color: c.primarySoft,
-                  borderRadius: AppRadius.lg,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(
                     color: c.primary.withValues(alpha: 0.18),
                   ),
@@ -709,7 +707,7 @@ class _ProductStatsScreenState extends State<ProductStatsScreen> {
                   height: 46,
                   decoration: BoxDecoration(
                     color: c.primarySoft,
-                    borderRadius: AppRadius.lg,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: Border.all(
                       color: c.primary.withValues(alpha: 0.15),
                     ),

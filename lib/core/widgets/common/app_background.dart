@@ -16,7 +16,7 @@ import '../../theme/app_colors.dart';
 /// utilisent un `Scaffold` transparent et le fond apparaît naturellement.
 ///
 /// Les widgets ayant besoin du dégradé par eux-mêmes (sheets, dialogs, cartes
-/// héro) utilisent `DashColors.backgroundGradient` / `AppDecorations.page`.
+/// héro) utilisent `DashColors.backgroundGradient` / `AppGradients.page(c)`.
 /// ============================================================================
 class AppBackground extends StatelessWidget {
   /// Contenu affiché au-dessus du dégradé (généralement le Navigator).

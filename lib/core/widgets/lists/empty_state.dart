@@ -167,7 +167,7 @@ class ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, height: 1.5)),
+              style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, height: 1.5),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),

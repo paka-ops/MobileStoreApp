@@ -323,7 +323,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return AlertDialog(
           backgroundColor: colors.card,
           shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.xl,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             side: BorderSide(color: colors.border),
           ),
           titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -335,7 +335,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: colors.primarySoft,
-                  borderRadius: AppRadius.sm,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(Icons.add_business_rounded,
                     color: colors.primary, size: 22),
@@ -346,9 +346,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   "Nouvelle Boutique",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
-                  ),
+                  style: AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
                 ),
               ),
             ],

@@ -254,7 +254,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: c.primarySoft,
-                    borderRadius: AppRadius.sm,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Icon(Icons.receipt_long_rounded,
                       color: c.primary, size: 18),
@@ -280,7 +280,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: c.primarySoft,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.refresh_rounded,
                         color: c.primary, size: 18),
@@ -345,8 +345,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
               ),
               hint: Text(
                 "Tous les statuts",
-                style: TextStyle(
-                    AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500)),
+                style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
               ),
               style: TextStyle(
                   color: c.textPrimary,
@@ -504,8 +503,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                 child: Text(
                   "Chargement des commandes...",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500)),
+                  style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -602,7 +600,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
             return AlertDialog(
               backgroundColor: c.card,
               shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.xl,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: c.border),
               ),
               contentPadding:
@@ -626,9 +624,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     widget.userType == 'employee'
                         ? "Demander l'annulation"
                         : "Supprimer la commande",
-                    style: TextStyle(
-                      AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
-                    ),
+                    style: AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -636,9 +632,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                         ? "Une demande d'annulation sera envoyée pour la commande N°${order.orderId.substring(0, 8)}."
                         : "Voulez-vous vraiment supprimer la commande N°${order.orderId.substring(0, 8)} ? Cette action est irréversible.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary).5, height: 1.5),
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -791,7 +785,7 @@ class _OrderCardState extends State<_OrderCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: sSoft,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
                           color: sColor.withValues(alpha: 0.2)),
                     ),
@@ -923,8 +917,7 @@ class _OrderCardState extends State<_OrderCard> {
                               horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: c.cardElevated,
-                            borderRadius:
-                            AppRadius.sm,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                             border:
                             Border.all(color: c.border),
                           ),
@@ -988,19 +981,14 @@ class _OrderCardState extends State<_OrderCard> {
                       const SizedBox(width: 8),
                       Text(
                         "Vendeur : ",
-                        style: TextStyle(
-                          AppTextStyles.bodySecondary.copyWith(color: c.textSecondary),
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontWeight: FontWeight.w500),
                       ),
                       Flexible(
                         child: Text(
                           order.maker?['username'] ?? 'N/A',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
-                          ),
+                          style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],

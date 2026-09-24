@@ -104,7 +104,7 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.xl,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -116,7 +116,7 @@ class _StoreItemState extends State<StoreItem> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.fill,
-                      borderRadius: AppRadius.sm,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Icon(Icons.edit_rounded,
                         color: colors.textPrimary, size: 21),
@@ -127,9 +127,7 @@ class _StoreItemState extends State<StoreItem> {
                       "Modifier la boutique",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
-                      ),
+                      style: AppTextStyles.heading.copyWith(fontSize: 17.5, color: colors.textPrimary),
                     ),
                   ),
                 ],
@@ -256,7 +254,7 @@ class _StoreItemState extends State<StoreItem> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.xl,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -276,18 +274,14 @@ class _StoreItemState extends State<StoreItem> {
                   const SizedBox(height: 18),
                   Text(
                     "Supprimer la boutique",
-                    style: TextStyle(
-                      AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
-                    ),
+                    style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "Voulez-vous vraiment supprimer '${_store.name}' ?"
                         " Cette action est irréversible.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5, height: 1.5),
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -355,7 +349,7 @@ class _StoreItemState extends State<StoreItem> {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: AppRadius.xl,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             onTap: () {
               if (_showActions) {
                 setState(() => _showActions = false);
@@ -432,7 +426,7 @@ class _StoreItemState extends State<StoreItem> {
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: colors.card,
-                            borderRadius: AppRadius.sm,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                             border: Border.all(color: colors.border),
                           ),
                           child: Icon(
@@ -471,10 +465,7 @@ class _StoreItemState extends State<StoreItem> {
                                     : "Adresse non renseignée",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary).5,
-                                  height: 1.3,
-                                ),
+                                style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.3),
                               ),
                             ),
                           ],
@@ -590,9 +581,7 @@ class _StoreItemState extends State<StoreItem> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
-              AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
-            ),
+            style: AppTextStyles.label.copyWith(color: colors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -610,9 +599,9 @@ class _StoreItemState extends State<StoreItem> {
     return Expanded(
       child: Material(
         color: backgroundColor,
-        borderRadius: AppRadius.sm,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
         child: InkWell(
-          borderRadius: AppRadius.sm,
+          borderRadius: BorderRadius.circular(AppRadius.sm),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),

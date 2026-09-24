@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// ============================================================================
-/// AppSpacing — échelle d'espacement standard de tout le design system.
+/// Spacing — échelle d'espacement standard de tout le design system.
 ///
 /// Base 4 px. Utilisez ces constantes partout, jamais de valeurs magiques :
 ///   SizedBox(height: Spacing.md)
