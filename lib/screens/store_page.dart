@@ -20,8 +20,9 @@ import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
-import 'package:mobile_store_app/utils/app_colors.dart'
-    show appDarkMode, DashColors;
+import 'package:mobile_store_app/utils/app_colors.dart' show appDarkMode;
+import 'store/store_design.dart';
+import 'store/store_widgets.dart';
 import 'package:mobile_store_app/utils/message.dart';
 import 'package:mobile_store_app/widgets/design_system.dart';
 import '../models/Store.dart';
@@ -189,16 +190,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return ValueListenableBuilder<bool>(
       valueListenable: appDarkMode,
       builder: (context, isDark, __) {
-        final colors = DashColors(context);
+        final colors = StorePalette(context);
 
         // Écran d'attente « BouTika » tant que les appels API
         // de chargement des données ne sont pas terminés.
         if (_isLoading) {
           return Scaffold(
             backgroundColor: colors.background,
-            body: Center(
-              child: const BouTikaLoader(
-                message: "Préparation de votre boutique…",
+            // Fond dégradé du nouveau design system (lavande → blanc cassé).
+            body: Container(
+              decoration: BoxDecoration(gradient: colors.gradient),
+              child: const Center(
+                child: BouTikaLoader(
+                  message: "Préparation de votre boutique…",
+                ),
               ),
             ),
           );
@@ -206,23 +211,27 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 
         return Scaffold(
           backgroundColor: colors.background,
-          body: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                _buildTopBar(context, colors),
-                Expanded(
-                  child: IndexedStack(
-                    index: _currentIndex,
-                    children: [
-                      _buildDashboardTab(context, colors),
-                      _buildSalesTab(context),
-                      _buildStockTab(context, colors),
-                      _buildMoreTab(context, colors),
-                    ],
+          body: Container(
+            // Fond principal : dégradé lavande (clair) / neutre (sombre).
+            decoration: BoxDecoration(gradient: colors.gradient),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  _buildTopBar(context, colors),
+                  Expanded(
+                    child: IndexedStack(
+                      index: _currentIndex,
+                      children: [
+                        _buildDashboardTab(context, colors),
+                        _buildSalesTab(context),
+                        _buildStockTab(context, colors),
+                        _buildMoreTab(context, colors),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           floatingActionButton: _currentIndex == 0
@@ -237,10 +246,10 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // TOP BAR
   // =========================================================================
-  Widget _buildTopBar(BuildContext context, DashColors colors) {
+  Widget _buildTopBar(BuildContext context, StorePalette colors) {
     final String? location = widget.store.location;
 
-    return AppGreetingHeader(
+    return StoreGreetingHeader(
       greeting: "Bonjour, ${UserService.username} 👋",
       title: widget.store.name,
       subtitle: (location != null && location.trim().isNotEmpty)
@@ -272,7 +281,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // STORE SWITCHER SHEET (logique de navigation inchangée)
   // =========================================================================
-  void _showStoreSwitcherSheet(BuildContext context, DashColors colors) {
+  void _showStoreSwitcherSheet(BuildContext context, StorePalette colors) {
     AppSheet.show(
       context,
       title: "Mes boutiques",
@@ -284,26 +293,25 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             children: [
               ListTile(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                 ),
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(StoreDimensions.paddingS),
                   decoration: BoxDecoration(
                     color: colors.primarySoft,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                   ),
                   child: Icon(Icons.check_circle_rounded,
                       color: colors.primary, size: 20),
                 ),
                 title: Text(
                   widget.store.name,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: colors.textPrimary),
+                  style: StoreTextStyles.cardTitle
+                      .copyWith(color: colors.textPrimary),
                 ),
                 subtitle: Text(
                   "Boutique active",
-                  style: TextStyle(color: colors.textSecondary),
+                  style: StoreTextStyles.bodySecondary,
                 ),
               ),
               if (displayStore.isNotEmpty)
@@ -314,20 +322,20 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     color: colors.border),
               ...displayStore.map((newStore) => ListTile(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                 ),
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(StoreDimensions.paddingS),
                   decoration: BoxDecoration(
                     color: colors.cardElevated,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                   ),
                   child: Icon(Icons.storefront_outlined,
                       color: colors.textSecondary, size: 20),
                 ),
                 title: Text(newStore.name,
-                    style:
-                    TextStyle(color: colors.textPrimary)),
+                    style: StoreTextStyles.productTitle
+                        .copyWith(color: colors.textPrimary)),
                 trailing: Icon(Icons.chevron_right_rounded,
                     color: colors.textSecondary),
                 onTap: () {
@@ -358,27 +366,27 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // BOTTOM NAV
   // =========================================================================
-  Widget _buildBottomNav(BuildContext context, DashColors colors) {
+  Widget _buildBottomNav(BuildContext context, StorePalette colors) {
     final items = [
-      const FloatingNavItem(
+      const StoreNavItem(
           icon: Icons.home_outlined,
           activeIcon: Icons.home_rounded,
           label: "Accueil"),
-      const FloatingNavItem(
+      const StoreNavItem(
           icon: Icons.receipt_long_outlined,
           activeIcon: Icons.receipt_long_rounded,
           label: "Ventes"),
-      const FloatingNavItem(
+      const StoreNavItem(
           icon: Icons.inventory_2_outlined,
           activeIcon: Icons.inventory_2_rounded,
           label: "Stock"),
-      const FloatingNavItem(
+      const StoreNavItem(
           icon: Icons.settings_outlined,
           activeIcon: Icons.settings_rounded,
           label: "Plus"),
     ];
 
-    return FloatingBottomNavBar(
+    return StoreBottomNav(
       items: items,
       currentIndex: _currentIndex,
       onTap: (index) => setState(() => _currentIndex = index),
@@ -391,7 +399,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   Widget _sectionCard({
     required String title,
-    required DashColors colors,
+    required StorePalette colors,
     String? subtitle,
     IconData? icon,
     required Widget child,
@@ -400,8 +408,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     return Container(
       margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        color: colors.cardBackground,
+        borderRadius: BorderRadius.circular(StoreDimensions.radiusMedium),
         boxShadow: colors.cardShadow,
       ),
       child: Column(
@@ -409,7 +417,12 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+            padding: const EdgeInsets.fromLTRB(
+              StoreDimensions.paddingM,
+              StoreDimensions.paddingM,
+              StoreDimensions.paddingM,
+              0,
+            ),
             child: SectionHeader(
               title: title,
               subtitle: subtitle,
@@ -419,7 +432,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       height: 44,
                       decoration: BoxDecoration(
                         color: colors.primarySoft,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                       ),
                       child: Icon(icon, color: colors.primary, size: 21),
                     )
@@ -427,7 +440,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(StoreDimensions.paddingM),
             child: child,
           ),
         ],
@@ -438,7 +451,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // ONGLET 0 — ACCUEIL
   // =========================================================================
-  Widget _buildDashboardTab(BuildContext context, DashColors colors) {
+  Widget _buildDashboardTab(BuildContext context, StorePalette colors) {
     return RefreshIndicator(
       onRefresh: _fetchAllData,
       color: colors.primary,
@@ -460,7 +473,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 ),
               ),
             ),
-            CustomTabBar(
+            StoreTabBar(
               tabs: const ["Catégories", "Gérer"],
               currentIndex: _inventoryTab,
               onTap: (i) => setState(() => _inventoryTab = i),
@@ -469,9 +482,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             if (_inventoryTab == 0)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CategoryGrid(
+                child: StoreCategoryGrid(
                   itemCount: categories.length,
-                  itemBuilder: (i) => CategoryCard(
+                  itemBuilder: (i) => StoreCategoryCard(
                     label: categories[i].name,
                     icon: Icons.category_rounded,
                     index: i,
@@ -491,7 +504,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // KPI — cartes à dégradé du design system (données réelles, aucun calcul)
   // =========================================================================
-  Widget _buildKpiRow(BuildContext context, DashColors colors) {
+  Widget _buildKpiRow(BuildContext context, StorePalette colors) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       child: SizedBox(
@@ -499,7 +512,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         child: Row(
           children: [
             Expanded(
-              child: GradientInfoCard(
+              child: StoreKpiCard(
                 icon: Icons.inventory_2_outlined,
                 label: "Produits",
                 value: "${allStoreProducts.length}",
@@ -509,12 +522,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: GradientInfoCard(
+              child: StoreKpiCard(
                 icon: Icons.warning_amber_rounded,
                 label: "Alertes",
                 value: "${lowStockProducts.length}",
                 caption: "sous le seuil",
-                tint: colors.pastelAt(0),
+                tint: colors.pastelAt(3),
+                iconColor: colors.starYellow,
                 showChevron: true,
                 onTap: () => Navigator.push(
                   context,
@@ -563,7 +577,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // ONGLET 2 — STOCK
   // =========================================================================
-  Widget _buildStockTab(BuildContext context, DashColors colors) {
+  Widget _buildStockTab(BuildContext context, StorePalette colors) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -615,13 +629,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // ONGLET 3 — PLUS
   // =========================================================================
-  Widget _buildMoreTab(BuildContext context, DashColors colors) {
+  Widget _buildMoreTab(BuildContext context, StorePalette colors) {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       children: [
         // Carte profil
         AppCard(
-          padding: const EdgeInsets.all(16),
+          padding: StoreDimensions.paddingAllM,
+          radius: StoreDimensions.radiusMedium,
+          shadow: colors.cardShadow,
           borderColor: Colors.transparent,
           child: Row(
             children: [
@@ -640,11 +656,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       "${UserService.username}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          letterSpacing: -0.2,
-                          color: colors.textPrimary),
+                      style: StoreTextStyles.sectionTitle
+                          .copyWith(color: colors.textPrimary),
                     ),
                     const SizedBox(height: 5),
                     Container(
@@ -652,16 +665,15 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           horizontal: 9, vertical: 3),
                       decoration: BoxDecoration(
                         color: colors.fill,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                       ),
                       child: Text(
                         widget.userType == 'employee'
                             ? "EMPLOYÉ"
                             : "PROPRIÉTAIRE",
-                        style: TextStyle(
+                        style: StoreTextStyles.chip.copyWith(
                           color: colors.textSecondary,
                           fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -677,6 +689,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Actions
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
+          radius: StoreDimensions.radiusMedium,
+          shadow: colors.cardShadow,
           borderColor: Colors.transparent,
           child: Column(
             children: [
@@ -760,6 +774,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Déconnexion
         AppCard(
           padding: const EdgeInsets.symmetric(vertical: 6),
+          radius: StoreDimensions.radiusMedium,
+          shadow: colors.cardShadow,
           borderColor: Colors.transparent,
           child: ServiceListTile(
             icon: Icons.logout_rounded,
@@ -780,7 +796,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // FAB
   // =========================================================================
-  Widget _buildSaleAndExpenseFab(BuildContext context, DashColors colors) {
+  Widget _buildSaleAndExpenseFab(BuildContext context, StorePalette colors) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -818,7 +834,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // SECTION EMPLOYÉS
   // =========================================================================
-  Widget _buildEmployeeSection(BuildContext context, DashColors colors) {
+  Widget _buildEmployeeSection(BuildContext context, StorePalette colors) {
     return _sectionCard(
       title: "Équipe de vente",
       subtitle: "${employees.length} membre(s)",
@@ -842,10 +858,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     const SizedBox(height: 8),
                     Text(
                       "Aucun employé pour le moment",
-                      style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500),
+                      style: StoreTextStyles.bodySecondary
+                          .copyWith(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -865,18 +879,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: colors.fill,
+                          // Bouton circulaire d'action : encre + icône claire.
+                          color: colors.ink,
                           shape: BoxShape.circle,
+                          boxShadow: colors.softShadow,
                         ),
                         child: Icon(Icons.add_rounded,
-                            color: colors.textPrimary, size: 21),
+                            color: colors.onInk, size: 21),
                       ),
                       const SizedBox(height: 5),
                       Text("Ajouter",
-                          style: TextStyle(
-                              color: colors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12)),
+                          style: StoreTextStyles.chip
+                              .copyWith(color: colors.textSecondary)),
                     ],
                   ),
                 ),
@@ -888,7 +902,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   Widget _buildClickableAvatar(
-      BuildContext context, Employee emp, DashColors colors) {
+      BuildContext context, Employee emp, StorePalette colors) {
     return GestureDetector(
       onLongPress: () {
         if (widget.userType == "employer")
@@ -917,10 +931,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: colors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12),
+                style: StoreTextStyles.chip
+                    .copyWith(color: colors.textPrimary),
               ),
             ],
           ),
@@ -933,7 +945,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // LISTE DES CATÉGORIES
   // =========================================================================
   Widget _buildCategoryList(
-      BuildContext context, List<Category> cats, DashColors colors) {
+      BuildContext context, List<Category> cats, StorePalette colors) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -948,22 +960,24 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           child: GestureDetector(
             onTap: () => _showAddCategoryForm(context, null, colors),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              height: 44,
+              padding: const EdgeInsets.symmetric(
+                horizontal: StoreDimensions.paddingM,
+              ),
               decoration: BoxDecoration(
-                color: colors.fill,
-                borderRadius: BorderRadius.circular(AppRadius.card),
+                // Bouton d'action « + » : pilule encre, icône et texte clairs.
+                color: colors.ink,
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusPill),
+                boxShadow: colors.softShadow,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_rounded,
-                      color: colors.textPrimary, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(Icons.add_rounded, color: colors.onInk, size: 20),
+                  const SizedBox(width: StoreDimensions.paddingS),
                   Text("Ajouter une catégorie",
-                      style: TextStyle(
-                          color: colors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13.5)),
+                      style: StoreTextStyles.cardTitle.copyWith(
+                          fontSize: 13.5, color: colors.onInk)),
                 ],
               ),
             ),
@@ -974,8 +988,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   Widget _buildExpandableCategory(
-      BuildContext context, Category category, DashColors colors) {
-    return _CategoryCard(
+      BuildContext context, Category category, StorePalette colors) {
+    return _StoreCategoryCard(
       category: category,
       userType: widget.userType,
       colors: colors,
@@ -988,14 +1002,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // OPTIONS EMPLOYÉ
   // =========================================================================
   void _showEmployeeOptions(
-      BuildContext context, Employee emp, DashColors colors) {
+      BuildContext context, Employee emp, StorePalette colors) {
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.card,
       barrierColor: colors.barrier,
       shape: const RoundedRectangleBorder(
           borderRadius:
-          BorderRadius.vertical(top: Radius.circular(26))),
+          BorderRadius.vertical(top: Radius.circular(StoreDimensions.radiusSheet))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1006,27 +1020,26 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               height: 4,
               decoration: BoxDecoration(
                 color: colors.border,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
               ),
             ),
             const SizedBox(height: 10),
             ListTile(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
               ),
               leading: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(StoreDimensions.paddingS),
                 decoration: BoxDecoration(
                   color: colors.dangerSoft,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                 ),
                 child: Icon(Icons.delete_outline_rounded,
                     color: colors.danger, size: 20),
               ),
               title: Text("Supprimer l'employé",
-                  style: TextStyle(
-                      color: colors.danger,
-                      fontWeight: FontWeight.w600)),
+                  style: StoreTextStyles.cardTitle
+                      .copyWith(color: colors.danger)),
               onTap: () {
                 Navigator.pop(ctx);
                 _confirmDeleteEmployee(context, emp, colors);
@@ -1040,7 +1053,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   void _confirmDeleteEmployee(
-      BuildContext context, Employee emp, DashColors colors) {
+      BuildContext context, Employee emp, StorePalette colors) {
     showDialog(
       context: context,
       builder: (ctx) =>
@@ -1048,7 +1061,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding:
@@ -1059,7 +1072,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: StoreDimensions.paddingAllM,
                     decoration: BoxDecoration(
                       color: colors.dangerSoft,
                       shape: BoxShape.circle,
@@ -1070,10 +1083,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   const SizedBox(height: 18),
                   Text(
                     "Confirmation",
-                    style: TextStyle(
+                    style: StoreTextStyles.heading.copyWith(
                       fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -1081,7 +1092,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Voulez-vous vraiment supprimer ${emp.username} ?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: StoreTextStyles.bodySecondary.copyWith(
                       color: colors.textSecondary,
                       fontSize: 13.5,
                       height: 1.5,
@@ -1141,7 +1152,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // LOGIQUE DE VENTE
   // =========================================================================
   void _showStartSaleDialog(
-      BuildContext context, DashColors colors) async {
+      BuildContext context, StorePalette colors) async {
     final orderService = OrderService();
     Order? createdOrder;
 
@@ -1190,7 +1201,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   void _showSaleForm(
-      BuildContext context, String orderId, DashColors colors) {
+      BuildContext context, String orderId, StorePalette colors) {
     final formKey = GlobalKey<FormState>();
     final saleLines = [OrderLine()];
 
@@ -1209,7 +1220,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return Dialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               child: ConstrainedBox(
@@ -1218,7 +1229,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   maxHeight: MediaQuery.sizeOf(context).height * 0.8,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: StoreDimensions.paddingAllL,
                   child: Form(
                     key: formKey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1234,7 +1245,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                 decoration: BoxDecoration(
                                   color: colors.primarySoft,
                                   borderRadius:
-                                  BorderRadius.circular(12),
+                                  BorderRadius.circular(StoreDimensions.radiusSmall),
                                 ),
                                 child: Icon(
                                     Icons.shopping_cart_checkout_rounded,
@@ -1245,17 +1256,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               Expanded(
                                 child: Text(
                                   "Choix des produits",
-                                  style: TextStyle(
+                                  style: StoreTextStyles.heading.copyWith(
                                     fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.2,
                                     color: colors.textPrimary,
                                   ),
                                 ),
                               ),
                               Text("Ordre n°${orderId.substring(0, 8)}",
-                                  style: TextStyle(
-                                      fontSize: 11.5,
+                                  style: StoreTextStyles.caption.copyWith(
                                       color: colors.textSecondary)),
                             ],
                           ),
@@ -1361,7 +1369,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                                 color: colors.primary, size: 18),
                             label: Text(
                               "Ajouter un produit",
-                              style: TextStyle(color: colors.primary),
+                              style: StoreTextStyles.button
+                                  .copyWith(color: colors.primary),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -1372,7 +1381,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             decoration: BoxDecoration(
                               color: colors.primarySoft,
                               borderRadius:
-                              BorderRadius.circular(AppRadius.md),
+                              BorderRadius.circular(StoreDimensions.radiusSmall),
                             ),
                             child: Row(
                               mainAxisAlignment:
@@ -1380,17 +1389,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                               children: [
                                 Text(
                                   "TOTAL",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
+                                  style: StoreTextStyles.overline.copyWith(
                                     letterSpacing: 1.1,
                                     color: colors.textSecondary,
                                   ),
                                 ),
                                 Text(
                                   "${calculateTotal().toStringAsFixed(0)} F",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
+                                  style: StoreTextStyles.price.copyWith(
                                     fontSize: 17,
                                     color: colors.primary,
                                   ),
@@ -1469,7 +1475,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       String orderId,
       List<OrderLine> saleLines,
       double total,
-      DashColors colors,
+      StorePalette colors,
       ) {
     showDialog(
       context: context,
@@ -1479,7 +1485,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               contentPadding:
@@ -1490,7 +1496,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: StoreDimensions.paddingAllM,
                     decoration: BoxDecoration(
                       color: colors.successSoft,
                       shape: BoxShape.circle,
@@ -1501,10 +1507,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   const SizedBox(height: 18),
                   Text(
                     "Confirmer la Vente",
-                    style: TextStyle(
+                    style: StoreTextStyles.heading.copyWith(
                       fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -1512,7 +1516,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Valider la vente de ${total.toStringAsFixed(0)} F ?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: StoreTextStyles.bodySecondary.copyWith(
                       color: colors.textSecondary,
                       fontSize: 13.5,
                       height: 1.5,
@@ -1593,7 +1597,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // FORMULAIRE CATÉGORIE
   // =========================================================================
   void _showAddCategoryForm(
-      BuildContext context, Category? category, DashColors colors) {
+      BuildContext context, Category? category, StorePalette colors) {
     if (category != null) {
       _categoryNameController.text = category.name;
       _categoryDescController.text = category.description ?? "";
@@ -1610,7 +1614,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1622,7 +1626,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                     ),
                     child: Icon(Icons.category_rounded,
                         color: colors.primary, size: 22),
@@ -1635,11 +1639,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           : "Modifier Catégorie",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: StoreTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -1761,7 +1763,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // FORMULAIRE EMPLOYÉ
   // =========================================================================
-  void _showAddEmployeeForm(BuildContext context, DashColors colors,
+  void _showAddEmployeeForm(BuildContext context, StorePalette colors,
       {Employee? employee}) {
     _firstnameController.clear();
     _secondnameController.clear();
@@ -1776,7 +1778,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1788,7 +1790,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                     ),
                     child: Icon(Icons.person_add_alt_rounded,
                         color: colors.primary, size: 22),
@@ -1801,11 +1803,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                           : "Modifier ${employee.username}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: StoreTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -1927,13 +1927,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // DÉCONNEXION
   // =========================================================================
-  void _handleLogout(BuildContext context, DashColors colors) {
+  void _handleLogout(BuildContext context, StorePalette colors) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
           side: BorderSide(color: colors.border),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1942,7 +1942,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: StoreDimensions.paddingAllM,
               decoration: BoxDecoration(
                 color: colors.dangerSoft,
                 shape: BoxShape.circle,
@@ -1953,10 +1953,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             const SizedBox(height: 18),
             Text(
               "Déconnexion",
-              style: TextStyle(
+              style: StoreTextStyles.heading.copyWith(
                 fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
                 color: colors.textPrimary,
               ),
             ),
@@ -1964,7 +1962,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             Text(
               "Voulez-vous vraiment quitter BouTiKa ?",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: StoreTextStyles.bodySecondary.copyWith(
                 color: colors.textSecondary,
                 fontSize: 13.5,
               ),
@@ -2006,7 +2004,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   // =========================================================================
   // FORMULAIRE DÉPENSE
   // =========================================================================
-  void _showExpenseDialog(BuildContext context, DashColors colors) {
+  void _showExpenseDialog(BuildContext context, StorePalette colors) {
     bool isSavingExpense = false;
 
     showDialog(
@@ -2017,7 +2015,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
             return AlertDialog(
               backgroundColor: colors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(StoreDimensions.radiusLarge),
                 side: BorderSide(color: colors.border),
               ),
               titlePadding:   const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -2029,7 +2027,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors.accentSoft,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
                     ),
                     child: Icon(Icons.remove_circle_outline,
                         color: colors.accent, size: 20),
@@ -2040,11 +2038,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                       "Nouvelle Dépense",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: StoreTextStyles.heading.copyWith(
                         color: colors.textPrimary,
                         fontSize: 17.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -2155,7 +2151,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
 // HELPERS PASTEL — présentation uniquement (aucun impact métier)
 // ===========================================================================
 /// Pastel déterministe par catégorie (même couleur à chaque affichage).
-Color _pastelFor(String name, DashColors colors) {
+Color _pastelFor(String name, StorePalette colors) {
   int sum = 0;
   for (final int unit in name.codeUnits) {
     sum += unit;
@@ -2175,14 +2171,14 @@ Color _pastelIcon(Color pastel) {
 // ===========================================================================
 // CATEGORY CARD
 // ===========================================================================
-class _CategoryCard extends StatefulWidget {
+class _StoreCategoryCard extends StatefulWidget {
   final Category category;
   final String userType;
-  final DashColors colors;
+  final StorePalette colors;
   final VoidCallback onEdit;
   final VoidCallback onManage;
 
-  const _CategoryCard({
+  const _StoreCategoryCard({
     required this.category,
     required this.userType,
     required this.colors,
@@ -2191,10 +2187,10 @@ class _CategoryCard extends StatefulWidget {
   });
 
   @override
-  State<_CategoryCard> createState() => _CategoryCardState();
+  State<_StoreCategoryCard> createState() => _StoreCategoryCardState();
 }
 
-class _CategoryCardState extends State<_CategoryCard> {
+class _StoreCategoryCardState extends State<_StoreCategoryCard> {
   bool _expanded = false;
 
   @override
@@ -2208,7 +2204,7 @@ class _CategoryCardState extends State<_CategoryCard> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderRadius: BorderRadius.circular(StoreDimensions.radiusMedium),
         boxShadow: _expanded ? colors.floatingShadow : colors.cardShadow,
       ),
       child: Column(
@@ -2217,7 +2213,7 @@ class _CategoryCardState extends State<_CategoryCard> {
         children: [
           // Header
           InkWell(
-            borderRadius: BorderRadius.circular(AppRadius.xl),
+            borderRadius: BorderRadius.circular(StoreDimensions.radiusMedium),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -2245,10 +2241,9 @@ class _CategoryCardState extends State<_CategoryCard> {
                           category.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: StoreTextStyles.productTitle.copyWith(
                             fontWeight: FontWeight.w700,
                             fontSize: 14.5,
-                            letterSpacing: -0.1,
                             color: colors.textPrimary,
                           ),
                         ),
@@ -2256,9 +2251,8 @@ class _CategoryCardState extends State<_CategoryCard> {
                         Text("Gérer le stock et les prix",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: colors.textSecondary,
-                                fontSize: 12)),
+                            style: StoreTextStyles.bodySecondary
+                                .copyWith(fontSize: 12)),
                       ],
                     ),
                   ),
@@ -2305,17 +2299,16 @@ class _CategoryCardState extends State<_CategoryCard> {
                   Text(
                     category.description ??
                         "Aucune description fournie.",
-                    style: TextStyle(
+                    style: StoreTextStyles.bodySecondary.copyWith(
                         color: colors.textPrimary,
-                        height: 1.45,
-                        fontSize: 13),
+                        height: 1.45),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       if (widget.userType == "employer")
                         Expanded(
-                          child: _CategoryActionButton(
+                          child: _StoreCategoryActionButton(
                             icon: Icons.edit_outlined,
                             label: "Modifier",
                             filled: false,
@@ -2327,7 +2320,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                         const SizedBox(width: 10),
                       Expanded(
                         flex: 2,
-                        child: _CategoryActionButton(
+                        child: _StoreCategoryActionButton(
                           icon: Icons.inventory_2_outlined,
                           label: "Gérer les produits",
                           filled: true,
@@ -2350,14 +2343,14 @@ class _CategoryCardState extends State<_CategoryCard> {
 // ===========================================================================
 // BOUTON D'ACTION CATÉGORIE
 // ===========================================================================
-class _CategoryActionButton extends StatelessWidget {
+class _StoreCategoryActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool filled;
-  final DashColors colors;
+  final StorePalette colors;
   final VoidCallback onTap;
 
-  const _CategoryActionButton({
+  const _StoreCategoryActionButton({
     required this.icon,
     required this.label,
     required this.filled,
@@ -2369,15 +2362,15 @@ class _CategoryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: filled ? colors.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(
               vertical: 11, horizontal: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.md),
+            borderRadius: BorderRadius.circular(StoreDimensions.radiusSmall),
             border: filled
                 ? null
                 : Border.all(color: colors.border, width: 1.2),
@@ -2394,9 +2387,8 @@ class _CategoryActionButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: StoreTextStyles.button.copyWith(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
                     color: filled
                         ? colors.onPrimary
                         : colors.textPrimary,
