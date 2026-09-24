@@ -6,34 +6,34 @@ import 'package:mobile_store_app/core/widgets/cards/app_card.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/models/person.dart';
-import 'package:mobile_store_app/models/spending.dart';
-import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/service/withdrawal_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show DashColors, appDarkMode;
 import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
-class ExpensesScreen extends StatefulWidget {
+class WithdrawalScreen extends StatefulWidget {
   final String storeId;
 
-  const ExpensesScreen({super.key, required this.storeId});
+  const WithdrawalScreen({super.key, required this.storeId});
 
   @override
-  State<ExpensesScreen> createState() => _ExpensesScreenState();
+  State<WithdrawalScreen> createState() => _WithdrawalScreenState();
 }
 
-class _ExpensesScreenState extends State<ExpensesScreen> {
-  final SpendingServcie _spendingService = SpendingServcie();
+class _WithdrawalScreenState extends State<WithdrawalScreen> {
+  final WithdrawalService _withdrawalService = WithdrawalService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   bool isLoading = false;
-  List<Spending> expenses = [];
+  List<Withdrawal> withdrawals = [];
 
   late DateTime startDate;
   late DateTime endDate;
 
-  static const Color _accent = Color(0xFFC08552);
+  static const Color _accent = Color(0xFF5B8DEF);
   static const Color _danger = Color(0xFFDE4A52);
 
   @override
@@ -42,7 +42,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final today = _today();
     startDate = today;
     endDate = today;
-    _fetchExpenses();
+    _fetchWithdrawals();
   }
 
   @override
@@ -71,26 +71,26 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     return !_isSameDay(startDate, today) || !_isSameDay(endDate, today);
   }
 
-  Future<void> _fetchExpenses() async {
+  Future<void> _fetchWithdrawals() async {
     setState(() => isLoading = true);
     try {
-      final spendings = await _spendingService.getAllSpending(
+      final data = await _withdrawalService.getAllWithdrawals(
         widget.storeId,
         _atStartOfDay(startDate),
         _atEndOfDay(endDate),
         context,
       );
 
-      spendings.sort((a, b) {
+      data.sort((a, b) {
         final aDate = a.createdAt ?? DateTime(2000);
         final bDate = b.createdAt ?? DateTime(2000);
         return bDate.compareTo(aDate);
       });
 
       if (!mounted) return;
-      setState(() => expenses = spendings);
+      setState(() => withdrawals = data);
     } catch (e) {
-      debugPrint('Erreur lors de la récupération des dépenses : $e');
+      debugPrint('Erreur lors de la récupération des retraits : $e');
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -98,8 +98,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     }
   }
 
-  double get _totalFilteredAmount {
-    return expenses.fold<double>(
+  double get _totalAmount {
+    return withdrawals.fold<double>(
       0,
       (sum, item) => sum + (item.price ?? 0),
     );
@@ -143,7 +143,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       }
     });
 
-    await _fetchExpenses();
+    await _fetchWithdrawals();
   }
 
   Future<void> _resetFilters() async {
@@ -152,20 +152,20 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       startDate = today;
       endDate = today;
     });
-    await _fetchExpenses();
+    await _fetchWithdrawals();
   }
 
-  void _prepareForm([Spending? spending]) {
-    _amountController.text = spending?.price?.toStringAsFixed(0) ?? '';
-    _descriptionController.text = spending?.description ?? '';
+  void _prepareForm([Withdrawal? withdrawal]) {
+    _amountController.text = withdrawal?.price?.toStringAsFixed(0) ?? '';
+    _descriptionController.text = withdrawal?.description ?? '';
   }
 
-  Future<void> _showExpenseForm({Spending? spending}) async {
+  Future<void> _showWithdrawalForm({Withdrawal? withdrawal}) async {
     final colors = DashColors(context);
-    final isEdit = spending != null;
-    bool isSavingExpense = false;
+    final isEdit = withdrawal != null;
+    bool isSaving = false;
 
-    _prepareForm(spending);
+    _prepareForm(withdrawal);
 
     await showDialog(
       context: context,
@@ -186,19 +186,19 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: colors.accentSoft,
+                    color: colors.primarySoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    isEdit ? Icons.edit_rounded : Icons.remove_circle_outline,
-                    color: colors.accent,
+                    isEdit ? Icons.edit_rounded : Icons.south_west_rounded,
+                    color: colors.primary,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Flexible(
                   child: Text(
-                    isEdit ? 'Modifier la dépense' : 'Nouvelle dépense',
+                    isEdit ? 'Modifier le retrait' : 'Nouveau retrait',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -222,7 +222,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       keyboardType: TextInputType.number,
                       label: 'Montant (F)',
                       icon: Icons.payments_outlined,
-                      hint: 'Ex: 2500',
+                      hint: 'Ex: 10000',
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Indiquez le montant';
@@ -240,7 +240,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       maxLines: 2,
                       label: 'Description / Motif',
                       icon: Icons.description_outlined,
-                      hint: 'Ex: Transport marchandises',
+                      hint: 'Ex: Retrait de caisse',
                       validator: (value) =>
                           (value == null || value.trim().isEmpty)
                               ? 'Indiquez le motif'
@@ -257,11 +257,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     child: AppButton.secondary(
                       label: 'Annuler',
                       height: 48,
-                      onPressed: isSavingExpense
+                      onPressed: isSaving
                           ? null
-                          : () {
-                              Navigator.pop(ctx);
-                            },
+                          : () => Navigator.pop(ctx),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -270,31 +268,31 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     child: AppButton.primary(
                       label: isEdit ? 'Modifier' : 'Enregistrer',
                       height: 48,
-                      background: colors.accent,
+                      background: colors.primary,
                       foreground: Colors.white,
-                      isLoading: isSavingExpense,
-                      onPressed: isSavingExpense
+                      isLoading: isSaving,
+                      onPressed: isSaving
                           ? null
                           : () async {
                               if (!_formKey.currentState!.validate()) {
                                 return;
                               }
 
-                              setPopupState(() => isSavingExpense = true);
+                              setPopupState(() => isSaving = true);
 
-                              final payload = Spending(
+                              final payload = Withdrawal(
                                 price: double.parse(_amountController.text.trim()),
                                 description: _descriptionController.text.trim(),
                                 storeId: widget.storeId,
                               );
 
                               final success = isEdit
-                                  ? await _spendingService.updateSpending(
-                                      spending.id!,
+                                  ? await _withdrawalService.updateWithdrawal(
+                                      withdrawal.id!,
                                       payload,
                                       context,
                                     )
-                                  : await _spendingService.saveSpending(
+                                  : await _withdrawalService.saveWithdrawal(
                                       payload,
                                       context,
                                     );
@@ -303,11 +301,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                               if (success) {
                                 Navigator.pop(ctx);
-                                await _fetchExpenses();
+                                await _fetchWithdrawals();
                                 return;
                               }
 
-                              setPopupState(() => isSavingExpense = false);
+                              setPopupState(() => isSaving = false);
                             },
                     ),
                   ),
@@ -320,7 +318,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Future<void> _confirmDelete(Spending spending) async {
+  Future<void> _confirmDelete(Withdrawal withdrawal) async {
     final colors = DashColors(context);
     bool isDeleting = false;
 
@@ -354,7 +352,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'Supprimer la dépense',
+                    'Supprimer le retrait',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -364,7 +362,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Voulez-vous vraiment supprimer cette dépense ? Cette action est irréversible.',
+                    'Voulez-vous vraiment supprimer ce retrait ? Cette action est irréversible.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: colors.textSecondary,
@@ -397,12 +395,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                             ? null
                             : () async {
                                 setDialogState(() => isDeleting = true);
-                                final success = await _spendingService
-                                    .deleteSpending(spending.id!, context);
+                                final success = await _withdrawalService
+                                    .deleteWithdrawal(withdrawal.id!, context);
                                 if (!mounted) return;
                                 if (success) {
                                   Navigator.pop(dialogContext);
-                                  await _fetchExpenses();
+                                  await _fetchWithdrawals();
                                 } else {
                                   setDialogState(() => isDeleting = false);
                                 }
@@ -425,8 +423,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       return person.username!.trim();
     }
 
-    final fullName = '${person.firstname} ${person.lastname}'.trim();
-    return fullName;
+    return '${person.firstname} ${person.lastname}'.trim();
   }
 
   @override
@@ -440,7 +437,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           backgroundColor: colors.background,
           appBar: AppBar(
             title: Text(
-              'Historique des dépenses',
+              'Historique des retraits',
               style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 16.5,
@@ -455,14 +452,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             actions: [
               IconButton(
                 tooltip: 'Actualiser',
-                onPressed: _fetchExpenses,
+                onPressed: _fetchWithdrawals,
                 icon: Icon(Icons.refresh_rounded, color: colors.primary),
               ),
             ],
           ),
           body: SafeArea(
             child: RefreshIndicator(
-              onRefresh: _fetchExpenses,
+              onRefresh: _fetchWithdrawals,
               color: colors.primary,
               backgroundColor: colors.card,
               child: ListView(
@@ -478,10 +475,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       padding: EdgeInsets.only(top: 80),
                       child: Center(child: BouTikaLoader()),
                     )
-                  else if (expenses.isEmpty)
-                    _buildEmptyState(colors)
+                  else if (withdrawals.isEmpty)
+                    _buildEmptyState()
                   else
-                    ...expenses.map((expense) => _buildExpenseCard(expense, colors)),
+                    ...withdrawals
+                        .map((withdrawal) => _buildWithdrawalCard(withdrawal, colors)),
                 ],
               ),
             ),
@@ -506,7 +504,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.account_balance_wallet_outlined,
+                  Icons.account_balance_wallet_rounded,
                   color: _accent,
                   size: 20,
                 ),
@@ -514,7 +512,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Résumé des dépenses',
+                  'Résumé des retraits',
                   style: TextStyle(
                     color: colors.textPrimary,
                     fontWeight: FontWeight.w800,
@@ -532,7 +530,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 child: _buildStatBox(
                   colors: colors,
                   label: 'TOTAL',
-                  value: '${_totalFilteredAmount.toStringAsFixed(0)} F',
+                  value: '${_totalAmount.toStringAsFixed(0)} F',
                   valueColor: _danger,
                 ),
               ),
@@ -541,7 +539,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 child: _buildStatBox(
                   colors: colors,
                   label: 'NOMBRE',
-                  value: '${expenses.length}',
+                  value: '${withdrawals.length}',
                   valueColor: colors.primary,
                 ),
               ),
@@ -659,7 +657,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         endDate = startDate;
                       }
                     });
-                    await _fetchExpenses();
+                    await _fetchWithdrawals();
                   },
                 ),
               ),
@@ -677,7 +675,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         startDate = endDate;
                       }
                     });
-                    await _fetchExpenses();
+                    await _fetchWithdrawals();
                   },
                 ),
               ),
@@ -688,11 +686,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildExpenseCard(Spending spending, DashColors colors) {
-    final amount = spending.price ?? 0;
-    final actor = _actorLabel(spending.person);
-    final dateText = spending.createdAt != null
-        ? DateFormat('dd MMM yyyy • HH:mm').format(spending.createdAt!)
+  Widget _buildWithdrawalCard(Withdrawal withdrawal, DashColors colors) {
+    final amount = withdrawal.price ?? 0;
+    final actor = _actorLabel(withdrawal.person);
+    final dateText = withdrawal.createdAt != null
+        ? DateFormat('dd MMM yyyy • HH:mm').format(withdrawal.createdAt!)
         : 'Date inconnue';
 
     return Container(
@@ -715,7 +713,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
-                  Icons.money_off_rounded,
+                  Icons.south_west_rounded,
                   color: _accent,
                   size: 22,
                 ),
@@ -726,8 +724,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      spending.description?.trim().isNotEmpty == true
-                          ? spending.description!
+                      withdrawal.description?.trim().isNotEmpty == true
+                          ? withdrawal.description!
                           : 'Sans description',
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -790,9 +788,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   color: colors.warning,
                   softColor: colors.warningSoft,
                   height: 44,
-                  onPressed: spending.id == null
+                  onPressed: withdrawal.id == null
                       ? null
-                      : () => _showExpenseForm(spending: spending),
+                      : () => _showWithdrawalForm(withdrawal: withdrawal),
                 ),
               ),
               const SizedBox(width: 10),
@@ -801,9 +799,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   label: 'Supprimer',
                   icon: Icons.delete_outline_rounded,
                   height: 44,
-                  onPressed: spending.id == null
+                  onPressed: withdrawal.id == null
                       ? null
-                      : () => _confirmDelete(spending),
+                      : () => _confirmDelete(withdrawal),
                 ),
               ),
             ],
@@ -813,18 +811,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildEmptyState(DashColors colors) {
+  Widget _buildEmptyState() {
     return Padding(
       padding: const EdgeInsets.only(top: 40),
       child: SizedBox(
         height: 420,
         child: EmptyState(
-          icon: Icons.receipt_long_outlined,
-          title: 'Aucune dépense trouvée',
-          message:
-              'Aucune dépense ne correspond à la période sélectionnée.',
+          icon: Icons.account_balance_wallet_outlined,
+          title: 'Aucun retrait trouvé',
+          message: 'Aucun retrait ne correspond à la période sélectionnée.',
           actionLabel: 'Actualiser',
-          onAction: _fetchExpenses,
+          onAction: _fetchWithdrawals,
         ),
       ),
     );
