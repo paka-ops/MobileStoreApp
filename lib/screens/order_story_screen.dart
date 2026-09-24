@@ -345,7 +345,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
               ),
               hint: Text(
                 "Tous les statuts",
-                style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
+                style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
               ),
               style: TextStyle(
                   color: c.textPrimary,
@@ -503,7 +503,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                 child: Text(
                   "Chargement des commandes...",
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
+                  style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ),
             ],

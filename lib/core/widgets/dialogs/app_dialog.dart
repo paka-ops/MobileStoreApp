@@ -74,7 +74,10 @@ class AppDialog {
               title,
               textAlign: TextAlign.center,
               style: AppTextStyles.h3.copyWith(
-                AppTextStyles.heading.copyWith(fontSize: 17, color: c.textPrimary),
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
+                color: c.textPrimary,
               ),
             ),
           );

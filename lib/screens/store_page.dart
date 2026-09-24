@@ -1085,9 +1085,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Voulez-vous vraiment supprimer ${emp.username} ?",
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySecondary.copyWith(
-                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),
@@ -1507,9 +1505,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   Text(
                     "Valider la vente de ${total.toStringAsFixed(0)} F ?",
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySecondary.copyWith(
-                      AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
-                    ),
+                    style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
                   ),
                 ],
               ),

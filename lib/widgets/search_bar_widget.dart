@@ -148,9 +148,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           widget.hint,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.body.copyWith(
-                            AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14),
-                          ),
+                          style: AppTextStyles.body.copyWith(color: c.textSecondary, fontSize: 14),
                         ),
                       )
                     : TextField(
@@ -176,9 +174,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           errorBorder: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                           hintText: widget.hint,
-                          hintStyle: AppTextStyles.body.copyWith(
-                            AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14),
-                          ),
+                          hintStyle: AppTextStyles.body.copyWith(color: c.textSecondary, fontSize: 14),
                         ),
                       ),
               ),

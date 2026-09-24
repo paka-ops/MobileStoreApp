@@ -223,7 +223,7 @@ class _EmployerCategoryDetailsState
             const SizedBox(height: 16),
             Text(
               "Chargement des produits...",
-              style: AppTextStyles.bodySecondary.copyWith(AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14), fontWeight: FontWeight.w500),
+              style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
         ),
