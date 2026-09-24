@@ -14,11 +14,13 @@ import 'package:mobile_store_app/screens/low_stock_product.dart';
 import 'package:mobile_store_app/screens/order_story_screen.dart';
 import 'package:mobile_store_app/screens/spending_page.dart';
 import 'package:mobile_store_app/screens/stock_history_screen.dart';
+import 'package:mobile_store_app/screens/withdrawal_page.dart';
 import 'package:mobile_store_app/screens/subscription_screen_page.dart';
 import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
 import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/service/withdrawal_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart'
     show appDarkMode, DashColors;
 import 'package:mobile_store_app/utils/message.dart';
@@ -26,6 +28,7 @@ import 'package:mobile_store_app/widgets/design_system.dart';
 import '../models/Store.dart';
 import '../models/employee.dart';
 import '../models/spending.dart';
+import '../models/withdrawal.dart';
 import '../service/product_service.dart';
 import '../service/user_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -111,13 +114,16 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   final _usernameController     = TextEditingController();
   final _phoneController        = TextEditingController();
   final _passwordController     = TextEditingController();
-  final _categoryNameController = TextEditingController();
-  final _categoryDescController = TextEditingController();
-  final _expensePriceController = TextEditingController();
-  final _expenseDescController  = TextEditingController();
+  final _categoryNameController   = TextEditingController();
+  final _categoryDescController   = TextEditingController();
+  final _expensePriceController   = TextEditingController();
+  final _expenseDescController    = TextEditingController();
+  final _withdrawalPriceController = TextEditingController();
+  final _withdrawalDescController  = TextEditingController();
 
-  final _expenseFormKey  = GlobalKey<FormState>();
-  final _categoryFormKey = GlobalKey<FormState>();
+  final _expenseFormKey    = GlobalKey<FormState>();
+  final _withdrawalFormKey = GlobalKey<FormState>();
+  final _categoryFormKey   = GlobalKey<FormState>();
   final _formKey         = GlobalKey<FormState>();
 
   List<Store> displayStore = [];
@@ -141,6 +147,8 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
     _categoryDescController.dispose();
     _expensePriceController.dispose();
     _expenseDescController.dispose();
+    _withdrawalPriceController.dispose();
+    _withdrawalDescController.dispose();
     super.dispose();
   }
 
@@ -713,6 +721,25 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   ),
                 ),
               ),
+              Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: colors.border),
+              ServiceListTile(
+                icon: Icons.south_west_rounded,
+                title: "Mes Retraits",
+                subtitle: "Suivre les retraits de la boutique",
+                pastel: colors.primarySoft,
+                iconColor: colors.primary,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        WithdrawalScreen(storeId: widget.store.id),
+                  ),
+                ),
+              ),
               if (widget.store.subscription != null) ...[
                 Divider(
                     height: 1,
@@ -775,6 +802,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        RoundActionButton(
+          icon: Icons.south_west_rounded,
+          tooltip: "Retrait",
+          size: 50,
+          iconColor: colors.primary,
+          onTap: () => _showWithdrawalDialog(context, colors),
+        ),
+        const SizedBox(height: 12),
         RoundActionButton(
           icon: Icons.money_off_rounded,
           tooltip: "Dépense",
@@ -2040,9 +2075,16 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                         label: "Montant (F)",
                         icon: Icons.payments_outlined,
                         hint: "Ex: 2500",
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? "Indiquez le montant"
-                            : null,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return "Indiquez le montant";
+                          }
+                          final amount = double.tryParse(v.trim());
+                          if (amount == null || amount <= 0) {
+                            return "Montant invalide";
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 14),
                       AppTextField(
@@ -2090,31 +2132,31 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                             setPopupState(
                                 () => isSavingExpense = true);
                             try {
-                              await SpendingServcie().saveSpending(
+                              final saved = await SpendingServcie().saveSpending(
                                 Spending(
                                   price: double.parse(
-                                      _expensePriceController.text),
+                                      _expensePriceController.text.trim()),
                                   description:
-                                  _expenseDescController.text,
+                                  _expenseDescController.text.trim(),
                                   storeId: widget.store.id,
                                 ),
                                 context,
                               );
-                              if (mounted) {
+                              if (mounted && saved) {
                                 _expensePriceController.clear();
                                 _expenseDescController.clear();
                                 Navigator.pop(ctx);
+                                return;
                               }
                             } catch (e) {
                               print(e);
                               showErrorMessage(
                                   "Erreur lors de l'enregistrement",
                                   context);
-                            } finally {
-                              if (mounted) {
-                                setPopupState(() =>
-                                isSavingExpense = false);
-                              }
+                            }
+                            if (mounted) {
+                              setPopupState(() =>
+                              isSavingExpense = false);
                             }
                           }
                         },
@@ -2125,6 +2167,164 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               ],
             );
           }),
+    );
+  }
+
+  void _showWithdrawalDialog(BuildContext context, DashColors colors) {
+    bool isSavingWithdrawal = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (_, setPopupState) {
+          return AlertDialog(
+            backgroundColor: colors.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: colors.border),
+            ),
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+            actionsPadding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: colors.primarySoft,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.south_west_rounded,
+                    color: colors.primary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    "Nouveau Retrait",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 17.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Form(
+                key: _withdrawalFormKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppTextField(
+                      controller: _withdrawalPriceController,
+                      keyboardType: TextInputType.number,
+                      label: "Montant (F)",
+                      icon: Icons.payments_outlined,
+                      hint: "Ex: 5000",
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return "Indiquez le montant";
+                        }
+                        final amount = double.tryParse(v.trim());
+                        if (amount == null || amount <= 0) {
+                          return "Montant invalide";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    AppTextField(
+                      controller: _withdrawalDescController,
+                      maxLines: 2,
+                      label: "Description / Motif",
+                      icon: Icons.description_outlined,
+                      hint: "Ex: Retrait de caisse",
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? "Indiquez le motif"
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.secondary(
+                      label: "Annuler",
+                      height: 48,
+                      onPressed: () {
+                        _withdrawalPriceController.clear();
+                        _withdrawalDescController.clear();
+                        Navigator.pop(ctx);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: AppButton.primary(
+                      label: "Enregistrer",
+                      height: 48,
+                      background: colors.primary,
+                      foreground: Colors.white,
+                      isLoading: isSavingWithdrawal,
+                      onPressed: isSavingWithdrawal
+                          ? null
+                          : () async {
+                              if (_withdrawalFormKey.currentState!.validate()) {
+                                setPopupState(() => isSavingWithdrawal = true);
+                                try {
+                                  final saved = await WithdrawalService()
+                                      .saveWithdrawal(
+                                    Withdrawal(
+                                      price: double.parse(
+                                        _withdrawalPriceController.text.trim(),
+                                      ),
+                                      description:
+                                          _withdrawalDescController.text.trim(),
+                                      storeId: widget.store.id,
+                                    ),
+                                    context,
+                                  );
+
+                                  if (mounted && saved) {
+                                    _withdrawalPriceController.clear();
+                                    _withdrawalDescController.clear();
+                                    Navigator.pop(ctx);
+                                    return;
+                                  }
+                                } catch (e) {
+                                  print(e);
+                                  showErrorMessage(
+                                    "Erreur lors de l'enregistrement",
+                                    context,
+                                  );
+                                }
+                                if (mounted) {
+                                  setPopupState(
+                                    () => isSavingWithdrawal = false,
+                                  );
+                                }
+                              }
+                            },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

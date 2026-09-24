@@ -1,6 +1,6 @@
 import 'package:mobile_store_app/models/person.dart';
 
-class Spending {
+class Withdrawal {
   String? id;
   String? description;
   double? price;
@@ -8,17 +8,17 @@ class Spending {
   String? storeId;
   DateTime? createdAt;
 
-  Spending({
+  Withdrawal({
     this.id,
     this.description,
     this.price,
     this.person,
-    this.createdAt,
     this.storeId,
+    this.createdAt,
   });
 
-  factory Spending.fromJson(Map<String, dynamic> json) {
-    return Spending(
+  factory Withdrawal.fromJson(Map<String, dynamic> json) {
+    return Withdrawal(
       id: json['id'] as String?,
       description: json['description'] as String?,
       price: (json['price'] as num?)?.toDouble(),
@@ -38,3 +38,5 @@ class Spending {
         'storeId': storeId,
       };
 }
+
+typedef Withdrawall = Withdrawal;
