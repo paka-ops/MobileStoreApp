@@ -15,6 +15,7 @@ import 'package:mobile_store_app/screens/order_story_screen.dart';
 import 'package:mobile_store_app/screens/spending_page.dart';
 import 'package:mobile_store_app/screens/stock_history_screen.dart';
 import 'package:mobile_store_app/screens/subscription_screen_page.dart';
+import 'package:mobile_store_app/screens/withdrawal_page.dart';
 import 'package:mobile_store_app/service/category_service.dart';
 import 'package:mobile_store_app/service/employee_service.dart';
 import 'package:mobile_store_app/service/order_service.dart';
@@ -711,6 +712,21 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                   ),
                 ),
               ),
+              Divider(height: 1, color: colors.hairline),
+              ServiceListTile(
+                icon: Icons.savings_outlined,
+                title: "Mes Retraits",
+                subtitle: "Historique des retraits d'argent",
+                pastel: colors.primarySoft,
+                iconColor: colors.primary,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        WithdrawalScreen(storeId: widget.store.id),
+                  ),
+                ),
+              ),
               if (widget.store.subscription != null) ...[
                 Divider(
                     height: 1,
@@ -775,6 +791,18 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           size: 50,
           iconColor: colors.accent,
           onTap: () => _showExpenseDialog(context, colors),
+        ),
+        const SizedBox(height: 12),
+        // Bouton d'ajout d'un retrait — page d'accueil uniquement.
+        RoundActionButton(
+          icon: Icons.savings_outlined,
+          tooltip: "Retrait",
+          size: 50,
+          iconColor: colors.primary,
+          onTap: () => showWithdrawalFormDialog(
+            context,
+            storeId: widget.store.id,
+          ),
         ),
         const SizedBox(height: 12),
         ChatFab.labeled(

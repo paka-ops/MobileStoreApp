@@ -27,6 +27,52 @@ class SpendingServcie{
       showExceptionMessage(context);
     }
   }
+  updateSpending(Spending spending,BuildContext context)async{
+    try{
+      var result = await http.put(Uri.parse("$baseUrl/v1/spending/${spending.id}"),
+          body: jsonEncode(spending.toJson()),
+          headers: {
+            'Authorization' : 'Bearer $token',
+            'content-type' : 'application/json'
+          }
+      ).timeout(Duration(seconds: 16));
+      if(result.statusCode == 200){
+        showSuccessMessage("dépense modifiée avec success", context);
+        return true;
+      }else if(result.statusCode == 401){
+        showSubscriptionExpiredMessage(context);
+        return false;
+      }else {
+        showErrorMessage("erreur lors de la modification de la dépense", context);
+        return false;
+      }
+    }catch(e){
+      showExceptionMessage(context);
+      return false;
+    }
+  }
+  deleteSpending(String? spendingId,BuildContext context)async{
+    try{
+      var result = await http.delete(Uri.parse("$baseUrl/v1/spending/$spendingId"),
+          headers: {
+            'Authorization' : 'Bearer $token',
+            'content-type' : 'application/json'
+          }
+      ).timeout(Duration(seconds: 16));
+      if(result.statusCode == 200 || result.statusCode == 204){
+        return true;
+      }else if(result.statusCode == 401){
+        showSubscriptionExpiredMessage(context);
+        return false;
+      }else {
+        showErrorMessage("erreur lors de la suppression de la dépense", context);
+        return false;
+      }
+    }catch(e){
+      showExceptionMessage(context);
+      return false;
+    }
+  }
   getAllSpending(String? storeId,DateTime? startDate, DateTime? endDate, BuildContext context)async{
     var result = await http.get(Uri.parse("$baseUrl/v1/spending?storeId=$storeId&startDate=${startDate?.toIso8601String()}&endDate=${endDate?.toIso8601String()}"),
         headers: {
