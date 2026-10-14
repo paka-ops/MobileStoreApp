@@ -24,12 +24,14 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   bool isLoading = false;
 
-  /// Liste telle que renvoyée par le serveur pour la période filtrée.
+  int _fetchRequestId = 0;
+
+  /// Dépenses dont la date appartient à la période sélectionnée.
   List<Spending> expenses = [];
 
   /// Période envoyée à l'API — par défaut : la date d'aujourd'hui.
-  DateTime startDate = _today();
-  DateTime endDate = _today();
+  late DateTime startDate;
+  late DateTime endDate;
 
   static const Color _accent = AppColors.accentPink;
   static const Color _danger = AppColors.badgeRed;
@@ -40,49 +42,83 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       DateTime(date.year, date.month, date.day);
 
   static DateTime _endOfDay(DateTime date) =>
-      DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+      DateTime(date.year, date.month, date.day + 1)
+          .subtract(const Duration(microseconds: 1));
 
   @override
   void initState() {
     super.initState();
+    final today = _today();
+    startDate = today;
+    endDate = today;
     _fetchExpenses();
   }
 
-  /// Le filtrage est fait par le serveur : les dates choisies sont envoyées
-  /// dans l'API (`startDate` / `endDate`), aucune recherche côté application.
+  /// Envoie la période à l'API puis vérifie les dates des résultats côté page.
   Future<void> _fetchExpenses() async {
+    if (!mounted) return;
+    final requestId = ++_fetchRequestId;
+    final periodStart = _startOfDay(startDate);
+    final periodEnd = _endOfDay(endDate);
     setState(() => isLoading = true);
     try {
       final spendingServcie = SpendingServcie();
       final List<Spending> spendings = await spendingServcie.getAllSpending(
         widget.storeId,
-        _startOfDay(startDate),
-        _endOfDay(endDate),
+        periodStart,
+        periodEnd,
         context,
       );
 
-      spendings.sort((a, b) {
+      // Une réponse ancienne ne doit pas écraser le dernier filtre choisi.
+      if (!mounted || requestId != _fetchRequestId) return;
+
+      final filteredSpendings = spendings.where((spending) {
+        final date = spending.createdAt?.toLocal();
+        return date != null &&
+            !date.isBefore(periodStart) &&
+            !date.isAfter(periodEnd);
+      }).toList();
+
+      filteredSpendings.sort((a, b) {
         final aDate = a.createdAt ?? DateTime(2000);
         final bDate = b.createdAt ?? DateTime(2000);
         return bDate.compareTo(aDate);
       });
 
       if (mounted) {
-        setState(() => expenses = spendings);
+        setState(() => expenses = filteredSpendings);
       }
     } catch (e) {
       debugPrint("Erreur lors de la récupération : $e");
     } finally {
-      if (mounted) setState(() => isLoading = false);
+      if (mounted && requestId == _fetchRequestId) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   void _applyFilters() => _fetchExpenses();
 
-  void _resetToToday() {
+  void _setFilterDate(DateTime date, {required bool isStart}) {
     setState(() {
-      startDate = _today();
-      endDate = _today();
+      final selectedDate = _startOfDay(date);
+      if (isStart) {
+        startDate = selectedDate;
+        if (endDate.isBefore(startDate)) endDate = startDate;
+      } else {
+        endDate = selectedDate;
+        if (startDate.isAfter(endDate)) startDate = endDate;
+      }
+    });
+    _applyFilters();
+  }
+
+  void _resetToToday() {
+    final today = _today();
+    setState(() {
+      startDate = today;
+      endDate = today;
     });
     _applyFilters();
   }
@@ -315,10 +351,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   label: "Date début",
                   date: startDate,
                   onTap: () => _pickDate(isStart: true),
-                  onClear: () {
-                    setState(() => startDate = _today());
-                    _applyFilters();
-                  },
+                  onClear: () => _setFilterDate(_today(), isStart: true),
                 ),
               ),
               const SizedBox(width: 12),
@@ -327,10 +360,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   label: "Date fin",
                   date: endDate,
                   onTap: () => _pickDate(isStart: false),
-                  onClear: () {
-                    setState(() => endDate = _today());
-                    _applyFilters();
-                  },
+                  onClear: () => _setFilterDate(_today(), isStart: false),
                 ),
               ),
             ],
@@ -360,24 +390,15 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       ),
     );
 
-    if (picked != null) {
-      setState(() {
-        if (isStart) {
-          startDate = picked;
-          if (endDate.isBefore(picked)) endDate = picked;
-        } else {
-          endDate = picked;
-          if (startDate.isAfter(picked)) startDate = picked;
-        }
-      });
-      _applyFilters();
+    if (picked != null && mounted) {
+      _setFilterDate(picked, isStart: isStart);
     }
   }
 
   Widget _buildExpenseCard(Spending spending, DashColors colors) {
     final amount = spending.price ?? 0;
     final dateText = spending.createdAt != null
-        ? DateFormat('dd MMM yyyy • HH:mm').format(spending.createdAt!)
+        ? DateFormat('dd MMM yyyy • HH:mm').format(spending.createdAt!.toLocal())
         : "Date inconnue";
 
     return Container(
