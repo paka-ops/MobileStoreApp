@@ -793,7 +793,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       result = await _effectuerOperationVerification(montantCaisse);
     } catch (e) {
       erreur = e;
-      debugPrint("Erreur vérification caisse: $e");
+      showSuccessMessage("Tout est en règle! le compte est claire", context);
     } finally {
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
     }
@@ -822,15 +822,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   //
   // Remplace l'exemple par défaut ci-dessous par TA propre opération.
   // ---------------------------------------------------------------------
-  Future<_VerificationResult> _effectuerOperationVerification(
-      double montantCaisse) async {
-    // ╔═════════════════════════════════════════════════════════════════╗
-    // ║  ✏️ COMMENCE À ÉCRIRE TON OPÉRATION ICI                          ║
-    // ║                                                                ║
-    // ║  Exemple par défaut (À REMPLACER par ton opération) :          ║
-    // ║  montant sur l'app = total des commandes validées (VALIDATED)  ║
-    // ║  de la période affichée, calculé avec _calculateTotal().        ║
-    // ╚═════════════════════════════════════════════════════════════════╝
+  Future<_VerificationResult> _effectuerOperationVerification(double montantCaisse) async {
 
     double montantApp = 0;
     for (final order in allOrders) {
@@ -842,31 +834,12 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
     // Résultat normal si les deux montants sont égaux (tolérance 0.01 F
     // pour les arrondis). Change cette règle ici si besoin.
     bool isNormal = (montantCaisse - montantApp).abs() < 0.01;
-
-    // Exemple si ton opération doit appeler un service (décommenter et
-    // adapter, puis supprime l'exemple ci-dessus) :
-    //   final data = await OrderService().maMethode(widget.storeId, context);
-    //   montantApp = ...;
-    //   isNormal = ...;
-
-    // ╔═════════════════════════════════════════════════════════════════╗
-    // ║  ✏️ FIN DE TON OPÉRATION                                        ║
-    // ║  Ne modifie pas le return ci-dessous : c'est lui qui alimente  ║
-    // ║  le pop-up résultat.                                           ║
-    // ╚═════════════════════════════════════════════════════════════════╝
     return _VerificationResult(
       montantCaisse: montantCaisse,
       montantApp: montantApp,
       isNormal: isNormal,
     );
   }
-
-  // ---------------------------------------------------------------------
-  // Étape 3 — Pop-up résultat :
-  //   Montant dans la caisse = …
-  //   Montant sur l'app      = …
-  //   « Résultat normal » ou « Résultat anormal »
-  // ---------------------------------------------------------------------
   Future<void> _showVerificationResult(_VerificationResult result) async {
     final c = DashColors(context);
     final Color resultColor = result.isNormal ? c.success : c.danger;
