@@ -644,7 +644,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   // ---------------------------------------------------------------------
   Future<void> _showVerificationForm() async {
     final c = DashColors(context);
-    final formKey = GlobalKey<FormState>();
+    final verificationFormKey = GlobalKey<FormState>();
     final montantController = TextEditingController();
 
     final double? montantCaisse = await showDialog<double>(
@@ -688,7 +688,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           ),
           content: SingleChildScrollView(
             child: Form(
-              key: formKey,
+              key: verificationFormKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -739,7 +739,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     icon: Icons.fact_check_rounded,
                     height: 48,
                     onPressed: () {
-                      if (!formKey.currentState!.validate()) return;
+                      if (!verificationFormKey.currentState!.validate()) return;
                       final double? montant =
                           _parseMontant(montantController.text);
                       if (montant == null) return;
