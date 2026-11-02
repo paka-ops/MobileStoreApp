@@ -76,7 +76,7 @@ class WithdrawalService{
           },
           body: jsonEncode(withdrawal.toJson())
       ).timeout(Duration(seconds: 10));
-      if(result.statusCode == 200 ){
+      if(result.statusCode == 200 || result.statusCode == 204 ){
         return _readWithdrawal(result.body, withdrawal);
       }else if(result.statusCode == 401){
         showSubscriptionExpiredMessage(context);
