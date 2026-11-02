@@ -721,7 +721,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
               Divider(height: 1, color: colors.hairline),
               ServiceListTile(
                 icon: Icons.savings_outlined,
-                title: "Mes Retraits",
+                title: "Mes Achats",
                 subtitle: "Historique des retraits d'argent",
                 pastel: colors.primarySoft,
                 iconColor: colors.primary,
@@ -804,7 +804,7 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
         // Bouton d'ajout d'un retrait — page d'accueil uniquement.
         RoundActionButton(
           icon: Icons.savings_outlined,
-          tooltip: "Retrait",
+          tooltip: "Achat",
           size: 50,
           iconColor: colors.primary,
           onTap: () => showWithdrawalFormDialog(

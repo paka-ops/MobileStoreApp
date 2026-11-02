@@ -495,6 +495,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: AppButton.danger(
+                  label: "Modifier",
+                  icon: Icons.update,
+                  height: 44,
+                  fontSize: 13,
+                  onPressed: () => _confirmUpadate(withdrawal),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: AppButton.danger(
                   label: "Supprimer",
                   icon: Icons.delete_outline_rounded,
                   height: 44,
@@ -593,6 +603,94 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       showSuccessMessage("Retrait supprimé avec succès", context);
     }
   }
+  Future<void> _confirmUpadate(Withdrawal withdrawal) async {
+    final String? id = withdrawal.id;
+    if (id == null || id.isEmpty) {
+      showErrorMessage("Retrait introuvable", context);
+      return;
+    }
+
+    final colors = DashColors(context);
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: colors.border),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.dangerSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.delete_forever_rounded,
+                  color: colors.danger, size: 30),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              "Mettre a jours",
+              style: AppTextStyles.heading.copyWith(fontSize: 17, color: colors.textPrimary),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Voulez-vous vraiment mettre a jour le retrait de "
+                  "${withdrawal.amount.toStringAsFixed(0)} F ? Cette action est irréversible.",
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodySecondary.copyWith(color: colors.textSecondary, fontSize: 13.5, height: 1.5),
+            ),
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  label: "Annuler",
+                  height: 48,
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: AppButton.danger(
+                  label: "Modifier",
+                  height: 48,
+                  fontSize: 13,
+                  onPressed: () async{
+                    await WithdrawalService().update(storeId: widget.storeId,
+                        withdrawal: withdrawal, context: context);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final bool deleted = await WithdrawalService().delete(
+      withdrawalId: id,
+      context: context,
+    );
+
+    if (!mounted) return;
+    if (deleted) {
+      setState(() => withdrawals.removeWhere((w) => w.id == id));
+      showSuccessMessage("Retrait supprimé avec succès", context);
+    }
+  }
+
 
   Widget _buildEmptyState(DashColors colors) {
     return Padding(

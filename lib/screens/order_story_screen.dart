@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/service/withdrawal_service.dart';
 import '../core/theme/app_text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +18,7 @@ import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart';
 import 'package:mobile_store_app/utils/message.dart';
+import '../models/spending.dart';
 import '../service/order_service.dart';
 import 'category_report_screen.dart';
 import 'general_report_screen.dart';
@@ -43,8 +47,9 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   List<Order> filteredOrders = [];
   bool isLoading = false;
 
-  DateTime? startDate;
-  DateTime? endDate;
+  DateTime  startDate =  DateTime.now();
+  DateTime?  endDate = DateTime.now().add(const Duration(days: 1));
+
   OrderStatus? selectedStatus;
 
   @override
@@ -89,7 +94,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       List<Order> orders =
       await OrderService().getAllOrderBetweenTwoDate(
         widget.storeId,
-        startDate ?? DateTime.now().add(const Duration(days: -1)),
+        startDate ?? DateTime.now(),
         endDate ?? DateTime.now().add(const Duration(days: 1)),
         context,
       );
@@ -313,9 +318,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   date: startDate,
                   onTap: () => _pickDate(true),
                   onClear: () {
-                    setState(() {
-                      startDate = null;
-                    });
+
                     _applyFilters();
                   },
                 ),
@@ -327,9 +330,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   date: endDate,
                   onTap: () => _pickDate(false),
                   onClear: () {
-                    setState(() {
-                      endDate = null;
-                    });
+
                     _applyFilters();
                   },
                 ),
@@ -757,7 +758,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       },
     );
 
-    montantController.dispose();
+
     if (montantCaisse == null || !mounted) return;
     await _runVerification(montantCaisse);
   }
@@ -816,39 +817,32 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   // ---------------------------------------------------------------------
   Future<_VerificationResult> _effectuerOperationVerification(
       double montantCaisse) async {
-    // ╔═════════════════════════════════════════════════════════════════╗
-    // ║  ✏️ COMMENCE À ÉCRIRE TON OPÉRATION ICI                          ║
-    // ║                                                                ║
-    // ║  Exemple par défaut (À REMPLACER par ton opération) :          ║
-    // ║  montant sur l'app = total des commandes validées (VALIDATED)  ║
-    // ║  de la période affichée, calculé avec _calculateTotal().        ║
-    // ╚═════════════════════════════════════════════════════════════════╝
-
+    double spendingAmount = 0;
+    double withdrawalAmount = 0;
+    List<Spending>? spendings = await SpendingServcie().getAllSpending(widget.storeId, startDate, endDate, context);
+    List<Withdrawal>? withdrawals = await WithdrawalService().getWithdrawals(storeId: widget.storeId, startDate: startDate!, endDate: endDate!, context: context);
+   if(spendings != null) {
+     spendings.forEach((spending) {
+       if(spending.price != null) {spendingAmount += spending.price!;};
+     });
+     if(withdrawals != null){
+       withdrawals.forEach((withdrawal){
+         withdrawalAmount += withdrawal.amount;
+       });
+     }
+   }
     double montantApp = 0;
     for (final order in allOrders) {
       if (order.status == OrderStatus.VALIDATED) {
         montantApp += _calculateTotal(order);
       }
     }
-
-    // Résultat normal si les deux montants sont égaux (tolérance 0.01 F
-    // pour les arrondis). Change cette règle ici si besoin.
-    bool isNormal = (montantCaisse - montantApp).abs() < 0.01;
-
-    // Exemple si ton opération doit appeler un service (décommenter et
-    // adapter, puis supprime l'exemple ci-dessus) :
-    //   final data = await OrderService().maMethode(widget.storeId, context);
-    //   montantApp = ...;
-    //   isNormal = ...;
-
-    // ╔═════════════════════════════════════════════════════════════════╗
-    // ║  ✏️ FIN DE TON OPÉRATION                                        ║
-    // ║  Ne modifie pas le return ci-dessous : c'est lui qui alimente  ║
-    // ║  le pop-up résultat.                                           ║
-    // ╚═════════════════════════════════════════════════════════════════╝
+    bool isNormal = (montantCaisse - (montantApp-spendingAmount-withdrawalAmount)).abs() < 0.01;
     return _VerificationResult(
       montantCaisse: montantCaisse,
       montantApp: montantApp,
+      spendingAmount: spendingAmount,
+      withdrawalAmount: withdrawalAmount,
       isNormal: isNormal,
     );
   }
@@ -919,9 +913,12 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                       _buildResultRow(
                           c, "Montant sur l'app", result.montantApp),
                       const SizedBox(height: 10),
+                      _buildResultRow(c, "Total Dépense", result.spendingAmount),
+                      const SizedBox(height: 10,),
+                      _buildResultRow(c, "Total Achat", result.withdrawalAmount),
                       Container(height: 1, color: c.border),
                       const SizedBox(height: 10),
-                      _buildResultRow(c, "Écart", result.ecart),
+                      _buildResultRow(c, result.ecart<=0?"Manquant":"Surplus", result.ecart),
                     ],
                   ),
                 ),
@@ -996,7 +993,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         Text(
           "= ${_formatMontant(montant)}",
           style: TextStyle(
-            color: c.textPrimary,
+            color: (label == "Manquant" || label == "Surplus")?montant >=0?c.accentGreen:c.badgeRed:c.textSecondary,
             fontWeight: FontWeight.w800,
             fontSize: 13.5,
           ),
@@ -1281,7 +1278,7 @@ class _OrderCardState extends State<_OrderCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "$totalAmount F",
+                        "${totalAmount.toStringAsFixed(2)} F",
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           color: c.primary,
@@ -1369,7 +1366,7 @@ class _OrderCardState extends State<_OrderCard> {
                                 ),
                               ),
                               Text(
-                                "$lineTotal F",
+                                "${lineTotal.toStringAsFixed(2)} F",
                                 style: TextStyle(
                                   color: c.primary,
                                   fontWeight: FontWeight.w800,
@@ -1502,7 +1499,8 @@ class _OrderCardState extends State<_OrderCard> {
 class _VerificationResult {
   /// Montant saisi dans le formulaire (argent compté dans la caisse).
   final double montantCaisse;
-
+  final double spendingAmount;
+  final double withdrawalAmount;
   /// Montant calculé côté application par TON opération.
   final double montantApp;
 
@@ -1512,13 +1510,14 @@ class _VerificationResult {
   const _VerificationResult({
     required this.montantCaisse,
     required this.montantApp,
+    required this.spendingAmount,
+    required this.withdrawalAmount,
     required this.isNormal,
   });
 
-  /// Écart caisse − app (0 = concordance parfaite).
-  double get ecart => montantCaisse - montantApp;
-}
 
+  double get ecart => (montantCaisse + spendingAmount + withdrawalAmount) - montantApp;
+}
 double? _parseMontant(String value) => double.tryParse(
       value.trim().replaceAll(RegExp(r'\s'), '').replaceAll(',', '.'),
     );
@@ -1528,16 +1527,6 @@ String _formatMontant(double montant) => "${montant.toStringAsFixed(2)} F";
 /// Phases du dialog de vérification (un seul dialog, pas d'enchaînement
 /// de pop-ups : voir le commentaire « Correctif stabilité » plus haut).
 enum _VerificationPhase { form, loading, result }
-
-// =====================================================================
-// DIALOG VÉRIFICATION DE CAISSE — formulaire → loading → résultat
-//
-// StatefulWidget propriétaire de son TextEditingController : il est
-// libéré dans State.dispose(), donc uniquement APRÈS le retrait
-// complet du dialog de l'arbre (corrige « A TextEditingController was
-// used after being disposed » et la cascade « Duplicate GlobalKeys »
-// d'Overlay provoquée par les 3 dialogs enchaînés dans la même frame).
-// =====================================================================
 class _VerificationDialog extends StatefulWidget {
   /// TON opération (méthode de l'écran) : reçoit le montant saisi et
   /// retourne le résultat à afficher.
