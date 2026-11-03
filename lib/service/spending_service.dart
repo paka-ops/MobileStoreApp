@@ -29,7 +29,7 @@ class SpendingServcie{
   }
   updateSpending(Spending spending,BuildContext context)async{
     try{
-      var result = await http.put(Uri.parse("$baseUrl/v1/spending/${spending.id}"),
+      var result = await http.patch(Uri.parse("$baseUrl/v1/spending/${spending.id}"),
           body: jsonEncode(spending.toJson()),
           headers: {
             'Authorization' : 'Bearer $token',

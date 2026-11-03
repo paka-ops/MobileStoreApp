@@ -730,7 +730,6 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _amountController;
   late final TextEditingController _messageController;
-  late DateTime _date;
   bool isSaving = false;
 
   bool get isEditing => widget.withdrawal != null;
@@ -744,7 +743,6 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
     );
     _messageController =
         TextEditingController(text: existing?.message ?? "");
-    _date = existing?.date ?? DateTime.now();
   }
 
   @override
@@ -758,48 +756,13 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
       ? amount.toStringAsFixed(0)
       : amount.toString();
 
-  Future<void> _pickDate() async {
-    final colors = DashColors(context);
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2022),
-      lastDate: DateTime(2100),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-                primary: colors.primary,
-                onPrimary: Colors.white,
-                surface: colors.card,
-                onSurface: colors.textPrimary,
-              ),
-        ),
-        child: child!,
-      ),
-    );
-
-    if (picked != null) {
-      setState(() {
-        final DateTime previous = _date;
-        _date = DateTime(
-          picked.year,
-          picked.month,
-          picked.day,
-          previous.hour,
-          previous.minute,
-          previous.second,
-        );
-      });
-    }
-  }
-
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (isSaving || !_formKey.currentState!.validate()) return;
 
     final double? amount = double.tryParse(
       _amountController.text.trim().replaceAll(',', '.'),
     );
-    if (amount == null || amount <= 0) return;
+    if (amount == null || !amount.isFinite || amount <= 0) return;
 
     if (isEditing && (widget.withdrawal?.id == null ||
         widget.withdrawal!.id!.isEmpty)) {
@@ -810,7 +773,8 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
     final Withdrawal withdrawal = Withdrawal(
       id: widget.withdrawal?.id,
       amount: amount,
-      message: _messageController.text.trim()
+      message: _messageController.text.trim(),
+      date: widget.withdrawal?.date,
     );
 
     setState(() => isSaving = true);
@@ -893,8 +857,23 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                isEditing
+                    ? "Modifiez le montant et le motif de ce retrait."
+                    : "Renseignez le montant et le motif du retrait.",
+                style: TextStyle(color: colors.textSecondary, fontSize: 13),
+              ),
+              if (isEditing && widget.withdrawal!.date != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  "Date du retrait (non modifiable) : ${DateFormat('dd/MM/yyyy HH:mm').format(widget.withdrawal!.date!.toLocal())}",
+                  style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                ),
+              ],
+              const SizedBox(height: 18),
               AppTextField(
                 controller: _amountController,
+                enabled: !isSaving,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
@@ -905,7 +884,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
                   final double? value = double.tryParse(
                     (v ?? "").trim().replaceAll(',', '.'),
                   );
-                  if (value == null || value <= 0) {
+                  if (value == null || !value.isFinite || value <= 0) {
                     return "Indiquez un montant valide";
                   }
                   return null;
@@ -914,6 +893,7 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
               const SizedBox(height: 14),
               AppTextField(
                 controller: _messageController,
+                enabled: !isSaving,
                 maxLines: 2,
                 label: "Motif du retrait",
                 icon: Icons.description_outlined,
@@ -922,8 +902,6 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
                     ? "Indiquez le motif"
                     : null,
               ),
-              const SizedBox(height: 14),
-
             ],
           ),
         ),
@@ -952,59 +930,6 @@ class _WithdrawalFormDialogState extends State<_WithdrawalFormDialog> {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// ============================================================================
-/// CHAMP DATE — présentation uniquement (le datePicker vit dans le formulaire).
-/// ============================================================================
-class _DateField extends StatelessWidget {
-  final DateTime date;
-  final VoidCallback onTap;
-
-  const _DateField({required this.date, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final DashColors colors = DashColors(context);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 16),
-        decoration: BoxDecoration(
-          color: colors.fill,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_month_rounded,
-              size: 19,
-              color: colors.textSecondary,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                DateFormat('dd MMM yyyy').format(date),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14.5,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.expand_more_rounded,
-              size: 20,
-              color: colors.textSecondary,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

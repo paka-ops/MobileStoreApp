@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_store_app/utils/message.dart';
 
 class UserService {
-  static String baseUrl = "http://localhost:8080/api";
+  static String baseUrl = "http://127.0.0.1:8080/api";
   static String? token;
   static String? userType;
   static String? username;
