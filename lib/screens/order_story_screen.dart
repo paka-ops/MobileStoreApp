@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/service/withdrawal_service.dart';
 import '../core/theme/app_text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +18,7 @@ import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/app_colors.dart';
 import 'package:mobile_store_app/utils/message.dart';
+import '../models/spending.dart';
 import '../service/order_service.dart';
 import 'category_report_screen.dart';
 import 'general_report_screen.dart';
@@ -43,8 +47,9 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   List<Order> filteredOrders = [];
   bool isLoading = false;
 
-  DateTime? startDate;
-  DateTime? endDate;
+  DateTime  startDate =  DateTime.now();
+  DateTime?  endDate = DateTime.now().add(const Duration(days: 1));
+
   OrderStatus? selectedStatus;
 
   @override
@@ -89,7 +94,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       List<Order> orders =
       await OrderService().getAllOrderBetweenTwoDate(
         widget.storeId,
-        startDate ?? DateTime.now().add(const Duration(days: -1)),
+        startDate ?? DateTime.now(),
         endDate ?? DateTime.now().add(const Duration(days: 1)),
         context,
       );
@@ -201,12 +206,26 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
     if (!widget.embedded) {
       return Scaffold(
         body: SafeArea(child: content),
+        // FAB Vérification de caisse (ajout — aucun comportement existant modifié).
+        floatingActionButton: _buildVerificationFab(c),
       );
     }
 
+    // Mode embedded : pas de Scaffold propre à cet écran, le même FAB
+    // Vérification est donc superposé en bas à droite du contenu.
     return Container(
       color: c.background,
-      child: content,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          content,
+          Positioned(
+            right: 20,
+            bottom: 16,
+            child: _buildVerificationFab(c),
+          ),
+        ],
+      ),
     );
   }
 
@@ -299,9 +318,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   date: startDate,
                   onTap: () => _pickDate(true),
                   onClear: () {
-                    setState(() {
-                      startDate = null;
-                    });
+
                     _applyFilters();
                   },
                 ),
@@ -313,9 +330,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                   date: endDate,
                   onTap: () => _pickDate(false),
                   onClear: () {
-                    setState(() {
-                      endDate = null;
-                    });
+
                     _applyFilters();
                   },
                 ),
@@ -533,7 +548,9 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
       ),
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        // Bas de liste dégagé (96) pour ne pas masquer la dernière
+        // carte sous le FAB Vérification.
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
         itemCount: filteredOrders.length,
         itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -581,6 +598,407 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           orders: valideOrder,
         ),
       ),
+    );
+  }
+
+  // =====================================================================
+  // VÉRIFICATION DE CAISSE (FAB)
+  // FAB « Vérification » → formulaire (champ montant, boutons Annuler /
+  // Vérifier) → loading BouTika pendant l'opération → pop-up résultat
+  // (montant caisse / montant app / Résultat normal ou anormal).
+  // Fonctionnalité 100 % additive : aucune logique existante modifiée.
+  //
+  // Correctif stabilité : les 3 étapes vivent dans UN SEUL dialog
+  // (_VerificationDialog, en bas de fichier) qui bascule de phase en
+  // interne. On n'enchaîne plus 3 showDialog/pop dans la même frame
+  // (source des erreurs « Duplicate GlobalKeys » d'Overlay et
+  // « TextEditingController used after disposed » : le controller du
+  // champ était libéré alors que le formulaire était encore dans
+  // l'arbre pendant son animation de sortie).
+  // =====================================================================
+  Widget _buildVerificationFab(DashColors c) {
+    return FloatingActionButton.extended(
+      // heroTag unique : évite tout conflit avec le FAB de l'écran parent
+      // (store_page) lorsque cet écran est en mode embedded.
+      heroTag: "order_story_verification_fab",
+      onPressed: _showVerificationForm,
+      backgroundColor: c.primary,
+      foregroundColor: c.onPrimary,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      icon: Icon(Icons.fact_check_rounded, size: 20, color: c.onPrimary),
+      label: Text(
+        "Vérification",
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: c.onPrimary,
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Ouverture de la vérification : un seul dialog (_VerificationDialog)
+  // qui gère lui-même ses 3 phases (formulaire → loading BouTika →
+  // résultat) et possède son TextEditingController (dispose dans son
+  // propre State.dispose, jamais pendant qu'il est encore affiché).
+  // ---------------------------------------------------------------------
+  Future<void> _showVerificationForm() async {
+    final c = DashColors(context);
+    final formKey = GlobalKey<FormState>();
+    final montantController = TextEditingController();
+
+    final double? montantCaisse = await showDialog<double>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: c.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            side: BorderSide(color: c.border),
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: c.primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: Icon(Icons.fact_check_rounded,
+                    color: c.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  "Vérification de caisse",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: c.textPrimary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Saisissez le montant présent dans la caisse pour le "
+                    "comparer au montant sur l'app.",
+                    style: AppTextStyles.bodySecondary.copyWith(
+                        color: c.textSecondary, fontSize: 13.5, height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: montantController,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    textInputAction: TextInputAction.done,
+                    label: "Montant dans la caisse (F)",
+                    hint: "Ex: 50000",
+                    icon: Icons.payments_outlined,
+                    validator: (v) {
+                      final double? value = _parseMontant(v ?? "");
+                      if (value == null || value < 0) {
+                        return "Indiquez un montant valide";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton.secondary(
+                    label: "Annuler",
+                    height: 48,
+                    onPressed: () => Navigator.pop(dialogContext),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: AppButton.primary(
+                    label: "Vérifier",
+                    icon: Icons.fact_check_rounded,
+                    height: 48,
+                    onPressed: () {
+                      if (!formKey.currentState!.validate()) return;
+                      final double? montant =
+                          _parseMontant(montantController.text);
+                      if (montant == null) return;
+                      Navigator.pop(dialogContext, montant);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+
+    if (montantCaisse == null || !mounted) return;
+    await _runVerification(montantCaisse);
+  }
+
+  // ---------------------------------------------------------------------
+  // Étape 2 — Loading BouTika pendant l'opération, puis pop-up résultat.
+  // Le loading est toujours fermé, même si l'opération lève une erreur.
+  // ---------------------------------------------------------------------
+  Future<void> _runVerification(double montantCaisse) async {
+    final c = DashColors(context);
+
+    showDialog<void>(
+      context: context,
+      // Fermeture uniquement via Annuler / Fermer : empêche aussi de
+      // fermer par le fond pendant la phase de loading.
+      barrierDismissible: false,
+      builder: (_) => _VerificationDialog(
+        onVerify: _effectuerOperationVerification,
+      ),
+    );
+
+    _VerificationResult? result;
+    Object? erreur;
+    try {
+      result = await _effectuerOperationVerification(montantCaisse);
+    } catch (e) {
+      erreur = e;
+      debugPrint("Erreur vérification caisse: $e");
+    } finally {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    }
+
+    if (!mounted) return;
+    if (erreur != null || result == null) {
+      showErrorMessage("Échec de la vérification, réessayez", context);
+      return;
+    }
+    await _showVerificationResult(result);
+  }
+
+  // ---------------------------------------------------------------------
+  // ✏️ TON OPÉRATION DE VÉRIFICATION — LA PLACE EST ICI
+  //
+  // Cette méthode reçoit [montantCaisse] (le montant saisi dans le
+  // formulaire) et doit retourner un _VerificationResult avec :
+  //   • montantApp : le montant calculé côté application
+  //   • isNormal   : true  → « Résultat normal »
+  //                  false → « Résultat anormal »
+  //
+  // Tu as accès à tout l'écran : allOrders, filteredOrders,
+  // _calculateTotal(order), widget.storeId, widget.userType,
+  // startDate, endDate, context… et tu peux faire des appels async
+  // (services) : le loading BouTika reste affiché pendant ce temps.
+  //
+  // Remplace l'exemple par défaut ci-dessous par TA propre opération.
+  // ---------------------------------------------------------------------
+  Future<_VerificationResult> _effectuerOperationVerification(
+      double montantCaisse) async {
+    double spendingAmount = 0;
+    double withdrawalAmount = 0;
+    List<Spending>? spendings = await SpendingServcie().getAllSpending(widget.storeId, startDate, endDate, context);
+    List<Withdrawal>? withdrawals = await WithdrawalService().getWithdrawals(storeId: widget.storeId, startDate: startDate!, endDate: endDate!, context: context);
+   if(spendings != null) {
+     spendings.forEach((spending) {
+       if(spending.price != null) {spendingAmount += spending.price!;};
+     });
+     if(withdrawals != null){
+       withdrawals.forEach((withdrawal){
+         withdrawalAmount += withdrawal.amount;
+       });
+     }
+   }
+    double montantApp = 0;
+    for (final order in allOrders) {
+      if (order.status == OrderStatus.VALIDATED) {
+        montantApp += _calculateTotal(order);
+      }
+    }
+    bool isNormal = (montantCaisse - (montantApp-spendingAmount-withdrawalAmount)).abs() < 0.01;
+    return _VerificationResult(
+      montantCaisse: montantCaisse,
+      montantApp: montantApp,
+      spendingAmount: spendingAmount,
+      withdrawalAmount: withdrawalAmount,
+      isNormal: isNormal,
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Étape 3 — Pop-up résultat :
+  //   Montant dans la caisse = …
+  //   Montant sur l'app      = …
+  //   « Résultat normal » ou « Résultat anormal »
+  // ---------------------------------------------------------------------
+  Future<void> _showVerificationResult(_VerificationResult result) async {
+    final c = DashColors(context);
+    final Color resultColor = result.isNormal ? c.success : c.danger;
+    final Color resultSoft = result.isNormal ? c.successSoft : c.dangerSoft;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: c.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            side: BorderSide(color: c.border),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: resultSoft,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    result.isNormal
+                        ? Icons.check_circle_rounded
+                        : Icons.warning_amber_rounded,
+                    color: resultColor,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  "Résultat de la vérification",
+                  style: AppTextStyles.heading
+                      .copyWith(fontSize: 17, color: c.textPrimary),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: c.cardElevated,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: c.border),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildResultRow(
+                          c, "Montant dans la caisse", result.montantCaisse),
+                      const SizedBox(height: 10),
+                      Container(height: 1, color: c.border),
+                      const SizedBox(height: 10),
+                      _buildResultRow(
+                          c, "Montant sur l'app", result.montantApp),
+                      const SizedBox(height: 10),
+                      _buildResultRow(c, "Total Dépense", result.spendingAmount),
+                      const SizedBox(height: 10,),
+                      _buildResultRow(c, "Total Achat", result.withdrawalAmount),
+                      Container(height: 1, color: c.border),
+                      const SizedBox(height: 10),
+                      _buildResultRow(c, result.ecart<=0?"Manquant":"Surplus", result.ecart),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: resultSoft,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(
+                        color: resultColor.withValues(alpha: 0.2)),
+                  ),
+                  child: Text(
+                    result.isNormal
+                        ? "Résultat normal"
+                        : "Résultat anormal",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: resultColor,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  result.isNormal
+                      ? "Le montant dans la caisse correspond au montant "
+                          "sur l'app."
+                      : "Le montant dans la caisse ne correspond pas au "
+                          "montant sur l'app.",
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodySecondary.copyWith(
+                      color: c.textSecondary, fontSize: 13.5, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton.primary(
+                    label: "Fermer",
+                    height: 48,
+                    onPressed: () => Navigator.pop(dialogContext),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildResultRow(DashColors c, String label, double montant) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: AppTextStyles.bodySecondary.copyWith(
+                color: c.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "= ${_formatMontant(montant)}",
+          style: TextStyle(
+            color: (label == "Manquant" || label == "Surplus")?montant >=0?c.accentGreen:c.badgeRed:c.textSecondary,
+            fontWeight: FontWeight.w800,
+            fontSize: 13.5,
+          ),
+        ),
+      ],
     );
   }
 
@@ -860,7 +1278,7 @@ class _OrderCardState extends State<_OrderCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "$totalAmount F",
+                        "${totalAmount.toStringAsFixed(2)} F",
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           color: c.primary,
@@ -948,7 +1366,7 @@ class _OrderCardState extends State<_OrderCard> {
                                 ),
                               ),
                               Text(
-                                "$lineTotal F",
+                                "${lineTotal.toStringAsFixed(2)} F",
                                 style: TextStyle(
                                   color: c.primary,
                                   fontWeight: FontWeight.w800,
@@ -1069,6 +1487,376 @@ class _OrderCardState extends State<_OrderCard> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// =====================================================================
+// RÉSULTAT DE VÉRIFICATION DE CAISSE
+// Valeur retournée par _effectuerOperationVerification() et affichée
+// telle quelle dans le pop-up résultat.
+// =====================================================================
+class _VerificationResult {
+  /// Montant saisi dans le formulaire (argent compté dans la caisse).
+  final double montantCaisse;
+  final double spendingAmount;
+  final double withdrawalAmount;
+  /// Montant calculé côté application par TON opération.
+  final double montantApp;
+
+  /// true → « Résultat normal » • false → « Résultat anormal ».
+  final bool isNormal;
+
+  const _VerificationResult({
+    required this.montantCaisse,
+    required this.montantApp,
+    required this.spendingAmount,
+    required this.withdrawalAmount,
+    required this.isNormal,
+  });
+
+
+  double get ecart => (montantCaisse + spendingAmount + withdrawalAmount) - montantApp;
+}
+double? _parseMontant(String value) => double.tryParse(
+      value.trim().replaceAll(RegExp(r'\s'), '').replaceAll(',', '.'),
+    );
+
+String _formatMontant(double montant) => "${montant.toStringAsFixed(2)} F";
+
+/// Phases du dialog de vérification (un seul dialog, pas d'enchaînement
+/// de pop-ups : voir le commentaire « Correctif stabilité » plus haut).
+enum _VerificationPhase { form, loading, result }
+class _VerificationDialog extends StatefulWidget {
+  /// TON opération (méthode de l'écran) : reçoit le montant saisi et
+  /// retourne le résultat à afficher.
+  final Future<_VerificationResult> Function(double montantCaisse) onVerify;
+
+  const _VerificationDialog({required this.onVerify});
+
+  @override
+  State<_VerificationDialog> createState() => _VerificationDialogState();
+}
+
+class _VerificationDialogState extends State<_VerificationDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _montantController = TextEditingController();
+
+  _VerificationPhase _phase = _VerificationPhase.form;
+  _VerificationResult? _result;
+
+  @override
+  void dispose() {
+    _montantController.dispose();
+    super.dispose();
+  }
+
+  // -------------------------------------------------------------------
+  // Clic « Vérifier » : valide, passe en loading (rendu au moins une
+  // frame), exécute l'opération, puis affiche le résultat — sans
+  // jamais fermer/rouvrir de dialog entre-temps. La garde sur _phase
+  // rend le double-clic sans effet.
+  // -------------------------------------------------------------------
+  Future<void> _submit() async {
+    if (_phase != _VerificationPhase.form) return;
+    if (!_formKey.currentState!.validate()) return;
+    final double? montant = _parseMontant(_montantController.text);
+    if (montant == null) return;
+
+    FocusScope.of(context).unfocus();
+    setState(() => _phase = _VerificationPhase.loading);
+
+    // Laisse la phase loading être réellement dessinée avant de lancer
+    // l'opération (qui peut se terminer de façon quasi synchrone).
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
+    try {
+      final _VerificationResult result = await widget.onVerify(montant);
+      if (!mounted) return;
+      setState(() {
+        _result = result;
+        _phase = _VerificationPhase.result;
+      });
+    } catch (e) {
+      debugPrint("Erreur vérification caisse: $e");
+      if (!mounted) return;
+      // Échec : retour au formulaire (montant conservé) pour réessayer.
+      setState(() => _phase = _VerificationPhase.form);
+      showErrorMessage("Échec de la vérification, réessayez", context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = DashColors(context);
+    final bool isForm = _phase == _VerificationPhase.form;
+
+    return PopScope(
+      // Retour système bloqué pendant le loading uniquement.
+      canPop: _phase != _VerificationPhase.loading,
+      child: AlertDialog(
+        backgroundColor: c.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: c.border),
+        ),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        contentPadding: EdgeInsets.fromLTRB(24, isForm ? 16 : 24, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        title: isForm ? _buildTitle(c) : null,
+        content: SingleChildScrollView(
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
+            child: _buildPhaseContent(c),
+          ),
+        ),
+        actions: _buildPhaseActions(),
+      ),
+    );
+  }
+
+  Widget _buildTitle(DashColors c) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: c.primarySoft,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
+          child: Icon(Icons.fact_check_rounded, color: c.primary, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            "Vérification de caisse",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: c.textPrimary,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhaseContent(DashColors c) {
+    switch (_phase) {
+      case _VerificationPhase.form:
+        return _buildForm(c);
+      case _VerificationPhase.loading:
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: BouTikaLoader(message: "Vérification en cours..."),
+        );
+      case _VerificationPhase.result:
+        return _buildResult(c);
+    }
+  }
+
+  List<Widget>? _buildPhaseActions() {
+    switch (_phase) {
+      case _VerificationPhase.form:
+        return [
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  label: "Annuler",
+                  height: 48,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: AppButton.primary(
+                  label: "Vérifier",
+                  icon: Icons.fact_check_rounded,
+                  height: 48,
+                  onPressed: _submit,
+                ),
+              ),
+            ],
+          ),
+        ];
+      case _VerificationPhase.loading:
+        return null;
+      case _VerificationPhase.result:
+        return [
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.primary(
+                  label: "Fermer",
+                  height: 48,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ],
+          ),
+        ];
+    }
+  }
+
+  // -------------------------------------------------------------------
+  // Phase 1 — Formulaire : un champ montant.
+  // -------------------------------------------------------------------
+  Widget _buildForm(DashColors c) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Saisissez le montant présent dans la caisse pour le "
+            "comparer au montant sur l'app.",
+            style: AppTextStyles.bodySecondary.copyWith(
+                color: c.textSecondary, fontSize: 13.5, height: 1.5),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            controller: _montantController,
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            textInputAction: TextInputAction.done,
+            label: "Montant dans la caisse (F)",
+            hint: "Ex: 50000",
+            icon: Icons.payments_outlined,
+            validator: (v) {
+              final double? value = _parseMontant(v ?? "");
+              if (value == null || value < 0) {
+                return "Indiquez un montant valide";
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------
+  // Phase 3 — Résultat :
+  //   Montant dans la caisse = …
+  //   Montant sur l'app      = …
+  //   « Résultat normal » ou « Résultat anormal »
+  // -------------------------------------------------------------------
+  Widget _buildResult(DashColors c) {
+    final _VerificationResult result = _result!;
+    final Color resultColor = result.isNormal ? c.success : c.danger;
+    final Color resultSoft = result.isNormal ? c.successSoft : c.dangerSoft;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: resultSoft,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            result.isNormal
+                ? Icons.check_circle_rounded
+                : Icons.warning_amber_rounded,
+            color: resultColor,
+            size: 30,
+          ),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          "Résultat de la vérification",
+          style: AppTextStyles.heading
+              .copyWith(fontSize: 17, color: c.textPrimary),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: c.cardElevated,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: c.border),
+          ),
+          child: Column(
+            children: [
+              _buildResultRow(c, "Montant dans la caisse", result.montantCaisse),
+              const SizedBox(height: 10),
+              Container(height: 1, color: c.border),
+              const SizedBox(height: 10),
+              _buildResultRow(c, "Montant sur l'app", result.montantApp),
+              const SizedBox(height: 10),
+              Container(height: 1, color: c.border),
+              const SizedBox(height: 10),
+              _buildResultRow(c, "Écart", result.ecart),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: resultSoft,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: resultColor.withValues(alpha: 0.2)),
+          ),
+          child: Text(
+            result.isNormal ? "Résultat normal" : "Résultat anormal",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: resultColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 15,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          result.isNormal
+              ? "Le montant dans la caisse correspond au montant "
+                  "sur l'app."
+              : "Le montant dans la caisse ne correspond pas au "
+                  "montant sur l'app.",
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodySecondary.copyWith(
+              color: c.textSecondary, fontSize: 13.5, height: 1.5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResultRow(DashColors c, String label, double montant) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: AppTextStyles.bodySecondary.copyWith(
+                color: c.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "= ${_formatMontant(montant)}",
+          style: TextStyle(
+            color: c.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 13.5,
+          ),
+        ),
+      ],
     );
   }
 }

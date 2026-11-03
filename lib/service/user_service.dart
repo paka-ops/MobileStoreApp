@@ -29,7 +29,7 @@ class UserService {
         headers: {"content-type": "application/x-www-form-urlencoded"},
         body: {"username": username, "password": password},
 
-      ).timeout(Duration(seconds: 10));
+      ).timeout(Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> responseMap = jsonDecode(response.body);
