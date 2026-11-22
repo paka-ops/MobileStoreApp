@@ -1,37 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:mobile_store_app/models/subscription.dart';
-import 'package:mobile_store_app/widgets/subscription_page/subscription_contact_button.dart';
-import 'package:mobile_store_app/widgets/subscription_page/subscription_features_list.dart';
-import 'package:mobile_store_app/widgets/subscription_page/subscription_header.dart';
-import 'package:mobile_store_app/widgets/subscription_page/subscription_plan_card.dart';
-import 'package:mobile_store_app/utils/app_colors.dart' show DashColors;
+// ============================================================================
+// COMPATIBILITÉ — ce fichier ne contient plus d'implémentation.
+//
+// L'écran d'abonnement vit désormais dans le module `subscription` :
+//   lib/features/subscription/subscription_screen.dart
+//
+// Ce shim conserve l'ancien chemin d'import le temps de la migration.
+// Il sera supprimé à l'étape de purge (routage SaaS).
+// ============================================================================
 
-class SubscriptionScreenPage extends StatelessWidget {
-  final Subscription subscription;
-  const SubscriptionScreenPage({super.key, required this.subscription});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = DashColors(context);
-
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SubscriptionHeader(),
-              const SizedBox(height: 24),
-              SubscriptionPlanCard(subscription: subscription),
-              const SizedBox(height: 24),
-              const SubscriptionFeaturesList(),
-              const SizedBox(height: 28),
-              const SubscriptionContactButton(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+export '../features/subscription/subscription_screen.dart'
+    show SubscriptionScreenPage;

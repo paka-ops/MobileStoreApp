@@ -1,50 +1,11 @@
-import 'package:flutter/material.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_spacing.dart';
-import 'package:mobile_store_app/utils/app_colors.dart'
-    show DashColors;
+// ============================================================================
+// COMPATIBILITÉ — ce fichier ne contient plus d'implémentation.
+//
+// Le composant vit désormais dans le module `subscription` :
+//   lib/features/subscription/widgets/subscription_header.dart
+//
+// Ce shim conserve l'ancien chemin d'import le temps de la migration.
+// Il sera supprimé à l'étape de purge (routage SaaS).
+// ============================================================================
 
-class SubscriptionHeader extends StatelessWidget {
-  const SubscriptionHeader({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final c = DashColors(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: c.primarySoft,
-                borderRadius: BorderRadius.circular(AppRadius.sm),
-              ),
-              child: Icon(Icons.verified_rounded,
-                  color: c.primary, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                "Abonnement",
-                style: TextStyle(
-                  color: c.textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.4,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Consultez l'état de votre abonnement et contactez le support pour le renouveler.",
-          style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 13.5, height: 1.5),
-        ),
-      ],
-    );
-  }
-}
+export '../../features/subscription/widgets/subscription_header.dart' show SubscriptionHeader;
