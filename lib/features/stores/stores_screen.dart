@@ -8,7 +8,7 @@ import 'package:mobile_store_app/features/stores/widgets/stores_empty_state.dart
 import 'package:mobile_store_app/features/stores/widgets/stores_header.dart';
 import 'package:mobile_store_app/features/stores/widgets/stores_list_view.dart';
 import 'package:mobile_store_app/models/Store.dart';
-import 'package:mobile_store_app/screens/dashboard_screens.dart';
+import 'package:mobile_store_app/features/dashboard/dashboard_screen.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 /// ============================================================================
