@@ -45,7 +45,13 @@ Future<bool> showWithdrawalFormDialog(
 /// ============================================================================
 class WithdrawalScreen extends StatefulWidget {
   final String storeId;
-  const WithdrawalScreen({super.key, required this.storeId});
+  final bool embedded;
+
+  const WithdrawalScreen({
+    super.key,
+    required this.storeId,
+    this.embedded = false,
+  });
 
   @override
   State<WithdrawalScreen> createState() => _WithdrawalScreenState();
@@ -121,6 +127,36 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       builder: (context, _, __) {
         final colors = DashColors(context);
 
+        final body = RefreshIndicator(
+          onRefresh: _fetchWithdrawals,
+          color: colors.primary,
+          backgroundColor: colors.card,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            children: [
+              _buildSummaryCard(colors),
+              const SizedBox(height: 16),
+              _buildFilterSection(colors),
+              const SizedBox(height: 16),
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.only(top: 80),
+                  child: Center(child: BouTikaLoader()),
+                )
+              else if (withdrawals.isEmpty)
+                _buildEmptyState(colors)
+              else
+                ...withdrawals
+                    .map((w) => _buildWithdrawalCard(w, colors)),
+            ],
+          ),
+        );
+
+        if (widget.embedded) {
+          return body;
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -143,33 +179,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               ),
             ],
           ),
-          body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _fetchWithdrawals,
-              color: colors.primary,
-              backgroundColor: colors.card,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                children: [
-                  _buildSummaryCard(colors),
-                  const SizedBox(height: 16),
-                  _buildFilterSection(colors),
-                  const SizedBox(height: 16),
-                  if (isLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 80),
-                      child: Center(child: BouTikaLoader()),
-                    )
-                  else if (withdrawals.isEmpty)
-                    _buildEmptyState(colors)
-                  else
-                    ...withdrawals
-                        .map((w) => _buildWithdrawalCard(w, colors)),
-                ],
-              ),
-            ),
-          ),
+          body: SafeArea(child: body),
         );
       },
     );

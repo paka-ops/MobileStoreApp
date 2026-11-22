@@ -15,7 +15,13 @@ import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class ExpensesScreen extends StatefulWidget {
   final String storeId;
-  const ExpensesScreen({super.key, required this.storeId});
+  final bool embedded;
+
+  const ExpensesScreen({
+    super.key,
+    required this.storeId,
+    this.embedded = false,
+  });
 
   @override
   State<ExpensesScreen> createState() => _ExpensesScreenState();
@@ -140,6 +146,37 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       builder: (context, _, __) {
         final colors = DashColors(context);
 
+        final body = RefreshIndicator(
+          onRefresh: _fetchExpenses,
+          color: colors.primary,
+          backgroundColor: colors.card,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            children: [
+              _buildSummaryCard(colors),
+              const SizedBox(height: 16),
+              _buildFilterSection(colors),
+              const SizedBox(height: 16),
+              if (isLoading)
+                Padding(
+                  padding: const EdgeInsets.only(top: 80),
+                  child: Center(
+                    child: const BouTikaLoader(),
+                  ),
+                )
+              else if (expenses.isEmpty)
+                _buildEmptyState(colors)
+              else
+                ...expenses.map((e) => _buildExpenseCard(e, colors)),
+            ],
+          ),
+        );
+
+        if (widget.embedded) {
+          return body;
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -162,34 +199,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
             ],
           ),
-          body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _fetchExpenses,
-              color: colors.primary,
-              backgroundColor: colors.card,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                children: [
-                  _buildSummaryCard(colors),
-                  const SizedBox(height: 16),
-                  _buildFilterSection(colors),
-                  const SizedBox(height: 16),
-                  if (isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 80),
-                      child: Center(
-                        child: const BouTikaLoader(),
-                      ),
-                    )
-                  else if (expenses.isEmpty)
-                    _buildEmptyState(colors)
-                  else
-                    ...expenses.map((e) => _buildExpenseCard(e, colors)),
-                ],
-              ),
-            ),
-          ),
+          body: SafeArea(child: body),
         );
       },
     );

@@ -214,7 +214,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
     // Mode embedded : pas de Scaffold propre à cet écran, le même FAB
     // Vérification est donc superposé en bas à droite du contenu.
     return Container(
-      color: c.background,
+      color: Colors.transparent,
       child: Stack(
         fit: StackFit.expand,
         children: [
