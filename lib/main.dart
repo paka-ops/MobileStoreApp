@@ -40,6 +40,7 @@ class _MyAppState extends State<MyApp> {
         // Table de routage centralisée dans `core/router/app_router.dart`.
         initialRoute: AppRouter.initialRoute,
         routes: AppRouter.routes,
+        onGenerateRoute: AppRouter.onGenerateRoute,
       ),
     );
   }
