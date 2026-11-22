@@ -47,10 +47,48 @@ lib/core/
     └── common/primitives.dart      # PressableScale, SoftChip, StatusPill, AppBadge…
 ```
 
-Compatibilité : `lib/utils/app_colors.dart` reste un **shim de ré-export** vers
-`core/theme/` pour ne casser aucun import existant. `lib/utils/message.dart`
-fournit les snackbars premium (`showSuccessMessage`, `showErrorMessage`,
-`showExceptionMessage`, `showSubscriptionExpiredMessage`).
+Les anciens barrels de compatibilité (`lib/utils/app_colors.dart`,
+`lib/widgets/design_system.dart`, `lib/screens/`) ont été purgés après la
+migration : tout import passe désormais par `core/`, `shared/` ou `features/`.
+`lib/utils/message.dart` fournit les snackbars premium (`showSuccessMessage`,
+`showErrorMessage`, `showExceptionMessage`, `showSubscriptionExpiredMessage`).
+
+### 2 bis. Architecture applicative — `core / shared / features`
+
+```
+lib/
+├── core/
+│   ├── config/      app_config.dart, saas_module.dart, saas_module_manager.dart
+│   ├── constants/   app_spacing.dart (Spacing, AppRadius, AppSizes)
+│   ├── router/      app_router.dart, route_arguments.dart
+│   ├── services/    api_client.dart
+│   ├── theme/       app_colors, app_text_styles, app_dimensions, …
+│   ├── utils/       formatters, date_utils, color_utils
+│   └── widgets/     boutons, champs, cartes, dialogues, listes, chargement
+├── shared/
+│   ├── models/      Store, Category, Product, Order, Spending, Withdrawal, …
+│   ├── services/    ProductService, OrderService, UserService, …
+│   └── widgets/     kit partagé (ui_kit.dart) + loading/boutika_loader.dart
+├── features/        un dossier par domaine (auth, stores, store_detail,
+│                    dashboard, categories, products, stock, history,
+│                    order_story, spending, withdrawals, reports,
+│                    subscription, welcome)
+└── main.dart        MaterialApp + AppRouter
+```
+
+### 2 ter. Routage — `core/router/`
+
+`AppRouter` remplace la table de routes déclarée en ligne dans `main.dart` :
+
+| Membre | Rôle |
+|---|---|
+| `AppRouter.initialRoute` | `/` (`AppConfig.routeRoot`) — accueil pré-login |
+| `AppRouter.routes` / `routesFor(manager)` | routes statiques `/` et `/login`, filtrées par `SaaSModuleManager` |
+| `AppRouter.onGenerateRoute` | routes des modules à arguments (`/store`, `/history`, `/expenses`, …) via `RouteArguments` typés |
+| `AppRouter.moduleForRoute(route)` | associe une route à son `SaaSModule` |
+
+Invariance : `/` et `/login` gardent exactement les mêmes builders ; les écrans
+poussés par `MaterialPageRoute` dans les modules ne changent pas.
 
 ## 3. Quick start
 

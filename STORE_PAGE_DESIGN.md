@@ -1,5 +1,12 @@
 # 🛍️ Boutique — nouveau design system de `store_page.dart`
 
+
+> **Emplacement actuel (novembre 2026)** : la page vit désormais dans
+> `lib/features/store_detail/store_detail_screen.dart` (avec
+> `widgets/store_category_card.dart`, `widgets/store_category_action_button.dart`
+> et `utils/get_low_stock_product.dart`). Les chemins cités ci-dessous sont
+> ceux de l'époque du document ; le code et les rendus sont inchangés.
+
 Refonte **100 % visuelle** de la page Boutique (`lib/screens/store_page.dart`),
 sans aucune modification de logique métier. Périmètre volontairement **local à
 cette page** : les autres écrans (login, dashboards, ventes, abonnements…)
