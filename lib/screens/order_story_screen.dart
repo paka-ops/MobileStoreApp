@@ -250,155 +250,174 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   }
 
   // =====================================================================
-  // FILTER BAR
+  // FILTER BAR (version compacte : statut réduit + bouton calendrier pop-up)
   // =====================================================================
   Widget _buildFilterBar(DashColors c) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: c.card,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: c.border),
-        boxShadow: c.cardShadow,
+        boxShadow: c.softShadow,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Titre + refresh (mode embedded)
-          if (widget.embedded)
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                    color: c.primarySoft,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: Icon(Icons.receipt_long_rounded,
-                      color: c.primary, size: 18),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    "Historique des ventes",
-                    style: TextStyle(
-                      color: c.textPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 15,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => _getOrders(
-                      storeId: widget.storeId,
-                      startDate: startDate,
-                      endDate: endDate),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: c.primarySoft,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: Icon(Icons.refresh_rounded,
-                        color: c.primary, size: 18),
-                  ),
-                ),
-              ],
-            ),
-          if (widget.embedded) const SizedBox(height: 14),
-
-          // Dates
           Row(
             children: [
+              // Menu déroulant des statuts — dimensions fortement réduites
               Expanded(
-                child: FilterDateChip(
-                  label: "Date début",
-                  date: startDate,
-                  onTap: () => _pickDate(true),
-                  onClear: () {
-
-                    _applyFilters();
-                  },
+                child: Container(
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: c.cardElevated,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: c.border, width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<OrderStatus?>(
+                      isExpanded: true,
+                      isDense: true,
+                      value: selectedStatus,
+                      dropdownColor: c.card,
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18,
+                        color: c.textSecondary,
+                      ),
+                      hint: Row(
+                        children: [
+                          Icon(Icons.filter_list_rounded,
+                              color: c.primary, size: 15),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              "Tous les statuts",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.bodySecondary.copyWith(
+                                color: c.textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      style: TextStyle(
+                        color: c.textPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      items: [
+                        DropdownMenuItem<OrderStatus?>(
+                          value: null,
+                          child: Text(
+                            "Tous les statuts",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: c.textSecondary,
+                            ),
+                          ),
+                        ),
+                        ...OrderStatus.values.map(
+                          (s) => DropdownMenuItem<OrderStatus?>(
+                            value: s,
+                            child: Text(
+                              _getStatusLabel(s),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: c.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        setState(() => selectedStatus = val);
+                        _runFilterLogic();
+                      },
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: FilterDateChip(
-                  label: "Date fin",
-                  date: endDate,
-                  onTap: () => _pickDate(false),
-                  onClear: () {
 
-                    _applyFilters();
-                  },
+              // Bouton compact calendrier -> Pop-up choix de date
+              Tooltip(
+                message: "Changer la période",
+                child: InkWell(
+                  onTap: _showDateFilterDialog,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: c.primarySoft,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: c.primary.withValues(alpha: 0.20),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.calendar_month_rounded,
+                      color: c.primary,
+                      size: 18,
+                    ),
+                  ),
                 ),
               ),
+
+              if (widget.embedded) ...[
+                const SizedBox(width: 6),
+                Tooltip(
+                  message: "Actualiser",
+                  child: InkWell(
+                    onTap: () => _getOrders(
+                      storeId: widget.storeId,
+                      startDate: startDate,
+                      endDate: endDate,
+                    ),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: c.fill,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                      child: Icon(
+                        Icons.refresh_rounded,
+                        color: c.textPrimary,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 12),
-
-          // Dropdown statut
-          Container(
-            decoration: BoxDecoration(
-              color: c.cardElevated,
-              borderRadius: BorderRadius.circular(AppRadius.mlg),
-              border: Border.all(color: c.border, width: 1.2),
-            ),
-            child: DropdownButtonFormField<OrderStatus>(
-              decoration: InputDecoration(
-                filled: false,
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Icon(Icons.filter_list_rounded,
-                      color: c.primary, size: 20),
-                ),
-                border: InputBorder.none,
-                contentPadding:
-                const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              ),
-              hint: Text(
-                "Tous les statuts",
-                style: AppTextStyles.bodySecondary.copyWith(color: c.textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-              style: TextStyle(
-                  color: c.textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600),
-              dropdownColor: c.card,
-              value: selectedStatus,
-              items: OrderStatus.values
-                  .map(
-                    (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(_getStatusLabel(s)),
-                ),
-              )
-                  .toList(),
-              onChanged: (val) {
-                setState(() => selectedStatus = val);
-                _runFilterLogic();
-              },
-            ),
-          ),
-          const SizedBox(height: 14),
-
+          const SizedBox(height: 8),
           Divider(color: c.border, height: 1),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
 
-          // Shortcuts
+          // Shortcuts — logique et affichage inchangés
           _buildShortcuts(c),
         ],
       ),
     );
   }
 
-  Future<void> _pickDate(bool isStart) async {
+  Future<DateTime?> _pickSingleDate(DateTime initialDate) async {
     final c = DashColors(context);
-    DateTime? picked = await showDatePicker(
+    return showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(2022),
       lastDate: DateTime(2100),
       builder: (context, child) {
@@ -415,13 +434,129 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         );
       },
     );
-    if (picked != null) {
+  }
+
+  Future<void> _showDateFilterDialog() async {
+    final c = DashColors(context);
+    DateTime tempStart = startDate;
+    DateTime? tempEnd = endDate;
+
+    final bool? applied = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          return AlertDialog(
+            backgroundColor: c.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              side: BorderSide(color: c.border),
+            ),
+            titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            actionsPadding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: c.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Icon(Icons.calendar_month_rounded,
+                      color: c.primary, size: 19),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    "Filtrer par date",
+                    style: AppTextStyles.heading.copyWith(
+                      fontSize: 16.5,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setDialogState(() {
+                      tempStart = DateTime.now();
+                      tempEnd = DateTime.now().add(const Duration(days: 1));
+                    });
+                  },
+                  child: Text(
+                    "Aujourd'hui",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: c.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FilterDateChip(
+                  label: "Date début",
+                  date: tempStart,
+                  onTap: () async {
+                    final picked = await _pickSingleDate(tempStart);
+                    if (picked != null) {
+                      setDialogState(() => tempStart = picked);
+                    }
+                  },
+                  onClear: () {
+                    setDialogState(() => tempStart = DateTime.now());
+                  },
+                ),
+                const SizedBox(height: 10),
+                FilterDateChip(
+                  label: "Date fin",
+                  date: tempEnd,
+                  onTap: () async {
+                    final picked =
+                        await _pickSingleDate(tempEnd ?? tempStart);
+                    if (picked != null) {
+                      setDialogState(() => tempEnd = picked);
+                    }
+                  },
+                  onClear: () {
+                    setDialogState(() => tempEnd = null);
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.secondary(
+                      label: "Annuler",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: AppButton.primary(
+                      label: "Appliquer",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    if (applied == true && mounted) {
       setState(() {
-        if (isStart) {
-          startDate = picked;
-        } else {
-          endDate = picked;
-        }
+        startDate = tempStart;
+        endDate = tempEnd;
       });
       _applyFilters();
     }
@@ -503,9 +638,71 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
   // =====================================================================
   // BODY
   // =====================================================================
+  String _formatPeriodLabel() {
+    final DateFormat fullFmt = DateFormat('dd/MM/yyyy');
+    final DateFormat shortFmt = DateFormat('dd/MM');
+    if (endDate == null ||
+        (startDate.year == endDate!.year &&
+            startDate.month == endDate!.month &&
+            startDate.day == endDate!.day)) {
+      return fullFmt.format(startDate);
+    }
+    return "${shortFmt.format(startDate)} - ${fullFmt.format(endDate!)}";
+  }
+
+  Widget _buildDateCornerBar(DashColors c) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 2),
+      child: Row(
+        children: [
+          if (!isLoading)
+            Text(
+              "${filteredOrders.length} commande(s)",
+              style: AppTextStyles.label.copyWith(
+                fontSize: 11.5,
+                color: c.textSecondary,
+              ),
+            ),
+          const Spacer(),
+          GestureDetector(
+            onTap: _showDateFilterDialog,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: c.card.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(color: c.border.withValues(alpha: 0.85)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 11,
+                    color: c.primary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    _formatPeriodLabel(),
+                    style: AppTextStyles.label.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBody(DashColors c) {
+    final Widget mainArea;
     if (isLoading) {
-      return Center(
+      mainArea = Center(
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -525,10 +722,8 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
           ),
         ),
       );
-    }
-
-    if (filteredOrders.isEmpty) {
-      return EmptyState(
+    } else if (filteredOrders.isEmpty) {
+      mainArea = EmptyState(
         icon: Icons.receipt_long_rounded,
         title: "Aucune commande trouvée",
         message:
@@ -536,36 +731,43 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         actionLabel: "Rafraîchir",
         onAction: () => _getOrders(storeId: widget.storeId),
       );
-    }
-
-    return RefreshIndicator(
-      color: c.primary,
-      backgroundColor: c.card,
-      onRefresh: () async => _getOrders(
-        storeId: widget.storeId,
-        startDate: startDate,
-        endDate: endDate,
-      ),
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        // Bas de liste dégagé (96) pour ne pas masquer la dernière
-        // carte sous le FAB Vérification.
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
-        itemCount: filteredOrders.length,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _OrderCard(
-            order: filteredOrders[index],
-            c: c,
-            userType: widget.userType,
-            onDelete: () => _confirmDelete(filteredOrders[index]),
-            calculateTotal: _calculateTotal,
-            getStatusLabel: _getStatusLabel,
-            statusColor: (s) => _statusColor(c, s),
-            statusSoftColor: (s) => _statusSoftColor(c, s),
+    } else {
+      mainArea = RefreshIndicator(
+        color: c.primary,
+        backgroundColor: c.card,
+        onRefresh: () async => _getOrders(
+          storeId: widget.storeId,
+          startDate: startDate,
+          endDate: endDate,
+        ),
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          // Bas de liste dégagé (96) pour ne pas masquer la dernière
+          // carte sous le FAB Vérification.
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+          itemCount: filteredOrders.length,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _OrderCard(
+              order: filteredOrders[index],
+              c: c,
+              userType: widget.userType,
+              onDelete: () => _confirmDelete(filteredOrders[index]),
+              calculateTotal: _calculateTotal,
+              getStatusLabel: _getStatusLabel,
+              statusColor: (s) => _statusColor(c, s),
+              statusSoftColor: (s) => _statusSoftColor(c, s),
+            ),
           ),
         ),
-      ),
+      );
+    }
+
+    return Column(
+      children: [
+        _buildDateCornerBar(c),
+        Expanded(child: mainArea),
+      ],
     );
   }
 
