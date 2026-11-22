@@ -9,8 +9,8 @@ import 'package:mobile_store_app/features/order_story/order_story_screen.dart';
 import 'package:mobile_store_app/features/spending/spending_screen.dart';
 import 'package:mobile_store_app/features/stock/stock_history_screen.dart';
 import 'package:mobile_store_app/features/withdrawals/withdrawal_screen.dart';
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// ============================================================================
 /// HISTORY SCREEN — écran unifié des quatre historiques de la boutique.

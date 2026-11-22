@@ -6,7 +6,7 @@ import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/features/withdrawals/controllers/withdrawal_form_controller.dart';
-import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/shared/models/withdrawal.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 /// Ouvre le formulaire de retrait (ajout sans [withdrawal], édition avec).

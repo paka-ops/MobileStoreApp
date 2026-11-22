@@ -8,7 +8,7 @@ import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/features/stock/controllers/low_stock_controller.dart';
 import 'package:mobile_store_app/features/stock/controllers/stock_level.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// Résultat d'un restockage : produit mis à jour et quantité ajoutée.
 class RestockResult {

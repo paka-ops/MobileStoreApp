@@ -1,6 +1,6 @@
 
 
-import 'package:mobile_store_app/models/subscription.dart';
+import 'package:mobile_store_app/shared/models/subscription.dart';
 
 class Store {
   final String id;

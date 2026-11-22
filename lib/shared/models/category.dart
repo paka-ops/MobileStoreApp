@@ -1,5 +1,5 @@
 // dart
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 class Category {
   final String id;

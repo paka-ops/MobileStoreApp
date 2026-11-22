@@ -13,8 +13,8 @@ import 'package:mobile_store_app/features/products/widgets/product_stats_header.
 import 'package:mobile_store_app/features/products/widgets/product_stats_hero_card.dart';
 import 'package:mobile_store_app/features/products/widgets/product_stats_loading.dart';
 import 'package:mobile_store_app/features/products/widgets/product_stats_overview.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 
 /// ============================================================================
 /// PRODUCT STATS SCREEN — statistiques détaillées d'un produit.

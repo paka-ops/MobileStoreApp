@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mobile_store_app/core/theme/app_colors.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// ============================================================================
 /// STOCK LEVEL — niveau de stock d'un produit et ses libellés associés.

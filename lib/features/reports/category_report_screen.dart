@@ -4,8 +4,8 @@ import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/features/reports/controllers/category_sales_calculator.dart';
 import 'package:mobile_store_app/features/reports/widgets/category_analysis_card.dart';
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/order.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
 
 /// ============================================================================
 /// CATEGORY REPORT SCREEN — analyses par catégorie.

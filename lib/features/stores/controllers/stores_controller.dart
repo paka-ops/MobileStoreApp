@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_store_app/models/Store.dart';
-import 'package:mobile_store_app/service/store_service.dart';
+import 'package:mobile_store_app/shared/models/Store.dart';
+import 'package:mobile_store_app/shared/services/store_service.dart';
 
 /// Issue d'une création de boutique.
 enum StoreCreationStatus {

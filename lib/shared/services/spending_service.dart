@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile_store_app/models/spending.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/spending.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 class SpendingServcie{
   String baseUrl = UserService.baseUrl;

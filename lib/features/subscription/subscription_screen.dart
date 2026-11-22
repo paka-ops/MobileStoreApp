@@ -4,7 +4,7 @@ import 'package:mobile_store_app/features/subscription/widgets/subscription_cont
 import 'package:mobile_store_app/features/subscription/widgets/subscription_features_list.dart';
 import 'package:mobile_store_app/features/subscription/widgets/subscription_header.dart';
 import 'package:mobile_store_app/features/subscription/widgets/subscription_plan_card.dart';
-import 'package:mobile_store_app/models/subscription.dart';
+import 'package:mobile_store_app/shared/models/subscription.dart';
 
 /// ============================================================================
 /// SUBSCRIPTION SCREEN PAGE — détail de l'abonnement de la boutique.

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_store_app/service/employer_service.dart';
+import 'package:mobile_store_app/shared/services/employer_service.dart';
 
 /// Action résultant du bouton « Suivant » / « Terminer l'inscription ».
 enum SignupStepAction {

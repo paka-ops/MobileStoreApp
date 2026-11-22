@@ -4,7 +4,7 @@ import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/features/products/controllers/product_stats_calculator.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// ============================================================================
 /// PRODUCT STATS HERO CARD — carte d'identité et de stock d'un produit.

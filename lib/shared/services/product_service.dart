@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/models/stock.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 class ProductService{

@@ -1,5 +1,5 @@
 import 'package:mobile_store_app/core/theme/app_colors.dart';
-import 'package:mobile_store_app/models/subscription.dart';
+import 'package:mobile_store_app/shared/models/subscription.dart';
 
 /// ============================================================================
 /// SUBSCRIPTION STATUS — état dérivé d'un abonnement.

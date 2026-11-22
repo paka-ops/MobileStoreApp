@@ -4,8 +4,8 @@ import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/features/categories/widgets/category_dialog_parts.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/service/product_service.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/services/product_service.dart';
 
 /// Ouvre la confirmation de suppression d'un produit de la catégorie.
 ///

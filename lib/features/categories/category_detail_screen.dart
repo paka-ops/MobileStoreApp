@@ -16,8 +16,8 @@ import 'package:mobile_store_app/features/categories/widgets/category_product_fo
 import 'package:mobile_store_app/features/categories/widgets/category_product_info_dialog.dart';
 import 'package:mobile_store_app/features/categories/widgets/category_restock_dialog.dart';
 import 'package:mobile_store_app/features/stock/low_stock_screen.dart';
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 import 'package:mobile_store_app/shared/widgets/loading/boutika_loader.dart';
 import 'package:mobile_store_app/utils/message.dart';
 

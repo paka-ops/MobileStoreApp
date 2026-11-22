@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mobile_store_app/core/theme/app_colors.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// ============================================================================
 /// PRODUCT STATS — agrégats statistiques d'un produit.

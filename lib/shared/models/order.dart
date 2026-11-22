@@ -1,8 +1,8 @@
 // dart
 import 'dart:convert';
 
-import 'package:mobile_store_app/models/enums.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/enums.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 import 'order_content.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mobile_store_app/models/withdrawal.dart';
-import 'package:mobile_store_app/service/withdrawal_service.dart';
+import 'package:mobile_store_app/shared/models/withdrawal.dart';
+import 'package:mobile_store_app/shared/services/withdrawal_service.dart';
 
 /// ============================================================================
 /// WITHDRAWALS CONTROLLER — historique des retraits d'une boutique.

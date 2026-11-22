@@ -1,4 +1,4 @@
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// Produits dont le stock restant est strictement inférieur à 10.
 ///

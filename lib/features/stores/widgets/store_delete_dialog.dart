@@ -5,7 +5,7 @@ import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/features/stores/controllers/store_actions_controller.dart';
-import 'package:mobile_store_app/models/Store.dart';
+import 'package:mobile_store_app/shared/models/Store.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 /// Ouvre le dialogue de suppression d'une boutique.

@@ -1,6 +1,6 @@
 // dart
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/stock.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
 
 class Product {
   final String id;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/shared/models/withdrawal.dart';
 import 'package:mobile_store_app/features/withdrawals/widgets/withdrawal_form_dialog.dart';
 
 void main() {

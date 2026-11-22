@@ -5,8 +5,8 @@ import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/widgets/lists/empty_state.dart';
 import 'package:mobile_store_app/features/categories/controllers/category_products_controller.dart';
 import 'package:mobile_store_app/features/categories/widgets/category_dialog_parts.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/service/product_service.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/services/product_service.dart';
 
 /// Résultat d'un restockage réussi.
 class CategoryRestockResult {

@@ -5,7 +5,7 @@ import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/features/products/product_details_screen.dart';
 import 'package:mobile_store_app/features/stock/controllers/stock_level.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 
 /// ============================================================================
 /// LOW STOCK INFO DIALOG — fiche compacte d'un produit en alerte.

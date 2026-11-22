@@ -6,7 +6,7 @@ import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:mobile_store_app/features/subscription/controllers/subscription_status_calculator.dart';
-import 'package:mobile_store_app/models/subscription.dart';
+import 'package:mobile_store_app/shared/models/subscription.dart';
 
 /// ============================================================================
 /// SUBSCRIPTION PLAN CARD — carte détaillée de l'abonnement.

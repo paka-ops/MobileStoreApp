@@ -1,4 +1,4 @@
-import 'package:mobile_store_app/models/person.dart';
+import 'package:mobile_store_app/shared/models/person.dart';
 
 class Spending{
   String? id;

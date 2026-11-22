@@ -11,9 +11,9 @@ import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/common/primitives.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_store_app/models/enums.dart';
-import 'package:mobile_store_app/models/order.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/enums.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 
 // =====================================================================
 // ORDER CARD — carte extensible

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/models/stock.dart';
-import 'package:mobile_store_app/service/product_service.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
+import 'package:mobile_store_app/shared/services/product_service.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 
 /// Période sélectionnée dans le dialogue de dates.
 class RestockPeriod {

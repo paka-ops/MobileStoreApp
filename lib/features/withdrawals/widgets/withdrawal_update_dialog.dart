@@ -4,7 +4,7 @@ import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
-import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/shared/models/withdrawal.dart';
 
 /// ============================================================================
 /// WITHDRAWAL UPDATE DIALOG — dialogue historique « Mettre a jours ».

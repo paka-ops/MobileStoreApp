@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
-import 'package:mobile_store_app/models/stock.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
 
 /// ============================================================================
 /// RESTOCK CARD — carte dépliable d'un mouvement de stock.

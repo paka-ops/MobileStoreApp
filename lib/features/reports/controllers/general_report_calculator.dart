@@ -1,4 +1,4 @@
-import 'package:mobile_store_app/models/order.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
 
 /// ============================================================================
 /// GENERAL REPORT METRICS — agrégats d'un rapport général.

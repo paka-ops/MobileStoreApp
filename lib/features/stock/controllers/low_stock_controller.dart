@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:mobile_store_app/features/stock/controllers/stock_level.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/service/product_service.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/services/product_service.dart';
 
 /// ============================================================================
 /// LOW STOCK CONTROLLER — produits en stock critique.

@@ -11,7 +11,7 @@ import 'package:mobile_store_app/features/spending/widgets/expense_edit_dialog.d
 import 'package:mobile_store_app/features/spending/widgets/expense_filter_section.dart';
 import 'package:mobile_store_app/features/spending/widgets/expense_period_dialog.dart';
 import 'package:mobile_store_app/features/spending/widgets/expense_summary_card.dart';
-import 'package:mobile_store_app/models/spending.dart';
+import 'package:mobile_store_app/shared/models/spending.dart';
 import 'package:mobile_store_app/shared/widgets/loading/boutika_loader.dart';
 import 'package:mobile_store_app/utils/message.dart';
 

@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:mobile_store_app/models/enums.dart';
-import 'package:mobile_store_app/models/order.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/enums.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
-import '../models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 class OrderService {
   String? token = UserService.token;
   String basedUrl = UserService.baseUrl;

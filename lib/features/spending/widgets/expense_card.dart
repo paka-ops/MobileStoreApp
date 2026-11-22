@@ -5,7 +5,7 @@ import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
-import 'package:mobile_store_app/models/spending.dart';
+import 'package:mobile_store_app/shared/models/spending.dart';
 
 /// ============================================================================
 /// EXPENSE CARD — carte d'une dépense.

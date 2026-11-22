@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile_store_app/models/employee.dart';
-import 'package:mobile_store_app/service/user_service.dart';
+import 'package:mobile_store_app/shared/models/employee.dart';
+import 'package:mobile_store_app/shared/services/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 class EmployeeService{
   String? token = UserService().getToken();

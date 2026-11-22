@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 
-import 'package:mobile_store_app/models/category.dart';
-import 'package:mobile_store_app/models/order.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
 
 /// Ventes et bénéfice d'une catégorie.
 class CategorySalesMetrics {

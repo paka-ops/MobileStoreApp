@@ -6,7 +6,7 @@ import 'package:mobile_store_app/features/reports/controllers/general_report_cal
 import 'package:mobile_store_app/features/reports/widgets/report_chart_placeholder.dart';
 import 'package:mobile_store_app/features/reports/widgets/report_kpi_card.dart';
 import 'package:mobile_store_app/features/reports/widgets/report_section_title.dart';
-import 'package:mobile_store_app/models/order.dart';
+import 'package:mobile_store_app/shared/models/order.dart';
 
 /// ============================================================================
 /// GENERAL REPORT SCREEN — rapport général (CA, commandes, panier, bénéfices).

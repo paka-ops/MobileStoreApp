@@ -2,8 +2,8 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:mobile_store_app/models/Store.dart';
-import 'package:mobile_store_app/models/person.dart';
+import 'package:mobile_store_app/shared/models/Store.dart';
+import 'package:mobile_store_app/shared/models/person.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_store_app/utils/message.dart';
 

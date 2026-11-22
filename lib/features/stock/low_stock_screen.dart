@@ -10,7 +10,7 @@ import 'package:mobile_store_app/features/stock/widgets/low_stock_header.dart';
 import 'package:mobile_store_app/features/stock/widgets/low_stock_info_dialog.dart';
 import 'package:mobile_store_app/features/stock/widgets/low_stock_stats_row.dart';
 import 'package:mobile_store_app/features/stock/widgets/restock_product_dialog.dart';
-import 'package:mobile_store_app/models/product.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 /// ============================================================================

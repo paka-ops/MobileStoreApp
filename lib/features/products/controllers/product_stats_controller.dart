@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mobile_store_app/features/products/controllers/product_stats_calculator.dart';
-import 'package:mobile_store_app/service/product_service.dart';
+import 'package:mobile_store_app/shared/services/product_service.dart';
 
 /// État de chargement des statistiques d'un produit.
 enum ProductStatsStatus { loading, error, ready }

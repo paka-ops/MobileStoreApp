@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mobile_store_app/features/stores/widgets/store_item.dart';
-import 'package:mobile_store_app/models/Store.dart';
+import 'package:mobile_store_app/shared/models/Store.dart';
 
 /// ============================================================================
 /// STORES LIST VIEW — liste adaptative des boutiques.

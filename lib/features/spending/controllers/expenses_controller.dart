@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mobile_store_app/core/utils/date_utils.dart';
-import 'package:mobile_store_app/models/spending.dart';
-import 'package:mobile_store_app/service/spending_service.dart';
+import 'package:mobile_store_app/shared/models/spending.dart';
+import 'package:mobile_store_app/shared/services/spending_service.dart';
 
 /// ============================================================================
 /// EXPENSES CONTROLLER — dépenses d'une boutique sur une période.

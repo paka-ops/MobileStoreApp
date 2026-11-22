@@ -6,7 +6,7 @@ import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
 import 'package:mobile_store_app/features/stores/controllers/stores_controller.dart';
-import 'package:mobile_store_app/models/Store.dart';
+import 'package:mobile_store_app/shared/models/Store.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
 /// Ouvre le dialogue de création d'une boutique.

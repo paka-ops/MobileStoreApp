@@ -13,7 +13,7 @@ import 'package:mobile_store_app/features/withdrawals/widgets/withdrawal_form_di
 import 'package:mobile_store_app/features/withdrawals/widgets/withdrawal_period_dialog.dart';
 import 'package:mobile_store_app/features/withdrawals/widgets/withdrawal_summary_card.dart';
 import 'package:mobile_store_app/features/withdrawals/widgets/withdrawal_update_dialog.dart';
-import 'package:mobile_store_app/models/withdrawal.dart';
+import 'package:mobile_store_app/shared/models/withdrawal.dart';
 import 'package:mobile_store_app/shared/widgets/loading/boutika_loader.dart';
 import 'package:mobile_store_app/utils/message.dart';
 

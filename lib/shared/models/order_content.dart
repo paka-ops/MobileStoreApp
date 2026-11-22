@@ -1,5 +1,5 @@
 // dart
-import 'package:mobile_store_app/models/stock.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
 
 class OrderContent {
   final String orderId;

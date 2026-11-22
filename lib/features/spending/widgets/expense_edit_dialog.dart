@@ -4,7 +4,7 @@ import 'package:mobile_store_app/core/constants/app_spacing.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/widgets/buttons/app_button.dart';
 import 'package:mobile_store_app/core/widgets/inputs/app_text_field.dart';
-import 'package:mobile_store_app/models/spending.dart';
+import 'package:mobile_store_app/shared/models/spending.dart';
 import 'package:mobile_store_app/features/spending/controllers/expenses_controller.dart';
 
 /// Ouvre le dialogue de modification d'une dépense.

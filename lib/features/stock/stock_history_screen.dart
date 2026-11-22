@@ -11,8 +11,8 @@ import 'package:mobile_store_app/features/stock/widgets/restock_card.dart';
 import 'package:mobile_store_app/features/stock/widgets/restock_fab.dart';
 import 'package:mobile_store_app/features/stock/widgets/restock_filter_bar.dart';
 import 'package:mobile_store_app/features/stock/widgets/restock_period_dialog.dart';
-import 'package:mobile_store_app/models/product.dart';
-import 'package:mobile_store_app/models/stock.dart';
+import 'package:mobile_store_app/shared/models/product.dart';
+import 'package:mobile_store_app/shared/models/stock.dart';
 import 'package:mobile_store_app/shared/widgets/loading/boutika_loader.dart';
 
 /// ============================================================================

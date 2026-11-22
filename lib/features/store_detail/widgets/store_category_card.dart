@@ -7,7 +7,7 @@
 /// ============================================================================
 import 'package:flutter/material.dart';
 import 'package:mobile_store_app/features/store_detail/widgets/store_category_action_button.dart';
-import 'package:mobile_store_app/models/category.dart';
+import 'package:mobile_store_app/shared/models/category.dart';
 import 'package:mobile_store_app/core/theme/app_colors.dart';
 import 'package:mobile_store_app/core/theme/app_text_styles.dart';
 import 'package:mobile_store_app/core/constants/app_spacing.dart';
