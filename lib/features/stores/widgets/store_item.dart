@@ -8,7 +8,7 @@ import 'package:mobile_store_app/features/stores/controllers/store_actions_contr
 import 'package:mobile_store_app/features/stores/widgets/store_delete_dialog.dart';
 import 'package:mobile_store_app/features/stores/widgets/store_update_dialog.dart';
 import 'package:mobile_store_app/models/Store.dart';
-import 'package:mobile_store_app/screens/store_page.dart' hide AppColors;
+import 'package:mobile_store_app/features/store_detail/store_detail_screen.dart';
 import 'package:mobile_store_app/service/user_service.dart';
 import 'package:mobile_store_app/utils/message.dart';
 
