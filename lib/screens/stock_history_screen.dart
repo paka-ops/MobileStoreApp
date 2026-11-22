@@ -15,7 +15,14 @@ import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class RestockHistoryScreen extends StatefulWidget {
   final List<Product> products;
-  const RestockHistoryScreen({super.key, required this.products});
+  final bool embedded;
+
+  const RestockHistoryScreen({
+    super.key,
+    required this.products,
+    this.embedded = false,
+  });
+
   @override
   State<RestockHistoryScreen> createState() => _RestockHistoryScreenState();
 }
@@ -46,9 +53,14 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
     // 1. On lance l'animation de chargement
     setState(() => isLoading = true);
 
+    final DateTime effectiveStart =
+        startDate ?? DateTime.now().add(const Duration(days: -30));
+    final DateTime effectiveEnd =
+        endDate ?? DateTime.now().add(const Duration(days: 1));
+
     // 2. Appel au service (qui gère déjà ses propres erreurs)
     List<Stock>? results = await ProductService().getAllProductStocks(
-        startDate!, endDate!, productIds, context);
+        effectiveStart, effectiveEnd, productIds, context);
 
     // 3. Mise à jour des données et arrêt du chargement
     setState(() {
@@ -71,145 +83,336 @@ class _RestockHistoryScreenState extends State<RestockHistoryScreen> {
   }
 
   @override
+  void didUpdateWidget(covariant RestockHistoryScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.products != widget.products) {
+      productIds = widget.products.map((e) => e.id).toList();
+      _getAllStocksByProductIds(productIds);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final c = DashColors(context);
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppScreenHeader(
-              title: "Mouvements de Stock",
-              subtitle: "Historique des arrivages",
-              actions: [
-                AppIconButton(
-                  icon: Icons.refresh_rounded,
-                  tooltip: "Actualiser",
-                  onTap: () {
-                    _getAllStocksByProductIds(productIds);
-                  },
-                ),
-              ],
-            ),
-            _buildFilterBar(c),
-            Expanded(
-              child: isLoading
-                  ? Center(child: const BouTikaLoader())
-                  : stocks.isEmpty
+    final content = Column(
+      children: [
+        if (!widget.embedded)
+          AppScreenHeader(
+            title: "Mouvements de Stock",
+            subtitle: "Historique des arrivages",
+            actions: [
+              AppIconButton(
+                icon: Icons.refresh_rounded,
+                tooltip: "Actualiser",
+                onTap: () {
+                  _getAllStocksByProductIds(productIds);
+                },
+              ),
+            ],
+          ),
+        _buildFilterBar(c),
+        Expanded(
+          child: isLoading
+              ? Center(child: const BouTikaLoader())
+              : stocks.isEmpty
                   ? EmptyState(
-                icon: Icons.inventory_2_outlined,
-                title: "Pas de restockage trouvé",
-                message:
-                "Aucun mouvement de stock sur la période sélectionnée.",
-                actionLabel: "Actualiser",
-                onAction: () =>
-                    _getAllStocksByProductIds(productIds),
-              )
+                      icon: Icons.inventory_2_outlined,
+                      title: "Pas de restockage trouvé",
+                      message:
+                          "Aucun mouvement de stock sur la période sélectionnée.",
+                      actionLabel: "Actualiser",
+                      onAction: () =>
+                          _getAllStocksByProductIds(productIds),
+                    )
                   : _buildRestockList(c),
-            ),
-          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () { /* Formulaire pour créer un nouveau Stock */ },
-        label: const Text("Nouvel Arrivage"),
-        icon: const Icon(Icons.add_business_outlined),
-        backgroundColor: c.primary,
-        foregroundColor: c.onPrimary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+      ],
+    );
+
+    if (!widget.embedded) {
+      return Scaffold(
+        body: SafeArea(child: content),
+        floatingActionButton: _buildRestockFab(c),
+      );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        content,
+        Positioned(
+          right: 20,
+          bottom: 16,
+          child: _buildRestockFab(c),
         ),
+      ],
+    );
+  }
+
+  Widget _buildRestockFab(DashColors c) {
+    return FloatingActionButton.extended(
+      heroTag: "restock_history_add_fab",
+      onPressed: () {/* Formulaire pour créer un nouveau Stock */},
+      label: const Text("Nouvel Arrivage"),
+      icon: const Icon(Icons.add_business_outlined),
+      backgroundColor: c.primary,
+      foregroundColor: c.onPrimary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
     );
   }
 
+  String _formatPeriodLabel() {
+    final DateFormat fullFmt = DateFormat('dd/MM/yyyy');
+    final DateFormat shortFmt = DateFormat('dd/MM');
+    final DateTime s =
+        startDate ?? DateTime.now().add(const Duration(days: -30));
+    final DateTime? e = endDate;
+    if (e == null ||
+        (s.year == e.year && s.month == e.month && s.day == e.day)) {
+      return fullFmt.format(s);
+    }
+    return "${shortFmt.format(s)} - ${fullFmt.format(e)}";
+  }
+
   Widget _buildFilterBar(DashColors c) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: c.card,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: c.border),
-        boxShadow: c.cardShadow,
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 4),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.date_range_rounded,
-                  size: 16, color: c.primary),
-              const SizedBox(width: 6),
-              Text(
-                "Période d'analyse",
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: c.textSecondary,
-                  letterSpacing: 0.3,
-                ),
+          if (!isLoading)
+            Text(
+              "${stocks.length} arrivage(s)",
+              style: AppTextStyles.label.copyWith(
+                fontSize: 11.5,
+                color: c.textSecondary,
               ),
-            ],
+            ),
+          const Spacer(),
+          GestureDetector(
+            onTap: _showDateFilterDialog,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              decoration: BoxDecoration(
+                color: c.card.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(color: c.border.withValues(alpha: 0.85)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 11,
+                    color: c.primary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    _formatPeriodLabel(),
+                    style: AppTextStyles.label.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: FilterDateChip(
-                  label: "Début",
-                  date: startDate,
-                  onTap: () => _pickDate(true),
-                  onClear: () {
-                    setState(() => startDate = null);
-                    _getAllStocksByProductIds(productIds);
-                  },
+          const SizedBox(width: 8),
+          Tooltip(
+            message: "Changer la période",
+            child: InkWell(
+              onTap: _showDateFilterDialog,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: c.primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: c.primary.withValues(alpha: 0.20),
+                  ),
+                ),
+                child: Icon(
+                  Icons.calendar_month_rounded,
+                  color: c.primary,
+                  size: 17,
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilterDateChip(
-                  label: "Fin",
-                  date: endDate,
-                  onTap: () => _pickDate(false),
-                  onClear: () {
-                    setState(() => endDate = null);
-                    _getAllStocksByProductIds(productIds);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
+          if (widget.embedded) ...[
+            const SizedBox(width: 6),
+            Tooltip(
+              message: "Actualiser",
+              child: InkWell(
+                onTap: () => _getAllStocksByProductIds(productIds),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: c.fill,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: c.textPrimary,
+                    size: 17,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Future<void> _pickDate(bool isStart) async {
+  Future<DateTime?> _pickSingleDate(DateTime initialDate) async {
     final c = DashColors(context);
-    DateTime? picked = await showDatePicker(
+    return showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(2022),
       lastDate: DateTime(2100),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: c.primary,
-            onPrimary: Colors.white,
-            surface: c.card,
-            onSurface: c.textPrimary,
-          ),
+                primary: c.primary,
+                onPrimary: Colors.white,
+                surface: c.card,
+                onSurface: c.textPrimary,
+              ),
         ),
         child: child!,
       ),
     );
-    if (picked != null) {
+  }
+
+  Future<void> _showDateFilterDialog() async {
+    final c = DashColors(context);
+    DateTime? tempStart = startDate;
+    DateTime? tempEnd = endDate;
+
+    final bool? applied = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          return AlertDialog(
+            backgroundColor: c.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              side: BorderSide(color: c.border),
+            ),
+            titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            actionsPadding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: c.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Icon(Icons.calendar_month_rounded,
+                      color: c.primary, size: 19),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    "Période d'analyse",
+                    style: AppTextStyles.heading.copyWith(
+                      fontSize: 16.5,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setDialogState(() {
+                      tempStart =
+                          DateTime.now().add(const Duration(days: -30));
+                      tempEnd = DateTime.now().add(const Duration(days: 1));
+                    });
+                  },
+                  child: Text(
+                    "30 jours",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: c.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FilterDateChip(
+                  label: "Début",
+                  date: tempStart,
+                  onTap: () async {
+                    final picked =
+                        await _pickSingleDate(tempStart ?? DateTime.now());
+                    if (picked != null) {
+                      setDialogState(() => tempStart = picked);
+                    }
+                  },
+                  onClear: () => setDialogState(() => tempStart = null),
+                ),
+                const SizedBox(height: 10),
+                FilterDateChip(
+                  label: "Fin",
+                  date: tempEnd,
+                  onTap: () async {
+                    final picked = await _pickSingleDate(
+                        tempEnd ?? tempStart ?? DateTime.now());
+                    if (picked != null) {
+                      setDialogState(() => tempEnd = picked);
+                    }
+                  },
+                  onClear: () => setDialogState(() => tempEnd = null),
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.secondary(
+                      label: "Annuler",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: AppButton.primary(
+                      label: "Appliquer",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    if (applied == true && mounted) {
       setState(() {
-        if (isStart) {
-          startDate = picked;
-        } else {
-          endDate = picked;
-        }
+        startDate = tempStart;
+        endDate = tempEnd;
       });
       _getAllStocksByProductIds(productIds);
     }

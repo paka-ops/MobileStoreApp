@@ -15,7 +15,13 @@ import 'package:mobile_store_app/widgets/boutika_loader.dart';
 
 class ExpensesScreen extends StatefulWidget {
   final String storeId;
-  const ExpensesScreen({super.key, required this.storeId});
+  final bool embedded;
+
+  const ExpensesScreen({
+    super.key,
+    required this.storeId,
+    this.embedded = false,
+  });
 
   @override
   State<ExpensesScreen> createState() => _ExpensesScreenState();
@@ -100,32 +106,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   void _applyFilters() => _fetchExpenses();
 
-  void _setFilterDate(DateTime date, {required bool isStart}) {
-    setState(() {
-      final selectedDate = _startOfDay(date);
-      if (isStart) {
-        startDate = selectedDate;
-        if (endDate.isBefore(startDate)) endDate = startDate;
-      } else {
-        endDate = selectedDate;
-        if (startDate.isAfter(endDate)) startDate = endDate;
-      }
-    });
-    _applyFilters();
-  }
-
-  void _resetToToday() {
-    final today = _today();
-    setState(() {
-      startDate = today;
-      endDate = today;
-    });
-    _applyFilters();
-  }
-
-  bool get _isTodayFilter =>
-      _startOfDay(startDate) == _today() && _startOfDay(endDate) == _today();
-
   double get _totalAmount {
     return expenses.fold<double>(
       0,
@@ -139,6 +119,37 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       valueListenable: appDarkMode,
       builder: (context, _, __) {
         final colors = DashColors(context);
+
+        final body = RefreshIndicator(
+          onRefresh: _fetchExpenses,
+          color: colors.primary,
+          backgroundColor: colors.card,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+            children: [
+              _buildFilterSection(colors),
+              const SizedBox(height: 10),
+              _buildSummaryCard(colors),
+              const SizedBox(height: 12),
+              if (isLoading)
+                Padding(
+                  padding: const EdgeInsets.only(top: 80),
+                  child: Center(
+                    child: const BouTikaLoader(),
+                  ),
+                )
+              else if (expenses.isEmpty)
+                _buildEmptyState(colors)
+              else
+                ...expenses.map((e) => _buildExpenseCard(e, colors)),
+            ],
+          ),
+        );
+
+        if (widget.embedded) {
+          return body;
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -162,34 +173,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
             ],
           ),
-          body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _fetchExpenses,
-              color: colors.primary,
-              backgroundColor: colors.card,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                children: [
-                  _buildSummaryCard(colors),
-                  const SizedBox(height: 16),
-                  _buildFilterSection(colors),
-                  const SizedBox(height: 16),
-                  if (isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 80),
-                      child: Center(
-                        child: const BouTikaLoader(),
-                      ),
-                    )
-                  else if (expenses.isEmpty)
-                    _buildEmptyState(colors)
-                  else
-                    ...expenses.map((e) => _buildExpenseCard(e, colors)),
-                ],
-              ),
-            ),
-          ),
+          body: SafeArea(child: body),
         );
       },
     );
@@ -296,85 +280,116 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
+  String _formatPeriodLabel() {
+    final DateFormat fullFmt = DateFormat('dd/MM/yyyy');
+    final DateFormat shortFmt = DateFormat('dd/MM');
+    if (_startOfDay(startDate) == _startOfDay(endDate)) {
+      return fullFmt.format(startDate);
+    }
+    return "${shortFmt.format(startDate)} - ${fullFmt.format(endDate)}";
+  }
+
   Widget _buildFilterSection(DashColors colors) {
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.filter_alt_outlined,
-                  color: colors.primary, size: 18),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Filtrer par période",
-                  style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5, color: colors.textPrimary),
-                ),
+          if (!isLoading)
+            Text(
+              "${expenses.length} dépense(s)",
+              style: AppTextStyles.label.copyWith(
+                fontSize: 11.5,
+                color: colors.textSecondary,
               ),
-              if (!_isTodayFilter)
-                GestureDetector(
-                  onTap: _resetToToday,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.today_rounded,
-                            size: 13, color: colors.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          "Aujourd'hui",
-                          style: TextStyle(
-                            color: colors.primary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11.5,
-                          ),
-                        ),
-                      ],
+            ),
+          const Spacer(),
+          GestureDetector(
+            onTap: _showDateFilterDialog,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              decoration: BoxDecoration(
+                color: colors.card.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(color: colors.border.withValues(alpha: 0.85)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 11,
+                    color: colors.primary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    _formatPeriodLabel(),
+                    style: AppTextStyles.label.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textSecondary,
                     ),
                   ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: FilterDateChip(
-                  label: "Date début",
-                  date: startDate,
-                  onTap: () => _pickDate(isStart: true),
-                  onClear: () => _setFilterDate(_today(), isStart: true),
+          const SizedBox(width: 8),
+          Tooltip(
+            message: "Changer la période",
+            child: InkWell(
+              onTap: _showDateFilterDialog,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: colors.primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: colors.primary.withValues(alpha: 0.20),
+                  ),
+                ),
+                child: Icon(
+                  Icons.calendar_month_rounded,
+                  color: colors.primary,
+                  size: 17,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilterDateChip(
-                  label: "Date fin",
-                  date: endDate,
-                  onTap: () => _pickDate(isStart: false),
-                  onClear: () => _setFilterDate(_today(), isStart: false),
+            ),
+          ),
+          if (widget.embedded) ...[
+            const SizedBox(width: 6),
+            Tooltip(
+              message: "Actualiser",
+              child: InkWell(
+                onTap: _fetchExpenses,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: colors.fill,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: colors.textPrimary,
+                    size: 17,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Future<void> _pickDate({required bool isStart}) async {
+  Future<DateTime?> _pickSingleDate(DateTime initialDate) async {
     final colors = DashColors(context);
-    final DateTime? picked = await showDatePicker(
+    return showDatePicker(
       context: context,
-      initialDate: isStart ? startDate : endDate,
+      initialDate: initialDate,
       firstDate: DateTime(2022),
       lastDate: DateTime(2100),
       builder: (context, child) => Theme(
@@ -389,9 +404,137 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         child: child!,
       ),
     );
+  }
 
-    if (picked != null && mounted) {
-      _setFilterDate(picked, isStart: isStart);
+  Future<void> _showDateFilterDialog() async {
+    final colors = DashColors(context);
+    DateTime tempStart = startDate;
+    DateTime tempEnd = endDate;
+
+    final bool? applied = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          return AlertDialog(
+            backgroundColor: colors.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              side: BorderSide(color: colors.border),
+            ),
+            titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            actionsPadding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: colors.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Icon(Icons.calendar_month_rounded,
+                      color: colors.primary, size: 19),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    "Filtrer par période",
+                    style: AppTextStyles.heading.copyWith(
+                      fontSize: 16.5,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final today = _today();
+                    setDialogState(() {
+                      tempStart = today;
+                      tempEnd = today;
+                    });
+                  },
+                  child: Text(
+                    "Aujourd'hui",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: colors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FilterDateChip(
+                  label: "Date début",
+                  date: tempStart,
+                  onTap: () async {
+                    final picked = await _pickSingleDate(tempStart);
+                    if (picked != null) {
+                      setDialogState(() {
+                        tempStart = _startOfDay(picked);
+                        if (tempEnd.isBefore(tempStart)) {
+                          tempEnd = tempStart;
+                        }
+                      });
+                    }
+                  },
+                  onClear: () => setDialogState(() => tempStart = _today()),
+                ),
+                const SizedBox(height: 10),
+                FilterDateChip(
+                  label: "Date fin",
+                  date: tempEnd,
+                  onTap: () async {
+                    final picked = await _pickSingleDate(tempEnd);
+                    if (picked != null) {
+                      setDialogState(() {
+                        tempEnd = _startOfDay(picked);
+                        if (tempStart.isAfter(tempEnd)) {
+                          tempStart = tempEnd;
+                        }
+                      });
+                    }
+                  },
+                  onClear: () => setDialogState(() => tempEnd = _today()),
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.secondary(
+                      label: "Annuler",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: AppButton.primary(
+                      label: "Appliquer",
+                      height: 44,
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    if (applied == true && mounted) {
+      setState(() {
+        startDate = tempStart;
+        endDate = tempEnd;
+      });
+      _applyFilters();
     }
   }
 

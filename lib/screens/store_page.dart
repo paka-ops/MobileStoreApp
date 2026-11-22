@@ -10,10 +10,8 @@ import 'package:mobile_store_app/models/category.dart';
 import 'package:mobile_store_app/models/order.dart';
 import 'package:mobile_store_app/models/product.dart';
 import 'package:mobile_store_app/screens/category_detail_screen.dart';
+import 'package:mobile_store_app/screens/history_screen.dart';
 import 'package:mobile_store_app/screens/low_stock_product.dart';
-import 'package:mobile_store_app/screens/order_story_screen.dart';
-import 'package:mobile_store_app/screens/spending_page.dart';
-import 'package:mobile_store_app/screens/stock_history_screen.dart';
 import 'package:mobile_store_app/screens/subscription_screen_page.dart';
 import 'package:mobile_store_app/screens/withdrawal_page.dart';
 import 'package:mobile_store_app/service/category_service.dart';
@@ -365,9 +363,9 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           activeIcon: Icons.home_rounded,
           label: "Accueil"),
       const FloatingNavItem(
-          icon: Icons.receipt_long_outlined,
-          activeIcon: Icons.receipt_long_rounded,
-          label: "Ventes"),
+          icon: Icons.history_outlined,
+          activeIcon: Icons.history_rounded,
+          label: "Historiques"),
       const FloatingNavItem(
           icon: Icons.inventory_2_outlined,
           activeIcon: Icons.inventory_2_rounded,
@@ -555,13 +553,14 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
   }
 
   // =========================================================================
-  // ONGLET 1 — VENTES
+  // ONGLET 1 — HISTORIQUES UNIFIÉS
   // =========================================================================
   Widget _buildSalesTab(BuildContext context) {
-    return OrderStoryScreen(
+    return HistoryScreen(
       storeId: widget.store.id,
       userType: widget.userType,
       categories: categories,
+      products: allStoreProducts,
       embedded: true,
     );
   }
@@ -587,8 +586,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  RestockHistoryScreen(products: allStoreProducts),
+              builder: (_) => HistoryScreen(
+                storeId: widget.store.id,
+                userType: widget.userType,
+                categories: categories,
+                products: allStoreProducts,
+                initialIndex: 1,
+              ),
             ),
           ),
         ),
@@ -713,8 +717,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        ExpensesScreen(storeId: widget.store.id),
+                    builder: (_) => HistoryScreen(
+                      storeId: widget.store.id,
+                      userType: widget.userType,
+                      categories: categories,
+                      products: allStoreProducts,
+                      initialIndex: 2,
+                    ),
                   ),
                 ),
               ),
@@ -728,8 +737,13 @@ class _StoreDetailScreen extends State<StoreDetailScreen> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        WithdrawalScreen(storeId: widget.store.id),
+                    builder: (_) => HistoryScreen(
+                      storeId: widget.store.id,
+                      userType: widget.userType,
+                      categories: categories,
+                      products: allStoreProducts,
+                      initialIndex: 3,
+                    ),
                   ),
                 ),
               ),
