@@ -5,7 +5,7 @@ import 'package:mobile_store_app/core/widgets/navigation/app_header.dart';
 import 'package:mobile_store_app/features/history/controllers/history_controller.dart';
 import 'package:mobile_store_app/features/history/widgets/history_keep_alive.dart';
 import 'package:mobile_store_app/features/history/widgets/history_nav_bar.dart';
-import 'package:mobile_store_app/screens/order_story_screen.dart';
+import 'package:mobile_store_app/features/order_story/order_story_screen.dart';
 import 'package:mobile_store_app/features/spending/spending_screen.dart';
 import 'package:mobile_store_app/features/stock/stock_history_screen.dart';
 import 'package:mobile_store_app/features/withdrawals/withdrawal_screen.dart';
