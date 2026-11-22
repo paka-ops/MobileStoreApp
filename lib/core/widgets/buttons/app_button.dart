@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:mobile_store_app/widgets/boutika_loader.dart';
+import 'package:mobile_store_app/shared/widgets/loading/boutika_loader.dart';
 
 import '../../constants/app_durations.dart';
 import '../../constants/app_spacing.dart';
