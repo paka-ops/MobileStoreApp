@@ -927,7 +927,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     hint: "Ex: 50000",
                     icon: Icons.payments_outlined,
                     validator: (v) {
-                      final double? value = _parseMontant(v ?? "");
+                      final double? value = parseOrderMontant(v ?? "");
                       if (value == null || value < 0) {
                         return "Indiquez un montant valide";
                       }
@@ -958,7 +958,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
                       final double? montant =
-                          _parseMontant(montantController.text);
+                          parseOrderMontant(montantController.text);
                       if (montant == null) return;
                       Navigator.pop(dialogContext, montant);
                     },
@@ -1204,7 +1204,7 @@ class _OrderStoryScreenState extends State<OrderStoryScreen> {
         ),
         const SizedBox(width: 8),
         Text(
-          "= ${_formatMontant(montant)}",
+          "= ${formatOrderMontant(montant)}",
           style: TextStyle(
             color: (label == "Manquant" || label == "Surplus")?montant >=0?c.accentGreen:c.badgeRed:c.textSecondary,
             fontWeight: FontWeight.w800,

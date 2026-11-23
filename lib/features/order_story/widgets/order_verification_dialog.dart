@@ -40,11 +40,11 @@ class OrderVerificationResult {
 
   double get ecart => (montantCaisse + spendingAmount + withdrawalAmount) - montantApp;
 }
-double? _parseMontant(String value) => double.tryParse(
+double? parseOrderMontant(String value) => double.tryParse(
       value.trim().replaceAll(RegExp(r'\s'), '').replaceAll(',', '.'),
     );
 
-String _formatMontant(double montant) => "${montant.toStringAsFixed(2)} F";
+String formatOrderMontant(double montant) => "${montant.toStringAsFixed(2)} F";
 
 /// Phases du dialog de vérification (un seul dialog, pas d'enchaînement
 /// de pop-ups : voir le commentaire « Correctif stabilité » plus haut).
@@ -82,7 +82,7 @@ class _VerificationDialogState extends State<OrderVerificationDialog> {
   Future<void> _submit() async {
     if (_phase != _VerificationPhase.form) return;
     if (!_formKey.currentState!.validate()) return;
-    final double? montant = _parseMontant(_montantController.text);
+    final double? montant = parseOrderMontant(_montantController.text);
     if (montant == null) return;
 
     FocusScope.of(context).unfocus();
@@ -254,7 +254,7 @@ class _VerificationDialogState extends State<OrderVerificationDialog> {
             hint: "Ex: 50000",
             icon: Icons.payments_outlined,
             validator: (v) {
-              final double? value = _parseMontant(v ?? "");
+              final double? value = parseOrderMontant(v ?? "");
               if (value == null || value < 0) {
                 return "Indiquez un montant valide";
               }
@@ -371,7 +371,7 @@ class _VerificationDialogState extends State<OrderVerificationDialog> {
         ),
         const SizedBox(width: 8),
         Text(
-          "= ${_formatMontant(montant)}",
+          "= ${formatOrderMontant(montant)}",
           style: TextStyle(
             color: c.textPrimary,
             fontWeight: FontWeight.w800,

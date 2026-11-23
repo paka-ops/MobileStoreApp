@@ -38,7 +38,7 @@ class AppFormatters {
   }
 
   /// Montant à deux décimales : `50000.00 F`.
-  /// (Vérification de caisse : `_formatMontant`.)
+  /// (Vérification de caisse : `formatOrderMontant`.)
   static String amountWithSymbol(double amount) =>
       '${amount.toStringAsFixed(2)} F';
 
@@ -71,7 +71,7 @@ class AppFormatters {
 
   /// Analyse d'un montant saisi, tolérante aux espaces et à la virgule
   /// décimale : `" 50 000,50 "` → `50000.5`.
-  /// (Vérification de caisse : `_parseMontant`.)
+  /// (Vérification de caisse : `parseOrderMontant`.)
   static double? parseAmount(String? value) {
     if (value == null) return null;
     return double.tryParse(
