@@ -43,8 +43,6 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:mobile_store_app/features/store_detail/utils/get_low_stock_product.dart';
 import 'package:mobile_store_app/features/store_detail/widgets/store_category_card.dart';
 
-    show appDarkMode, AppColors, DashColors;
-
 // ---------------------------------------------------------------------------
 // Modèle ligne de vente
 // ---------------------------------------------------------------------------
