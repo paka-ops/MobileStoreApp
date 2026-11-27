@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mobile_store_app/main.dart';
-import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
+import 'package:mobile_store_app/features/welcome/welcome_pre_login_screen.dart';
 
 void main() {
   testWidgets(

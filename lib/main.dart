@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_store_app/core/widgets/common/app_background.dart';
-import 'package:mobile_store_app/screens/login_screen.dart';
-import 'package:mobile_store_app/screens/welcome_screen_before_login.dart';
 
-import 'models/Store.dart';
-import 'utils/app_colors.dart';
+import 'package:mobile_store_app/core/router/app_router.dart';
+import 'package:mobile_store_app/core/theme/app_colors.dart';
+import 'package:mobile_store_app/core/theme/app_theme.dart';
+import 'package:mobile_store_app/core/widgets/common/app_background.dart';
 
 // Clé globale du ScaffoldMessenger (snackbars au-dessus de tout)
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
@@ -38,11 +37,10 @@ class _MyAppState extends State<MyApp> {
           child: child ?? const SizedBox.shrink(),
         ),
         scaffoldMessengerKey: rootScaffoldMessengerKey,
-        initialRoute: "/",
-        routes: {
-          "/": (context) => WelcomePreLoginScreen(),
-          "/login": (context) => LoginScreen(),
-        },
+        // Table de routage centralisée dans `core/router/app_router.dart`.
+        initialRoute: AppRouter.initialRoute,
+        routes: AppRouter.routes,
+        onGenerateRoute: AppRouter.onGenerateRoute,
       ),
     );
   }

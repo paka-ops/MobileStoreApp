@@ -180,6 +180,18 @@ class AppColors {
     pastelGrey,
   ];
 
+  /// Palette déterministe utilisée par les rapports par catégorie
+  /// (une teinte par catégorie, cyclique). Valeurs extraites telles quelles
+  /// de l'écran historique : aucune n'a été retouchée.
+  static const List<Color> categoryAccents = <Color>[
+    Color(0xFF4A7C82), // sarcelle doux
+    Color(0xFFC08552), // camel
+    Color(0xFF6FA687), // vert sauge
+    Color(0xFF8A7CB8), // violet doux
+    Color(0xFFD8A657), // or doux
+    Color(0xFF5C8AAE), // bleu pétrole doux
+  ];
+
   // -------------------------------------------------------------------
   // DÉGRADÉS
   // -------------------------------------------------------------------

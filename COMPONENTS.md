@@ -129,8 +129,8 @@ Convention actions : `Row` avec `Expanded` + `SizedBox(width: 10)`.
 
 | Widget | Fichier | Usage |
 |---|---|---|
-| `BouTikaLoader` / `.compact` | `lib/widgets/boutika_loader.dart` | Spinner de marque (écrans + boutons) |
-| Store card | `lib/widgets/store_item.dart` | Carte de boutique (liste post-login) |
+| `BouTikaLoader` / `.compact` | `lib/shared/widgets/loading/boutika_loader.dart` | Spinner de marque (écrans + boutons) |
+| Store card | `lib/features/stores/widgets/store_item.dart` | Carte de boutique (liste post-login) |
 
 ## Constantes — `core/constants/`
 

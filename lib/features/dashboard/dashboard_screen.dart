@@ -1,0 +1,621 @@
+/// ============================================================================
+/// DASHBOARD SCREEN — tableau de bord multi-boutiques.
+///
+/// Contenu repris à l'identique de `lib/screens/dashboard_screens.dart` ;
+/// seul le découpage change :
+///   • `features/dashboard/models/store_dash_data.dart` (`StoreDashData`)
+///   • `features/dashboard/widgets/global_kpi_card.dart` (`GlobalKpiCard`)
+///   • `features/dashboard/widgets/store_card.dart` (`StoreCard`)
+/// ============================================================================
+import 'package:flutter/material.dart';
+import 'package:mobile_store_app/core/theme/app_colors.dart';
+import 'package:mobile_store_app/core/theme/app_text_styles.dart';
+import 'package:mobile_store_app/core/constants/app_spacing.dart';
+import 'package:mobile_store_app/utils/message.dart';
+import 'package:flutter/services.dart';
+import 'package:mobile_store_app/features/dashboard/models/store_dash_data.dart';
+import 'package:mobile_store_app/features/dashboard/widgets/global_kpi_card.dart';
+import 'package:mobile_store_app/features/dashboard/widgets/store_card.dart';
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _selectedPeriodIndex = 2;
+
+
+  final List<String> _periods = ["Jour", "Semaine", "Mois", "Année"];
+  final List<String> _weekDays = [
+    "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"
+  ];
+
+  final List<StoreDashData> _stores = const [
+    StoreDashData(
+      id: "1",
+      name: "Boutique Centre-Ville",
+      location: "Rue 12, Douala",
+      chiffreAffaires: 4850000,
+      benefice: 1230000,
+      depenses: 890000,
+      nbCommandes: 342,
+      panierMoyen: 14181,
+      tauxConversion: 68.5,
+      weeklyRevenue: [320000, 480000, 290000, 510000, 680000, 420000, 590000],
+      weeklyExpense: [80000, 120000, 65000, 95000, 140000, 70000, 110000],
+    ),
+    StoreDashData(
+      id: "2",
+      name: "Boutique Akwa",
+      location: "Boulevard de la Liberté, Douala",
+      chiffreAffaires: 3200000,
+      benefice: 980000,
+      depenses: 620000,
+      nbCommandes: 218,
+      panierMoyen: 14679,
+      tauxConversion: 72.3,
+      weeklyRevenue: [250000, 380000, 310000, 420000, 510000, 350000, 480000],
+      weeklyExpense: [60000, 90000, 75000, 85000, 110000, 65000, 95000],
+    ),
+    StoreDashData(
+      id: "3",
+      name: "Boutique Bonamoussadi",
+      location: "Carrefour Ange Raphaël",
+      chiffreAffaires: 1750000,
+      benefice: 420000,
+      depenses: 380000,
+      nbCommandes: 126,
+      panierMoyen: 13889,
+      tauxConversion: 55.8,
+      weeklyRevenue: [180000, 220000, 150000, 280000, 340000, 200000, 310000],
+      weeklyExpense: [45000, 65000, 40000, 55000, 80000, 50000, 70000],
+    ),
+    StoreDashData(
+      id: "4",
+      name: "Boutique Yaoundé",
+      location: "Mvog-Mbi, Yaoundé",
+      chiffreAffaires: 2100000,
+      benefice: 650000,
+      depenses: 510000,
+      nbCommandes: 189,
+      panierMoyen: 11111,
+      tauxConversion: 61.2,
+      weeklyRevenue: [200000, 310000, 260000, 350000, 410000, 280000, 390000],
+      weeklyExpense: [55000, 80000, 60000, 70000, 100000, 55000, 85000],
+    ),
+  ];
+
+  double get _totalCA => _stores.fold(0, (s, e) => s + e.chiffreAffaires);
+  double get _totalBenefice => _stores.fold(0, (s, e) => s + e.benefice);
+  double get _totalDepenses => _stores.fold(0, (s, e) => s + e.depenses);
+  int get _totalCommandes => _stores.fold(0, (s, e) => s + e.nbCommandes);
+
+  @override
+  Widget build(BuildContext context) {
+    // Le thème global (main.dart) gère déjà la bascule light/dark
+    final c = DashColors(context);
+
+    // Ajuster la status bar
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness:
+      Theme.of(context).brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
+    ));
+
+    return Scaffold(
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader(c)),
+            SliverToBoxAdapter(child: _buildPeriodSelector(c)),
+            SliverToBoxAdapter(child: _buildGlobalKpiSection(c)),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child:
+                _buildSectionTitle(c, "Performance globale", "7 jours"),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                child: _buildGlobalBarChart(c),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
+                child: _buildSectionTitle(
+                    c, "Classement boutiques", "Par CA"),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                child: _buildRankingBar(c),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
+                child: _buildSectionTitle(
+                    c, "Mes boutiques", "${_stores.length} actives"),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: StoreCard(
+                      store: _stores[index],
+                      rank: index + 1,
+                      maxCA: _stores.first.chiffreAffaires,
+                      weekDays: _weekDays,
+                      colors: c,
+                      onTap: () => _navigateToStore(_stores[index]),
+                    ),
+                  ),
+                  childCount: _stores.length,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =====================================================================
+  // NAVIGATION
+  // =====================================================================
+  void _navigateToStore(StoreDashData store) {
+    showSuccessMessage("Ouverture de ${store.name}...", context);
+  }
+
+  // =====================================================================
+  // HEADER
+  // =====================================================================
+  Widget _buildHeader(DashColors c) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: c.primarySoft,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              border: Border.all(color: c.border),
+            ),
+            child: Icon(Icons.dashboard_rounded, color: c.primary, size: 24),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Dashboard",
+                  style: TextStyle(
+                    color: c.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "Vue d'ensemble de vos boutiques",
+                  style: AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 12.5),
+                ),
+              ],
+            ),
+          ),
+          // --- TOGGLE DARK MODE ---
+          GestureDetector(
+            onTap: () {
+              appDarkMode.value = !appDarkMode.value;
+              setState(() {});
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: c.cardElevated,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(color: c.border),
+              ),
+              child: Icon(
+                appDarkMode.value
+                    ? Icons.light_mode_rounded
+                    : Icons.dark_mode_rounded,
+                size: 20,
+                color: appDarkMode.value ? c.warning : c.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          _headerIconButton(c, Icons.notifications_none_rounded, badge: 5),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerIconButton(DashColors c, IconData icon, {int badge = 0}) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: c.card,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            border: Border.all(color: c.border),
+          ),
+          child: Icon(icon, size: 20, color: c.textPrimary),
+        ),
+        if (badge > 0)
+          Positioned(
+            top: -4,
+            right: -4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: c.danger,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                "$badge",
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // =====================================================================
+  // PERIOD SELECTOR
+  // =====================================================================
+  Widget _buildPeriodSelector(DashColors c) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: c.card,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: c.border),
+        ),
+        child: Row(
+          children: List.generate(_periods.length, (i) {
+            final bool sel = _selectedPeriodIndex == i;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedPeriodIndex = i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: sel ? c.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Text(
+                    _periods[i],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: sel ? Colors.white : c.textSecondary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  // =====================================================================
+  // KPI GLOBAUX
+  // =====================================================================
+  Widget _buildGlobalKpiSection(DashColors c) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+      child: Column(
+        children: [
+          Row(children: [
+            Expanded(
+              child: GlobalKpiCard(
+                icon: Icons.shopping_bag_rounded,
+                label: "Commandes",
+                value: "$_totalCommandes",
+                trend: "+12%",
+                trendUp: true,
+                color: c.info,
+                softColor: c.infoSoft,
+                c: c,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GlobalKpiCard(
+                icon: Icons.show_chart_rounded,
+                label: "Chiffre d'affaires",
+                value: _fmt(_totalCA),
+                trend: "+8.2%",
+                trendUp: true,
+                color: c.primary,
+                softColor: c.primarySoft,
+                c: c,
+              ),
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Row(children: [
+            Expanded(
+              child: GlobalKpiCard(
+                icon: Icons.trending_up_rounded,
+                label: "Bénéfice total",
+                value: _fmt(_totalBenefice),
+                trend: "+5.4%",
+                trendUp: true,
+                color: c.success,
+                softColor: c.successSoft,
+                c: c,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GlobalKpiCard(
+                icon: Icons.receipt_long_rounded,
+                label: "Dépenses totales",
+                value: _fmt(_totalDepenses),
+                trend: "+2.1%",
+                trendUp: false,
+                color: c.danger,
+                softColor: c.dangerSoft,
+                c: c,
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================================
+  // GRAPHE GLOBAL
+  // =====================================================================
+  Widget _buildGlobalBarChart(DashColors c) {
+    List<double> totalRev = List.filled(7, 0);
+    List<double> totalExp = List.filled(7, 0);
+    for (final s in _stores) {
+      for (int i = 0; i < 7; i++) {
+        totalRev[i] += s.weeklyRevenue[i];
+        totalExp[i] += s.weeklyExpense[i];
+      }
+    }
+    final double maxVal = totalRev.reduce(max).clamp(1, double.infinity);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: c.card,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: c.border),
+      ),
+      child: Column(
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            _legendDot(c, c.primary, "Revenus"),
+            const SizedBox(width: 16),
+            _legendDot(c, c.danger, "Dépenses"),
+          ]),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 150,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: List.generate(7, (i) {
+                final rH = (totalRev[i] / maxVal) * 120;
+                final eH = (totalExp[i] / maxVal) * 120;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _bar(rH, c.primary, c.primarySoft),
+                            const SizedBox(width: 3),
+                            _bar(eH, c.danger, c.dangerSoft),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(_weekDays[i],
+                            style: AppTextStyles.label.copyWith(color: c.textSecondary, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bar(double height, Color color, Color softColor) {
+    return Container(
+      width: 12,
+      height: height.clamp(4, 120),
+      decoration: BoxDecoration(
+        color: softColor,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          width: 12,
+          height: (height * 0.7).clamp(4, 120),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _legendDot(DashColors c, Color color, String l) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+              color: color, borderRadius: BorderRadius.circular(3))),
+      const SizedBox(width: 6),
+      Text(l,
+          style: AppTextStyles.label.copyWith(color: c.textSecondary, fontWeight: FontWeight.w600)),
+    ],
+  );
+
+  // =====================================================================
+  // CLASSEMENT
+  // =====================================================================
+  Widget _buildRankingBar(DashColors c) {
+    final sorted = List<StoreDashData>.from(_stores)
+      ..sort((a, b) => b.chiffreAffaires.compareTo(a.chiffreAffaires));
+    final double maxCA = sorted.first.chiffreAffaires;
+
+    final List<Color> rankColors = [
+      c.primary,
+      c.info,
+      c.accent,
+      c.success,
+      c.warning,
+      c.danger,
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: c.card,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: c.border),
+      ),
+      child: Column(
+        children: sorted.asMap().entries.map((entry) {
+          final i = entry.key;
+          final s = entry.value;
+          final ratio = s.chiffreAffaires / maxCA;
+          final color = rankColors[i % rankColors.length];
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: i < sorted.length - 1 ? 16 : 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text("#${i + 1}",
+                            style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(s.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodySecondary.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700, fontSize: 13.5)),
+                    ),
+                    Text(_fmt(s.chiffreAffaires),
+                        style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: ratio,
+                    minHeight: 8,
+                    backgroundColor: color.withValues(alpha: 0.12),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // =====================================================================
+  // HELPERS
+  // =====================================================================
+  Widget _buildSectionTitle(DashColors c, String title, String sub) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title,
+            style: TextStyle(
+                color: c.textPrimary,
+                fontWeight: FontWeight.w800,
+                fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: c.primarySoft,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
+          child: Text(sub,
+              style: TextStyle(
+                  color: c.primary,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600)),
+        ),
+      ],
+    );
+  }
+
+  String _fmt(double amount) {
+    if (amount >= 1000000) return "${(amount / 1000000).toStringAsFixed(1)}M";
+    if (amount >= 1000) return "${(amount / 1000).toStringAsFixed(0)}K";
+    return "${amount.toStringAsFixed(0)}";
+  }
+}

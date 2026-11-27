@@ -1,5 +1,19 @@
 # 🎨 Passe 3 — Palette « Calm Premium » + correctifs pixel overflow
 
+## 🏗️ Migration d'architecture (novembre 2026) — `core / shared / features`
+
+- **14 modules** dans `lib/features/` (auth, welcome, stores, store_detail,
+  dashboard, categories, products, stock, history, order_story, spending,
+  withdrawals, reports, subscription), chacun découpé en
+  `controllers/`, `widgets/` et écran.
+- **Routeur SaaS** : `lib/core/router/app_router.dart` + `route_arguments.dart`
+  remplacent la table de routes de `main.dart` ; garde `SaaSModuleManager`.
+- **Modèles et services partagés** : `lib/shared/models/`, `lib/shared/services/`.
+- **Shims purgés** : `lib/screens/`, `lib/widgets/`, `lib/utils/app_colors.dart`.
+- Aucun changement de texte, de couleur, de géométrie ni de logique métier.
+
+---
+
 Objectif : **arrêter de fatiguer l'œil**. La couleur ne porte plus de grandes
 surfaces ; elle devient une trace, comme dans les apps haut de gamme.
 

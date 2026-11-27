@@ -141,3 +141,77 @@ flutter run     # parcourir : accueil, boutique, ventes, stock, +, login, rappor
    le jour où une note est affichée.
 4. **Restauration de l'ancienne UI** — `git revert` du commit de migration :
    les valeurs sont centralisées, le retour arrière est donc instantané.
+
+---
+
+## 6. Migration d'architecture (novembre 2026) — `core / shared / features`
+
+La refonte visuelle étant terminée, le code a été réorganisé selon l'archétype
+**SaaS multi-boutiques** : `core` (socle technique), `shared` (modèles,
+services et widgets partagés), `features` (un module par domaine). Aucune
+règle métier, aucun texte et aucune géométrie n'ont été modifiés : chaque
+module reprend le code de l'écran d'origine, découpé en contrôleurs, widgets et
+dialogues.
+
+### a. Arborescence finale
+
+```
+lib/
+├── core/
+│   ├── config/      app_config.dart · saas_module.dart · saas_module_manager.dart
+│   ├── constants/   app_spacing.dart · app_durations.dart
+│   ├── router/      app_router.dart · route_arguments.dart
+│   ├── services/    api_client.dart
+│   ├── theme/       app_colors, app_text_styles, app_dimensions, app_shadows,
+│   │                app_decorations, app_theme
+│   ├── utils/       formatters.dart · date_utils.dart · color_utils.dart
+│   └── widgets/     15 composants (boutons, champs, cartes, dialogues, …)
+├── shared/
+│   ├── models/      14 modèles (Store, Category, Product, Order, …)
+│   ├── services/    9 services (ProductService, OrderService, UserService, …)
+│   └── widgets/     kit partagé (ui_kit.dart) + loading/boutika_loader.dart
+├── features/        14 modules : auth, categories, dashboard, history,
+│                    order_story, products, reports, spending, stock,
+│                    store_detail, stores, subscription, welcome, withdrawals
+└── main.dart
+```
+
+### b. Anciens chemins → nouveaux chemins
+
+| Avant | Après |
+|---|---|
+| `lib/screens/*.dart` (16 écrans) | `lib/features/<domaine>/*_screen.dart` |
+| `lib/widgets/*.dart` (15 composants) | `lib/shared/widgets/…` (barrel `ui_kit.dart`) |
+| `lib/widgets/store_page/functions/get_low_stock_product.dart` | `lib/features/store_detail/utils/get_low_stock_product.dart` |
+| `lib/models/*.dart` | `lib/shared/models/*.dart` |
+| `lib/service/*.dart` | `lib/shared/services/*.dart` |
+| `lib/utils/app_colors.dart` (barrel) | `lib/core/theme/app_colors.dart` |
+| `lib/widgets/design_system.dart` (barrel) | `lib/shared/widgets/ui_kit.dart` |
+| Routes déclarées dans `main.dart` | `lib/core/router/app_router.dart` |
+
+### c. Routage SaaS
+
+`AppRouter` centralise les routes nommées et les filtre par
+`SaaSModuleManager` : un module désactivé à chaud n'est plus routable. Les deux
+routes historiques (`/` et `/login`) gardent exactement les mêmes builders ;
+les routes des modules à arguments (`/store`, `/history`, `/orders`, `/stock`,
+`/expenses`, `/withdrawals`, `/reports`, `/subscription`, `/stores`) sont
+résolues via `onGenerateRoute` et des classes d'arguments typées
+(`route_arguments.dart`). `SaaSModule.catalog` reste non routable : la grille
+de catégories n'a pas d'écran autonome (elle vit dans l'onglet inventaire).
+
+### d. Purge
+
+Tous les shims de compatibilité ont été supprimés une fois les imports
+re-pointés : `lib/screens/` (17 fichiers), `lib/widgets/` (19 fichiers),
+`lib/utils/app_colors.dart`. Les tests (`test/widget_test.dart`,
+`test/withdrawal_form_test.dart`) pointent désormais vers les modules.
+
+### e. Vérifications
+
+Le SDK Flutter n'étant pas disponible dans l'environnement de travail, la
+vérification repose sur un audit statique (équilibrage des délimiteurs,
+résolution de tous les imports, symboles utilisés non importés, doublons de
+classes publiques, ponctuation Unicode, `TODO` résiduels) : **174 fichiers,
+0 erreur**.
+
